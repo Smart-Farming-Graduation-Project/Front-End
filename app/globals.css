@@ -1,0 +1,82 @@
+@import url("https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=Manrope:wght@200..800&family=Raleway:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --green: #228b22;
+  --yellow: #eec044;
+  --gray: #334155;
+  --black: #0f172a;
+  --white: #ffffff;
+  --hover-button: ##41a23d;
+  --light-green-section: #ecffe8;
+  --light-yellow-section: ##f8f7f0;
+  --light-oil-section: ##f8f7f0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  font-family: "Roboto", sans-serif;
+}
+ul {
+  list-style: none;
+}
+a {
+  text-decoration: none;
+}
+*:focus {
+  outline: none;
+}
+h1,
+h2,
+h3,
+h4 {
+  font-family: "Raleway", sans-serif;
+  color: var(--black);
+}
+h1 {
+  font-size: 2em;
+  font-weight: bold;
+}
+h2 {
+  font-size: 1.5em;
+  font-weight: semi-bold;
+}
+h3 {
+  font-size: 1.17em;
+  font-weight: semi-bold;
+}
+p {
+  color: var(--gray);
+}
+.main-paragraph {
+  font-family: "Covered By Your Grace", sans-serif;
+  color: var(--yellow);
+}
+.breadcrumb-text {
+  font-family: "Manrope", sans-serif;
+  text-transform: uppercase;
+}
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .container {
+    @apply mx-auto px-[15px];
+  }
+}
