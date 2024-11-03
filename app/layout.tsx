@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
-
+import { MobileHandlerProvider } from "./utils/contexts/MobileHandler";
 
 export const metadata: Metadata = {
   title: "CropPilot",
@@ -20,9 +20,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Header />
-        {children}
-        <Footer />
+        <MobileHandlerProvider>
+          <Header />
+          {children}
+          <Footer />
+        </MobileHandlerProvider>
       </body>
     </html>
   );

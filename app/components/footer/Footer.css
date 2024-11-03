@@ -1,9 +1,24 @@
-footer{
-  background-color: #333;
-  color: white;
-  padding: 10px;
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 10px;
+footer .foot h3 {
+  position: relative;
+}
+/* make grooup for common */
+footer .foot h3::before,
+footer .foot h3::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  height: 3px;
+  background-color: var(--green);
+}
+footer .foot h3::before {
+  left: 0;
+  width: 50px;
+  border-radius: 8px;
+}
+/* i need after be an dot */
+footer .foot h3::after {
+  left: 58px;
+  height: 4px;
+  width: 4px;
+  border-radius: 50%;
 }
