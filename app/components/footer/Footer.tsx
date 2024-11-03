@@ -11,7 +11,7 @@ const Footer = () => {
   type Link = {
     name: string;
     url: string;
-  };
+  }; 
   const links: Link[] = [
     { name: "Home", url: "/" },
     { name: "Shop", url: "/shop" },
