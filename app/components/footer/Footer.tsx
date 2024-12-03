@@ -32,7 +32,7 @@ const Footer = () => {
             <h3 className="text-2xl font-bold text-white mb-6">Explore</h3>
             <ul>
               {links.map((link, index) => (
-                <li key={index} className="py-2 flex gap-2 items-center text-sm">
+                <li key={index} className="py-2 flex gap-2 items-center text-sm ease hover:text-white">
                   <FaLeaf />
                   <Link href={link.url}>{link.name}</Link>
                 </li>

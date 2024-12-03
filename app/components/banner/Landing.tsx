@@ -13,7 +13,7 @@ const Landing = () => {
       </div>
       <div className="relative mt-5 flex items-center gap-6 flex-col sm:flex-row">
         <Button className="font-normal text-xl py-6 px-6">
-          <Link href="/shop">Shop Now</Link>
+          <Link href="/signIn">Join Now</Link>
         </Button>
         <Link href="/community">
           <BorderButton>
