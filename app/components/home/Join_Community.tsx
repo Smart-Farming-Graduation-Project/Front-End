@@ -12,7 +12,7 @@ const Join_Community = () => {
         <div className="w-full md:w-[50%] px-[15px] order-1 md:order-2 flex flex-col justify-center p-6">
           <div className="info mb-[40px]">
             <h3 className="text-green">Become a Part of Our Growing Family</h3>
-            <h2 className="text-[3rem] leading-[55px] mb-6 text-white">Join the CropPilot Community</h2>
+            <h2 className="text-[3rem] leading-[55px] mb-6 text-white">Join the CropGuard Community</h2>
             <p className="max-w-[512px] text-[#d1d5db]">Connect with other farmers, share tips, and grow smarter together.</p>
           </div>
           <div className="mt-5 flex items-center gap-6">

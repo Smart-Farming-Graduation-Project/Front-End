@@ -75,7 +75,7 @@ const Navbar = () => {
         {/* start user & sign in */}
         <div className="hidden md:flex items-center justify-end gap-3">
           <BorderButton>
-            <Link href="/sign-in">Sign In</Link>
+            <Link href="/signin">Sign In</Link>
             <FaArrowRightLong />
           </BorderButton>
         </div>

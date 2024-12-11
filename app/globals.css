@@ -61,10 +61,12 @@ p {
 .main-paragraph {
   font-family: "Covered By Your Grace", sans-serif;
   color: var(--yellow);
+  font-size: 2em;
 }
 .breadcrumb-text {
   font-family: "Manrope", sans-serif;
   text-transform: uppercase;
+  letter-spacing: 2px;
 }
 .ease{
   transition: all 0.3s ease;

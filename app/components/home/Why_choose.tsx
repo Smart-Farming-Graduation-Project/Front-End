@@ -16,7 +16,7 @@ const Why_choose = () => {
       <div className="container flex gap-6 md:gap-8 flex-col justify-center md:justify-between lg:flex-row lg:items-center">
         <div className="w-full lg:w-[50%]">
           <div className="info mb-[40px]">
-            <h2 className="text-[3rem]">Why Choose CropPilot?</h2>
+            <h2 className="text-[3rem]">Why Choose CropGuard?</h2>
             <p className=" max-w-[512px]">We connect you with the freshest produce and innovative farming equipment to support sustainable agriculture.</p>
           </div>
           <hr />

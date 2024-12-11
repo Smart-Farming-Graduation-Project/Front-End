@@ -11,7 +11,7 @@ const Footer = () => {
   type Link = {
     name: string;
     url: string;
-  }; 
+  };
   const links: Link[] = [
     { name: "Home", url: "/" },
     { name: "Shop", url: "/shop" },
@@ -25,7 +25,7 @@ const Footer = () => {
       <div className="container">
         <div className="grid gap-8 grid-cols-2 md:grid-cols-3 text-white/60 ">
           <div className="foot col-span-3 md:col-span-1">
-            <Image src={logo} alt="cropPilot" width={140} className={`mx-auto md:mx-0`} />
+            <Image src={logo} alt="CropGuard" width={140} className={`mx-auto md:mx-0`} />
             <p className="mt-2 text-sm text-white/60 text-center md:text-left">There are many variations of passages of lorem ipsum avilable, but the majority suffered.</p>
           </div>
           <div className="foot col-span-1">
@@ -33,7 +33,7 @@ const Footer = () => {
             <ul>
               {links.map((link, index) => (
                 <li key={index} className="py-2 flex gap-2 items-center text-sm ease hover:text-white">
-                  <FaLeaf />
+                  <FaLeaf className="text-yellow" />
                   <Link href={link.url}>{link.name}</Link>
                 </li>
               ))}
@@ -43,24 +43,26 @@ const Footer = () => {
             <h3 className="text-2xl font-bold text-white mb-6">Contact</h3>
             <div>
               <div className="flex items-center gap-2 py-2">
-                <MdCall />
+                <MdCall className="text-yellow" />
                 <span className=" text-sm">123 456 7890</span>
               </div>
-              <div className="flex items-center gap-2 py-2">
-                <MdEmail />
-                <a href="mailto:cropPilot@gmail.com" className=" text-sm">
-                  cropPilot@gmail.com
-                </a>
+              <div className="flex items-center gap-2 py-2 flex-wrap">
+                <MdEmail className="text-yellow" />
+                <div className="text-sm">
+                  <a href="mailto:CropGuard@gmail.com" className="break-all">
+                    CropGuard@gmail.com
+                  </a>
+                </div>
               </div>
               <div className="flex items-center gap-2 py-2">
-                <IoLocationSharp />
+                <IoLocationSharp className="text-yellow" />
                 <span className=" text-sm">Zagazig University, Egypt</span>
               </div>
             </div>
           </div>
         </div>
         <div className="mt-8 text-center">
-          <p className="text-white/60">&copy; 2025 All Rights Reserved CropPilot</p>
+          <p className="text-white/60">&copy; 2025 All Rights Reserved CropGuard</p>
         </div>
       </div>
     </footer>
