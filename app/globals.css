@@ -11,8 +11,8 @@
   --white: #ffffff;
   --hover-button: #41a23d;
   --light-green-section: #ecffe8;
-  --light-yellow-section: ##f8f7f0;
-  --light-oil-section: ##f8f7f0;
+  --light-yellow-section: #f8f7f0;
+  --light-blue-section: #e8eff0;
 }
 
 * {
@@ -63,12 +63,17 @@ p {
   color: var(--yellow);
   font-size: 2em;
 }
+.main-heading {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-family: "Raleway", sans-serif;
+}
 .breadcrumb-text {
   font-family: "Manrope", sans-serif;
   text-transform: uppercase;
   letter-spacing: 2px;
 }
-.ease{
+.ease {
   transition: all 0.3s ease;
 }
 .p-sec {

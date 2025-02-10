@@ -1,0 +1,23 @@
+.center-flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nav-icons > a {
+  @apply center-flex text-[22px] rounded-full w-[40px] h-[40px] relative cursor-pointer;
+  color: white;
+  transition: 0.3s all ease-in-out;
+}
+.nav-icons > a:hover {
+  background-color: #41a23d;
+}
+.nav-icons a span {
+  @apply center-flex rounded-full w-[16px] h-[16px] absolute;
+  background: #41a23d;
+  padding-top: 2px;
+  padding-left: 1px;
+  font-size: 12px;
+  top: 2px;
+  right: 0px;
+  font-weight: 600;
+}

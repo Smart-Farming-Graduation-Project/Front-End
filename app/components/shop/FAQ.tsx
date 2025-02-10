@@ -8,11 +8,11 @@ const FAQ = () => {
       <div className="container flex items-center gap-10 flex-wrap md:flex-nowrap">
         {/* Image Section */}
         <div className="w-full md:w-[50%] h-[300px] md:h-[600px] overflow-hidden">
-          <Image src={faq} alt="FAQ" className="w-full h-full object-cover rounded-2xl" />
+          <Image src={faq} alt="FAQ" className="w-full h-full object-cover rounded-2xl select-none" />
         </div>
         {/* FAQ Section */}
-        <div className="frequency-asked p-sec w-full md:w-[50%]">
-          <h2 className="text-xl sm:text-3xl md:text-4xl mb-6">Frequently Asked Questions</h2>
+        <div className="frequency-asked p-sec w-full md:w-[50%] select-none">
+          <h2 className="text-xl sm:text-3xl md:text-4xl mb-6 select-none">Frequently Asked Questions</h2>
           {/* FAQS */}
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1" className="p-4">

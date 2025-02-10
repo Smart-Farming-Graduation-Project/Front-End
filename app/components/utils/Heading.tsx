@@ -8,8 +8,8 @@ type Props = {
 const Heading = ({ heading, paragraph }: Props) => {
   return (
     <div className="text-center">
-      <p className="main-paragraph mb-[-30px]">{paragraph}</p>
-      <h1 className="">{heading}</h1>
+      <h2 className="main-heading text-[2rem] md:text-[3rem]">{heading}</h2>
+      <p className="main-paragraph  mt-[-35px] mb-10">{paragraph}</p>
     </div>
   );
 };

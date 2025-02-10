@@ -7,8 +7,18 @@ import { IoIosMenu } from "react-icons/io";
 import { IoCloseSharp } from "react-icons/io5";
 import BorderButton from "../utils/BorderButton";
 import { FaArrowRightLong } from "react-icons/fa6";
+import { HiOutlineShoppingCart } from "react-icons/hi";
+import { FaHeart } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { Product } from "@/app/utils/types/app";
+import "./Navbar.css";
+import { RootState } from "../../utils/redux/store/store";
 
 const Navbar = () => {
+  const dispatch = useDispatch();
+  const carts = useSelector((state: RootState) => state.carts.carts);
+  const wishList = useSelector((state: RootState) => state.wishList.wishList);
+
   type Link = {
     name: string;
     url: string;
@@ -24,7 +34,6 @@ const Navbar = () => {
   const { isMobile } = useMobileContext();
 
   return (
-    // i recommend to make menu in middle and (icon, sign in / photo) right
     <div className="flex md:items-center md:flex-1">
       {/* Mobile */}
       {isMobile && (
@@ -40,14 +49,20 @@ const Navbar = () => {
                   ))}
                 </ul>
               </nav>
-              {/* start user & sign in */}
-              <div className="flex items-center justify-center gap-3">
+              <div className="flex items-center justify-center gap-3 flex-col">
+                <Link href="/wishlist" className="flex items-center gap-2  text-white">
+                  <FaHeart /> Wishlist
+                </Link>
+                <Link href="/cart" className="flex items-center gap-2 text-white">
+                  <HiOutlineShoppingCart /> Cart
+                </Link>
                 <button
                   className="w-fit px-[20px] group text-[14px] whitespace-nowrap font-normal text-white flex gap-2 items-center rounded-full border border-white bg-white/0 hover:bg-white/10 hover:transition-all hover:duration-300"
                   style={{ height: "35px" }}>
                   <Link href="/sign-in">Sign In</Link>
                 </button>
               </div>
+              {/* start user & sign in */}
               {/* end user & sign in */}
             </div>
           )}
@@ -73,7 +88,15 @@ const Navbar = () => {
           </ul>
         </nav>
         {/* start user & sign in */}
-        <div className="hidden md:flex items-center justify-end gap-3">
+        <div className="nav-icons hidden md:flex items-center justify-end gap-3">
+          <Link href="/wishlist">
+            <span>{wishList.length ? wishList.length : 0}</span>
+            <FaHeart />
+          </Link>
+          <Link href="/cart">
+            <span>{carts.length ? carts.length : 0}</span>
+            <HiOutlineShoppingCart />
+          </Link>
           <BorderButton>
             <Link href="/signin">Sign In</Link>
             <FaArrowRightLong />
