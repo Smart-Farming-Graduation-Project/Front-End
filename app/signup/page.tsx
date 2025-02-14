@@ -14,6 +14,7 @@ export default function SignUp() {
   const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle sign-up logic here
+    
   };
 
   return (
@@ -21,7 +22,7 @@ export default function SignUp() {
       <div className="relative mb-4">
         <h1 className="text-white text-4xl md:text-6xl text-center mb-2">Welcome To CropGuard</h1>
         <p className="text-white text-center">Protecting Your Crops, Securing Your Future</p>
-      </div>
+      </div>  
       <div className="form-container relative bg-white p-8 rounded-lg shadow-md w-[400px] m-4">
         <h1 className="text-4xl font-bold mb-4 text-center text-green">Sign Up</h1>
         <p className="mb-4 text-center">Create a new account</p>
