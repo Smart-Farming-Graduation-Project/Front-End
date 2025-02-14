@@ -12,7 +12,7 @@ const config: Config = {
         black: "#0f172a",
         white: "#ffffff",
         "hover-button": "#41a23d",
-        "light-green-section": "#ecffe8",
+        "light-green-section": "rgba(236, 255, 232, 0.479)",
         "light-yellow-section": "#f8f7f0",
         "light-blue-section": "#e8eff0",
         background: "hsl(var(--background))",

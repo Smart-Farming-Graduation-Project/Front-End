@@ -6,6 +6,7 @@ import Card from "@/app/components/utils/Card";
 import { Product } from "@/app/utils/types/app";
 import React, { useEffect, useMemo, useState } from "react";
 import SearchBarCategory from "./SearchCategory";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 
 const Category = () => {
   const products: Product[] = useMemo(
@@ -108,7 +109,7 @@ const Category = () => {
       <div className="container p-sec">
         <SearchBarCategory searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
-        <div className="wishlist-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="category-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {currentProducts.length > 0 ? currentProducts.map((product) => <Card key={product.id} product={product} />) : <p className="text-center text-gray-600 col-span-full">No items match your search.</p>}
         </div>
 
@@ -117,7 +118,7 @@ const Category = () => {
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
             className="pagination-btn text-xl text-gray-700 p-2 w-10 h-10 flex items-center justify-center border border-gray-300 rounded-md hover:bg-gray-200">
-            &lt;
+            <FaArrowLeft />
           </button>
           <span className="text-lg">
             {currentPage} of {totalPages}
@@ -126,7 +127,7 @@ const Category = () => {
             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
             className="pagination-btn text-xl text-gray-700 p-2 w-10 h-10 flex items-center justify-center border border-gray-300 rounded-md hover:bg-gray-200">
-            &gt;
+            <FaArrowRight />
           </button>
         </div>
       </div>

@@ -7,7 +7,7 @@ interface Props {
   crumb: StaticImageData;
 }
 const Crumb = ({ crumb }: Props) => {
-  const pathname = usePathname().slice(1).replaceAll("/", " - ");
+  const pathname = usePathname().slice(1).replaceAll("/", " - ").split(" ").slice(0, 3).join(" ");
 
   return (
     <div className="crumb relative ">

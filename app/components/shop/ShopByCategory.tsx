@@ -5,7 +5,7 @@ import Heading from "../utils/Heading";
 import Link from "next/link";
 const ShopByCategory = () => {
   return (
-    <div className="shop-by-category p-sec">
+    <div className="shop-by-category p-sec" id="categoryId">
       <div className="container">
         <Heading heading="Shop By Category" paragraph=" Discover the best products, straight from the farm to your home." />
         <div className="category-container">

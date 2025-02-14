@@ -39,7 +39,7 @@ const Page = () => {
             <p className="text-lg text-center text-gray-600 mb-8">{wishList.length > 0 ? `You have ${wishList.length} items in your wishlist.` : "Your wishlist is currently empty."}</p>
             <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
-            <div className="wishlist-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="wishlist-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-8">
               {filteredWishlist.length > 0 ? filteredWishlist.map((product) => <Card key={product.id} product={product} />) : <p className="text-center text-gray-600 col-span-full">No items match your search.</p>}
             </div>
           </>

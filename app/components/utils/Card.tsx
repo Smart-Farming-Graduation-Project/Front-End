@@ -13,6 +13,7 @@ import { usePathname } from "next/navigation";
 import "./Card.css";
 import { FaBagShopping, FaRegHeart } from "react-icons/fa6";
 import { IoIosClose } from "react-icons/io";
+import { useRouter } from "next/navigation";
 
 type CardProps = {
   product: Product;
@@ -22,12 +23,19 @@ const Card = ({ product }: CardProps) => {
   const { wishList } = useSelector((state: { wishList: { wishList: Product[] } }) => state.wishList);
   const dispatch = useDispatch();
   const pathName = usePathname();
+  const router = useRouter();
   const currentPageName = pathName?.split("/").pop();
   const initialFav = wishList.some((prod) => prod.id === product.id) || false;
   const [isfav, setIsfav] = useState<boolean>(initialFav);
   console.log("currentPageName", isfav);
+  const trucnkString = (str: string, num: number) => {
+    if (str.length > num) return str.slice(0, num) + "...";
+    return str;
+  };
   return (
-    <div className="card h-[470px] bg-white border border-[#f5f5f5dc] rounded-xl p-3 relative cursor-pointer flex items-center justify-center flex-col overflow-hidden ease duration-300 hover:shadow-sm">
+    <div
+      className="card h-[470px] bg-white border border-[#f5f5f5dc] rounded-xl p-3 relative cursor-pointer flex items-center justify-center flex-col overflow-hidden ease duration-300 hover:shadow-sm"
+      onClick={() => router.push(`/shop/category/${product.id}`)}>
       {currentPageName !== "wishlist" ? (
         !isfav ? (
           <div
@@ -70,7 +78,7 @@ const Card = ({ product }: CardProps) => {
       {/* Product Info */}
       <div className="card-info py-5 text-center">
         <h4 className="text-lg font-bold">{product.name}</h4>
-        <p className="">{product.description}</p>
+        <p className="">{trucnkString(product.description, 150)}</p>
         <span className="flex items-center gap-2 text-xl justify-center my-2">
           <FaStar className="text-[#FFD700]" />
           <span>4.5</span>

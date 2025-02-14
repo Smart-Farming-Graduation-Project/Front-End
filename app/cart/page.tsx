@@ -22,7 +22,7 @@ const Page = () => {
     .toFixed(2);
 
   return (
-    <div className="cart p-4 relative">
+    <div className="cart relative">
       <Crumb crumb={img_about} />
       <div className="container">
         {carts.length > 0 ? (
@@ -45,7 +45,7 @@ const Page = () => {
           </div>
         )}
         <div className=" flex justify-center">
-          <Button className="font-normal text-xl py-6 px-6">
+          <Button className="font-normal text-xl py-6 px-6 mb-6">
             <Link href="/shop" className="mx-auto">
               Return To Shop
             </Link>

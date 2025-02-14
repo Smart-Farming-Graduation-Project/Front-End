@@ -22,9 +22,9 @@ const Discover = () => {
             <p className="w-full text-[#d1d5db]">Welcome to CropGuard! Dive into our selection of the freshest fruits and vegetables, straight from local farms to your table.</p>{" "}
             <div className="relative mt-5 flex items-center gap-3 pb-6 justify-center md:justify-start">
               <Button className="font-normal text-xl py-6 px-6">
-                <Link href="/shop">Shop Now</Link>
+                <Link href="#categoryId"> Shop Now</Link>
               </Button>
-              <Link href="/">
+              <Link href="/shop">
                 <div className="text-white flex items-center gap-2">
                   Learn More
                   <FaArrowRightLong />
