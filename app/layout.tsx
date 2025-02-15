@@ -31,7 +31,7 @@ export default function RootLayout({
       <html lang="en">
         <body>
           <MobileHandlerProvider>
-            {!shouldHide && <Header />}
+            <Header />
             {children}
             {!shouldHide && <Footer />}
           </MobileHandlerProvider>

@@ -1,4 +1,4 @@
-.signin {
+.landing-auth {
   position: relative;
   background-image: url("../assets/images/landing.jpeg");
   background-repeat: no-repeat;
@@ -11,7 +11,7 @@
   object-fit: cover;
   flex-direction: column;
 }
-.signin::before {
+.landing-auth::before {
   content: "";
   position: absolute;
   top: 0;
