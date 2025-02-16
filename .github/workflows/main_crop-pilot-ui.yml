@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js app to Azure Web App - Crop-Pilot-UI
+name: Build and deploy Next.js app to Azure Web App - Crop-Pilot-UI
 
 on:
   push:
@@ -9,28 +9,31 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  AZURE_APP_NAME: "Crop-Pilot-UI"
+
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read # Required for actions/checkout
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js version
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20.x'
+          node-version: "20.x"
 
-      - name: npm install, build, and test
+      - name: Install dependencies, build, and test
         run: |
           npm install
           npm run build --if-present
           npm run test --if-present
 
       - name: Archive build artifact
-        run: tar -czf build.tar.gz build
+        run: tar -czf build.tar.gz .next/standalone .next/static public
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -42,33 +45,32 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'Production'
+      name: "Production"
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
-    
+      id-token: write # Required for requesting the JWT
+      contents: read  # Required for actions/checkout
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: build-artifact
 
-      - name: Unzip artifact for deployment
+      - name: Extract artifact for deployment
         run: tar -xzf build.tar.gz -C ./
-      
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_2398CFE3D4F246C8897CF76CE8C9D55F }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_BA49F254C57B428F97B40637ECC84A76 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_924DED2EE0B84CCCBE30B90A05A35822 }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: 'Deploy to Azure Web App'
+      - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'Crop-Pilot-UI'
-          slot-name: 'Production'
-          package: ./build
-          
+          app-name: ${{ env.AZURE_APP_NAME }}
+          slot-name: "Production"
+          package: ./standalone
