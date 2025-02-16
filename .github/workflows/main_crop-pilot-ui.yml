@@ -28,15 +28,14 @@ jobs:
           npm install
           npm run build --if-present
           npm run test --if-present
+      - name: Zip artifact for deployment
+        run: zip release.zip ./* -r
 
-      - name: Archive build artifact
-        run: tar -czf build.tar.gz build
-
-      - name: Upload build artifact
+      - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifact
-          path: build.tar.gz
+          name: node-app
+          path: release.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -47,15 +46,14 @@ jobs:
     permissions:
       id-token: write #This is required for requesting the JWT
       contents: read #This is required for actions/checkout
-    
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: build-artifact
+          name: node-app
 
       - name: Unzip artifact for deployment
-        run: tar -xzf build.tar.gz -C ./
+        run: unzip release.zip
       
       - name: Login to Azure
         uses: azure/login@v2
@@ -70,5 +68,4 @@ jobs:
         with:
           app-name: 'Crop-Pilot-UI'
           slot-name: 'Production'
-          package: ./build
-          
+          package: .
