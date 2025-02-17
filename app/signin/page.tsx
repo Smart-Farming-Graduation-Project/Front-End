@@ -6,26 +6,51 @@ import { useState } from "react";
 import Link from "next/link";
 import "./signin.css";
 import { IoIosLock, IoMdMail } from "react-icons/io";
-import { FcGoogle } from "react-icons/fc"; // أيقونة Google
-import { FaFacebook } from "react-icons/fa"; // أيقونة Facebook
+import { FcGoogle } from "react-icons/fc";
+import { FaFacebook } from "react-icons/fa";
+import { loginUser, loginWithThirdParty } from "../utils/api/Auth";
+import { useRouter } from "next/navigation";
+import { auth, facebookProvider, googleProvider, signInWithPopup } from "../utils/api/firebase";
 
 export default function SignIn() {
-  const [email, setEmail] = useState("");
+  const [userNameOrEmail, setUserNameOrEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const handleSignIn = (e: React.FormEvent) => {
+  const [error, setError] = useState<{ message: string | null } | null>(null);
+  const router = useRouter();
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle sign-in logic here
-  };
+    setError(null);
 
-  const handleGoogleSignIn = () => {
-    // Handle Google sign-in logic here
-    console.log("Signing in with Google");
+    try {
+      const data = await loginUser({
+        userNameOrEmail,
+        password,
+      });
+      // Navigate to home/dashboard based on the token received
+      router.push("/");
+      console.log("Login Successful:", data);
+    } catch (apiErrors) {
+      console.error("Registration Failed:", apiErrors);
+      setError(apiErrors as { message: string });
+    }
   };
+  const handleThirdPartyLogin = async (provider: "google" | "facebook") => {
+    try {
+      let result;
+      if (provider === "google") {
+        result = await signInWithPopup(auth, googleProvider);
+      } else {
+        result = await signInWithPopup(auth, facebookProvider);
+      }
 
-  const handleFacebookSignIn = () => {
-    // Handle Facebook sign-in logic here
-    console.log("Signing in with Facebook");
+      const idToken = await result.user.getIdToken();
+      const response = await loginWithThirdParty(provider, idToken);
+
+      console.log(`${provider} Sign-In Successful:`, response);
+      router.push("/dashboard");
+    } catch (error) {
+      console.error(`${provider} Sign-In Failed:`, error);
+    }
   };
 
   return (
@@ -34,21 +59,23 @@ export default function SignIn() {
         <h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-2">Welcome To CropGuard</h1>
         <p className="text-white text-sm sm:text-base md:text-lg">Protecting Your Crops, Securing Your Future</p>
       </div>
-      <div className="form-container relative bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md w-[90%] sm:w-[80%] md:w-[400px]">
+      <div className="form-container relative bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-mdw-[90%] sm:w-[80%] md:w-[600px]">
         <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center text-green">Sign In</h1>
         <p className="mb-4 text-center text-sm sm:text-base text-gray-600">Enter your email to login your account</p>
+        {error && error.message !== "" && <p className="text-sm text-red-500 mb-4 text-center bg-[#ff232325] py-2 rounded-md">{error.message}</p>}
+
         <form onSubmit={handleSignIn}>
           {/* Email Field */}
-          <div className="grid w-full max-w-sm items-center gap-1.5 mb-4">
+          <div className="grid items-center gap-1.5 mb-4">
             <Label htmlFor="email">Email</Label>
             <div className="relative">
               <IoMdMail className="absolute left-2 top-1/2 transform -translate-y-1/2 text-green" size={18} />
-              <Input type="email" id="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="pl-8 py-[20px]" required />
+              <Input type="email" id="email" placeholder="Email" value={userNameOrEmail} onChange={(e) => setUserNameOrEmail(e.target.value)} className="pl-8 py-[20px]" required />
             </div>
           </div>
 
           {/* Password Field */}
-          <div className="grid w-full max-w-sm items-center gap-1.5 mb-4">
+          <div className="grid items-center gap-1.5 mb-4">
             <Label htmlFor="password">Password</Label>
             <div className="relative">
               <IoIosLock className="absolute left-2 top-1/2 transform -translate-y-1/2 text-green" size={18} />
@@ -70,11 +97,11 @@ export default function SignIn() {
 
           {/* Third-Party Sign In Buttons */}
           <div className="flex flex-col gap-2 mb-4">
-            <Button variant="outline" className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]" onClick={handleGoogleSignIn}>
+            <Button variant="outline" className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]" onClick={() => handleThirdPartyLogin("google")}>
               <FcGoogle size={20} />
               <span>Sign in with Google</span>
             </Button>
-            <Button variant="outline" className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]" onClick={handleFacebookSignIn}>
+            <Button variant="outline" className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]" onClick={() => handleThirdPartyLogin("facebook")}>
               <FaFacebook className="text-blue-600" size={20} />
               <span>Sign in with Facebook</span>
             </Button>

@@ -59,7 +59,7 @@ const Navbar = () => {
                 <button
                   className="w-fit px-[20px] group text-[14px] whitespace-nowrap font-normal text-white flex gap-2 items-center rounded-full border border-white bg-white/0 hover:bg-white/10 hover:transition-all hover:duration-300"
                   style={{ height: "35px" }}>
-                  <Link href="/sign-in">Sign In</Link>
+                  <Link href="/signin">Sign In</Link>
                 </button>
               </div>
               {/* start user & sign in */}
