@@ -1,27 +1,29 @@
 "use client";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
 import Link from "next/link";
 import "../signin/signin.css";
 import { IoIosLock } from "react-icons/io";
 import { resetPassword } from "../utils/api/Auth";
-import { useSearchParams } from "next/navigation";
 
-export default function ResetPassword() {
+function ResetPasswordForm() {
+  const searchParams = useSearchParams();
+  const email = searchParams.get("email");
+  const token = searchParams.get("token"); 
+
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isPasswordReset, setIsPasswordReset] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [error, setError] = useState<{ message: string | null } | null>(null);
-  const searchParams = useSearchParams();
-  const email = searchParams.get("email");
-  const token = searchParams.get("token");
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
     if (newPassword !== confirmPassword) {
       setPasswordError("Passwords do not match");
       return;
@@ -52,7 +54,7 @@ export default function ResetPassword() {
         <h1 className="text-3xl font-bold mb-4 text-center text-green">Reset Password</h1>
         {isPasswordReset ? (
           <div className="text-center">
-            <p className="mb-4 text-green-600">Password has reseted successfully!</p>
+            <p className="mb-4 text-green-600">Password has been reset successfully!</p>
             <Link href="/signin">
               <Button className="w-full py-[20px] bg-green hover:bg-green-700">Go to Login</Button>
             </Link>
@@ -97,5 +99,13 @@ export default function ResetPassword() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ResetPassword() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
