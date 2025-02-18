@@ -25,7 +25,7 @@ export default function SignUp() {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [error, setError] = useState<{ Message: string | null } | null>(null);
+  const [error, setError] = useState<{ message: string | null } | null>(null);
   const [emailSent, setEmailSent] = useState(false);
   const router = useRouter();
 
@@ -61,7 +61,7 @@ export default function SignUp() {
       setEmailSent(true);
     } catch (apiErrors) {
       console.error("Registration Failed:", apiErrors);
-      setError(apiErrors as { Message: string });
+      setError(apiErrors as { message: string });
     }
   };
   const handleThirdPartySignUp = async (provider: "google" | "facebook") => {
@@ -106,7 +106,7 @@ export default function SignUp() {
           <>
             <h1 className="text-3xl font-bold mb-4 text-center text-green">Sign Up</h1>
             <p className="mb-4 text-center">Create a new account</p>
-            {error && error.Message !== "" && <p className="text-sm text-red-500 mb-4 text-center bg-[#ff232325] py-2 rounded-md">{error.Message}</p>}
+            {error && error.message?.trim() !== "" && <p className="text-sm text-red-500 mb-4 text-center bg-[#ff232325] py-2 rounded-md">{error.message}</p>}
             <form onSubmit={handleSignUp}>
               {/* First Name and Last Name in one row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">

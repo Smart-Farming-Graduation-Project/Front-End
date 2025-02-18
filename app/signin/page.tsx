@@ -62,7 +62,7 @@ export default function SignIn() {
       <div className="form-container relative bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-mdw-[90%] sm:w-[80%] md:w-[600px]">
         <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center text-green">Sign In</h1>
         <p className="mb-4 text-center text-sm sm:text-base text-gray-600">Enter your email to login your account</p>
-        {error && error.message !== "" && <p className="text-sm text-red-500 mb-4 text-center bg-[#ff232325] py-2 rounded-md">{error.message}</p>}
+        {error && error.message?.trim() !== "" && <p className="text-sm text-red-500 mb-4 text-center bg-[#ff232325] py-2 rounded-md">{error.message}</p>}
 
         <form onSubmit={handleSignIn}>
           {/* Email Field */}

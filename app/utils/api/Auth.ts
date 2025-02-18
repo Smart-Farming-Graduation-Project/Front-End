@@ -74,7 +74,20 @@ export const confirmEmail = async (email: string, token: string) => {
     throw [{ Message: "An unexpected error occurred." }];
   }
 };
-
+export const resendConfirmationEmail = async (email: string) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/Authentication/resend-email-confirmation`, {
+      email,
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("Error resending confirmation email:", error.response?.data);
+      throw error.response?.data || [{ Message: "An unexpected error occurred." }];
+    }
+    throw [{ Message: "An unexpected error occurred." }];
+  }
+};
 export const registerWithThirdParty = async (provider: "google" | "facebook", idToken: string) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/Authentication/register-with-third-party`, {
