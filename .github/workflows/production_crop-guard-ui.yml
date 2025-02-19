@@ -51,9 +51,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_90F8929C4F40415BA30A050F601070DD }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_11799822ABCF4A15BA20B5FBB1BA5F1D }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C259D8C44EC04D3AABC00D48C9DF0BFD }}
   
       - name: Upload ZIP to Azure Storage
         run: |
