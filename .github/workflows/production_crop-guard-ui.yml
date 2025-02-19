@@ -39,37 +39,29 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write
-      contents: read
-  
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: node-app
-  
+
+      - name: Unzip artifact for deployment
+        run: unzip release.zip
+      
       - name: Login to Azure
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_90F8929C4F40415BA30A050F601070DD }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_11799822ABCF4A15BA20B5FBB1BA5F1D }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C259D8C44EC04D3AABC00D48C9DF0BFD }}
-  
-      - name: Upload ZIP to Azure Storage
-        run: |
-          az storage blob upload --account-name ${{ secrets.STORAGE_ACCOUNT_NAME }} \
-            --container-name ${{ secrets.STORAGE_CONTAINER_NAME }} \
-            --name crop-guard-ui.zip \
-            --file release.zip \
-            --auth-mode key
-  
-      - name: Get ZIP URL
-        run: |
-          echo "ZIP_URL=https://${{ secrets.STORAGE_ACCOUNT_NAME }}.blob.core.windows.net/${{ secrets.STORAGE_CONTAINER_NAME }}/crop-guard-ui.zip" >> $GITHUB_ENV
-  
-      - name: Deploy using Run From Package
+
+      - name: 'Deploy to Azure Web App'
+        id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'Crop-Guard-UI'
           slot-name: 'Production'
-          package: ${{ env.ZIP_URL }}
+          package: .
