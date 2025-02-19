@@ -46,7 +46,7 @@ export default function ForgotPassword() {
         ) : (
           <>
             <p className="mb-4 text-center">Enter your email to reset your password</p>
-            {error && error.message !== "" && <p className="text-sm text-red-500 mb-4 text-center bg-[#ff232325] py-2 rounded-md">{error.message}</p>}
+            {error && error.message?.trim() !== "" && <p className="text-sm text-red-500 mb-4 text-center bg-[#ff232325] py-2 rounded-md">{error.message}</p>}
             <form onSubmit={handleForgotPassword}>
               {/* Email Field */}
               <div className="grid items-center gap-1.5 mb-4">

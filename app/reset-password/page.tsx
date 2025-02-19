@@ -12,7 +12,7 @@ import { resetPassword } from "../utils/api/Auth";
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
-  const token = searchParams.get("token"); 
+  const token = searchParams.get("token");
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

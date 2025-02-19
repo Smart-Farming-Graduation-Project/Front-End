@@ -4,46 +4,73 @@ import "../signin/signin.css";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { confirmEmail } from "../utils/api/Auth";
+import { confirmEmail, resendConfirmationEmail } from "../utils/api/Auth";
 
 const ConfirmEmailContent = () => {
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
   const token = searchParams.get("token");
-  const [message, setMessage] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<{ message: string } | null>(null);
 
   useEffect(() => {
     const handleConfirmEmail = async () => {
       if (email && token) {
         try {
-          await confirmEmail(email as string, token as string);
-          setMessage(true);
-        } catch {
-          setMessage(false);
+          const data = await confirmEmail(email, token);
+          setMessage(data.message || "Your Email has been successfully confirmed!");
+        } catch (apiErrors) {
+          console.error("Error confirming email:", apiErrors);
+          setError(apiErrors as { message: string });
+        } finally {
+          setLoading(false);
         }
+      } else {
+        setLoading(false);
       }
     };
 
     handleConfirmEmail();
   }, [email, token]);
 
+  const handleResendConfirmationEmail = async () => {
+    if (email) {
+      try {
+        const data = await resendConfirmationEmail(email);
+        setMessage(data.message || "Confirmation email has been resent. Please check your inbox.");
+        setError(null);
+      } catch (apiErrors) {
+        console.error("Error resending confirmation email:", apiErrors);
+        setError(apiErrors as { message: string });
+      }
+    }
+  };
+
   return (
     <div className="form-container relative bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md w-[90%] sm:w-[80%] md:w-[600px]">
-      <div className="text-center">
-        {message ? (
+      <div className="text-center" aria-live="polite">
+        {loading ? (
+          <p className="text-green-600">Confirming your email, please wait...</p>
+        ) : message ? (
           <>
             <h1 className="text-3xl font-bold mb-4 text-center text-green">Congratulations</h1>
-            <p className="mb-4 text-green-600">Your Email has been successfully confirmed!</p>
+            <p className="mb-4 text-green-600">{message}</p>
             <Link href="/signin" className="text-sm text-green hover:underline">
               Back to Sign In
             </Link>
           </>
         ) : (
           <>
-            <p className="mb-4 text-green-600">Failed to confirm email. Please try again.</p>
-            <Button type="submit" className="w-full py-3 sm:py-[20px] mb-4" onClick={() => confirmEmail(email as string, token as string)}>
-              Resend Confirmation Email
-            </Button>
+            {error && <p className="mb-4 text-red-500">{error.message}</p>}
+            <Link href="/signin" className="text-sm text-green hover:underline mb-4">
+              Back to Sign In
+            </Link>
+            {error && error.message === "Invalid token. Please try again" && (
+              <Button type="submit" className="w-full py-3 sm:py-[20px] mb-4" onClick={handleResendConfirmationEmail}>
+                Resend Confirmation Email
+              </Button>
+            )}
           </>
         )}
       </div>
