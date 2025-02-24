@@ -4,6 +4,7 @@ import React from "react";
 // import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import { Navigation, Scrollbar } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+
 import Card from "../utils/Card";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -12,82 +13,29 @@ import Heading from "../utils/Heading";
 import { Product } from "@/app/utils/types/app";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 
-const LatestProducts = () => {
-  const products: Product[] = [
-    {
-      id: 1,
-      name: "Organic Apples",
-      description: "Fresh organic apples from our farm.",
-      price: 5.99,
-    },
-    {
-      id: 2,
-      name: "Organic Bananas",
-      description: "Fresh organic bananas from our farm.",
-      price: 3.99,
-    },
-    {
-      id: 3,
-      name: "Organic Oranges",
-      description: "Fresh organic oranges from our farm.",
-      price: 4.99,
-    },
-    {
-      id: 4,
-      name: "Organic Apples",
-      description: "Fresh organic apples from our farm.",
-      price: 5.99,
-    },
-    {
-      id: 5,
-      name: "Organic Bananas",
-      description: "Fresh organic bananas from our farm.",
-      price: 3.99,
-    },
-    {
-      id: 6,
-      name: "Organic Oranges",
-      description: "Fresh organic oranges from our farm.",
-      price: 4.99,
-    },
-    {
-      id: 7,
-      name: "Organic Apples",
-      description: "Fresh organic apples from our farm.",
-      price: 5.99,
-    },
-    {
-      id: 8,
-      name: "Organic Bananas",
-      description: "Fresh organic bananas from our farm.",
-      price: 3.99,
-    },
-    {
-      id: 9,
-      name: "Organic Oranges",
-      description: "Fresh organic oranges from our farm.",
-      price: 4.99,
-    },
-    {
-      id: 10,
-      name: "Organic Apples",
-      description: "Fresh organic apples from our farm.",
-      price: 5.99,
-    },
-    {
-      id: 11,
-      name: "Organic Bananas",
-      description: "Fresh organic bananas from our farm.",
-      price: 3.99,
-    },
-    {
-      id: 12,
-      name: "Organic Oranges",
-      description: "Fresh organic oranges from our farm.",
-      price: 4.99,
-    },
-  ];
+interface mostSellsProps {
+  mostSells: Product[] | null;
+}
 
+const LatestProducts: React.FC<mostSellsProps> = ({ mostSells }) => {
+  // const products: Product[] = [
+  //   {
+  //     productId: 1,
+  //     productName: "Organic Apples",
+  //     description: "Fresh organic apples from our farm.",
+  //     price: 5.99,
+  //     availability: "In Stock",
+  //     categoryName: "Fruits",
+  //     images: ["/apples.png"],
+  //   },
+  // ];
+  if (!mostSells || mostSells.length === 0) {
+    return (
+      <div className="shop-by-category p-sec text-center">
+        <p className="text-gray-600">Loading products...</p>
+      </div>
+    );
+  }
   return (
     <section className="LatestProducts p-sec bg-light-green-section">
       <Heading paragraph="Latest Products" heading="Latest Products" />
@@ -115,8 +63,8 @@ const LatestProducts = () => {
               slidesPerView: 4.5,
             },
           }}>
-          {products.map((product) => (
-            <SwiperSlide key={product.id}>
+          {mostSells.map((product) => (
+            <SwiperSlide key={product.productId}>
               <Card product={product} />
             </SwiperSlide>
           ))}

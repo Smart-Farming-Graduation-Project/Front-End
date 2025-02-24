@@ -1,14 +1,41 @@
 type Product = {
-  id: number;
-  name: string;
+  productId: number;
+  productName: string;
   description: string;
   price: number;
+  availability: string;
+  categoryName?: string;
+  images: string[];
 };
-type ProductCart = {
-  id: number;
-  name: string;
+type ProductId = {
+  productId: number;
+  productName: string;
   description: string;
   price: number;
+  availability: string;
+  categoryName?: string;
+  images: string[];
+  averageRating: number;
+};
+
+type ItemProps = {
+  id: number;
+  productId: number;
+  productName: string;
+  productPrice: number;
+  productAvailability: string;
+  productImages: string[];
+  productDescription: string;
+};
+type CartItem = ItemProps & {
   quantity: number;
 };
-export type { Product, ProductCart };
+type WishListItem = ItemProps & {
+  fav: boolean;
+};
+type CategoryType = {
+  categoryId: number;
+  categoryName: string;
+  categoryDescription: Product[];
+};
+export type { Product, CategoryType, ProductId, WishListItem, CartItem, ItemProps };

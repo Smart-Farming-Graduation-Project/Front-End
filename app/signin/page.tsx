@@ -10,8 +10,8 @@ import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { loginUser, loginWithThirdParty } from "../utils/api/Auth";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 import { auth, facebookProvider, googleProvider, signInWithPopup } from "../utils/api/firebase";
-
 export default function SignIn() {
   const [userNameOrEmail, setUserNameOrEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,8 +27,9 @@ export default function SignIn() {
         password,
       });
       // Navigate to home/dashboard based on the token received
+      console.log("Login Successful:", data.data.tokens.accessToken);
+      Cookies.set("token", data.data.tokens.accessToken);
       router.push("/");
-      console.log("Login Successful:", data);
     } catch (apiErrors) {
       console.error("Registration Failed:", apiErrors);
       setError(apiErrors as { message: string });
