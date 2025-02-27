@@ -10,8 +10,8 @@ import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { loginUser, loginWithThirdParty } from "../utils/api/Auth";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 import { auth, facebookProvider, googleProvider, signInWithPopup } from "../utils/api/firebase";
-
 export default function SignIn() {
   const [userNameOrEmail, setUserNameOrEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,8 +27,9 @@ export default function SignIn() {
         password,
       });
       // Navigate to home/dashboard based on the token received
+      // console.log("Login Successful:", data.data.tokens.accessToken);
+      Cookies.set("token", data.data.tokens.accessToken);
       router.push("/");
-      console.log("Login Successful:", data);
     } catch (apiErrors) {
       console.error("Registration Failed:", apiErrors);
       setError(apiErrors as { message: string });
@@ -59,7 +60,7 @@ export default function SignIn() {
         <h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-2">Welcome To CropGuard</h1>
         <p className="text-white text-sm sm:text-base md:text-lg">Protecting Your Crops, Securing Your Future</p>
       </div>
-      <div className="form-container relative bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-mdw-[90%] sm:w-[80%] md:w-[600px]">
+      <div className="form-container relative bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md w-[95%] md:w-[600px]">
         <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center text-green">Sign In</h1>
         <p className="mb-4 text-center text-sm sm:text-base text-gray-600">Enter your email to login your account</p>
         {error && error.message?.trim() !== "" && <p className="text-sm text-red-500 mb-4 text-center bg-[#ff232325] py-2 rounded-md">{error.message}</p>}

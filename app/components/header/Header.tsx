@@ -8,6 +8,7 @@ import Link from "next/link";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(true);
+  const [isOpenRounded, setIsOpenRounded] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,7 +24,7 @@ const Header = () => {
   }, []);
 
   return (
-    <header className={` fixed py-[8px] z-40 transition-all duration-300 ${isScrolled ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+    <header className={` fixed py-[8px] z-40 rounded-xl  ${isScrolled ? "opacity-100" : "opacity-0 pointer-events-none"} ${isOpenRounded ? "rounded-bl-none rounded-br-none" : ""}`}>
       <div className="container gap-4 flex items-center justify-between">
         {/* start logo */}
         <div className="h-full flex-shrink-0 flex items-center">
@@ -32,7 +33,7 @@ const Header = () => {
           </Link>
         </div>
         {/* end logo */}
-        <Navbar />
+        <Navbar setIsOpenRounded={setIsOpenRounded}/>
       </div>
     </header>
   );

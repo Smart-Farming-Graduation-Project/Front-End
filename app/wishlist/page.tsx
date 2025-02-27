@@ -2,30 +2,31 @@
 
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { hydrateWishListFromLocalStorage } from "../utils/redux/slices/wishListSlice";
+import { fetchWishlist } from "../utils/redux/slices/wishListSlice";
 import Card from "../components/utils/Card";
 import SearchBar from "./SearchWishList";
-import { ProductCart } from "../utils/types/app";
 import Link from "next/link";
 import Crumb from "../components/banner/Crumb";
 import img_about from "../assets/images/landing.jpeg";
 import Heading from "../components/utils/Heading";
 import { Button } from "@/components/ui/button";
+import { WishListItem } from "../utils/types/app";
+import { AppDispatch } from "../utils/redux/store/store";
 
 const Page = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
-  const { wishList } = useSelector((state: { wishList: { wishList: ProductCart[] } }) => state.wishList);
+  const { wishList } = useSelector((state: { wishList: { wishList: WishListItem[] } }) => state.wishList);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredWishlist, setFilteredWishlist] = useState<ProductCart[]>(wishList);
+  const [filteredWishlist, setFilteredWishlist] = useState<WishListItem[]>(wishList);
 
   useEffect(() => {
-    dispatch(hydrateWishListFromLocalStorage());
+    dispatch(fetchWishlist());
   }, [dispatch]);
 
   useEffect(() => {
-    const filtered = wishList.filter((product) => product.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    const filtered = wishList.filter((product) => product.productName.toLowerCase().includes(searchTerm.toLowerCase()));
     setFilteredWishlist(filtered);
   }, [searchTerm, wishList]);
 
@@ -40,7 +41,23 @@ const Page = () => {
             <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
             <div className="wishlist-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-8">
-              {filteredWishlist.length > 0 ? filteredWishlist.map((product) => <Card key={product.id} product={product} />) : <p className="text-center text-gray-600 col-span-full">No items match your search.</p>}
+              {filteredWishlist.length > 0 ? (
+                filteredWishlist.map((product) => (
+                  <Card
+                    key={product.id}
+                    product={{
+                      productId: product.productId,
+                      productName: product.productName,
+                      price: product.productPrice,
+                      availability: product.productAvailability,
+                      images: product.productImages,
+                      description: product.productDescription,
+                    }}
+                  />
+                ))
+              ) : (
+                <p className="text-center text-gray-600 col-span-full">No items match your search.</p>
+              )}
             </div>
           </>
         ) : (

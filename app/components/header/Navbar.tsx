@@ -14,7 +14,7 @@ import { Product } from "@/app/utils/types/app";
 import "./Navbar.css";
 import { RootState } from "../../utils/redux/store/store";
 
-const Navbar = () => {
+const Navbar = ({ setIsOpenRounded }: { setIsOpenRounded: (isOpen: boolean) => void }) => {
   const dispatch = useDispatch();
   const carts = useSelector((state: RootState) => state.carts.carts);
   const wishList = useSelector((state: RootState) => state.wishList.wishList);
@@ -39,7 +39,7 @@ const Navbar = () => {
       {isMobile && (
         <div className="flex items-center justify-between w-full">
           {isOpen && (
-            <div className="flex flex-col absolute top-[100%] bg-black/80 rounded-xl left-0 pb-5 gap-3 items-center w-full">
+            <div className="flex flex-col absolute top-[100%] bg-black/80 rounded-bl-xl rounded-br-xl left-0 pb-5 gap-3 items-center w-full">
               <nav>
                 <ul className="flex flex-col items-center gap-2 text-lg text-white">
                   {links.map((link, index) => (
@@ -50,16 +50,18 @@ const Navbar = () => {
                 </ul>
               </nav>
               <div className="flex items-center justify-center gap-3 flex-col">
-                <Link href="/wishlist" className="flex items-center gap-2  text-white">
+                <Link href="/wishlist" className="flex items-center gap-2  text-white" onClick={() => setIsOpen(false)}>
                   <FaHeart /> Wishlist
                 </Link>
-                <Link href="/cart" className="flex items-center gap-2 text-white">
+                <Link href="/cart" className="flex items-center gap-2 text-white" onClick={() => setIsOpen(false)}>
                   <HiOutlineShoppingCart /> Cart
                 </Link>
                 <button
-                  className="w-fit px-[20px] group text-[14px] whitespace-nowrap font-normal text-white flex gap-2 items-center rounded-full border border-white bg-white/0 hover:bg-white/10 hover:transition-all hover:duration-300"
+                  className="w-fit px-[100%] group text-[14px] whitespace-nowrap font-normal text-white flex gap-2 items-center rounded-full border border-white bg-white/0 hover:bg-white/10 hover:transition-all hover:duration-300"
                   style={{ height: "35px" }}>
-                  <Link href="/signin">Sign In</Link>
+                  <Link href="/signin" onClick={() => setIsOpen(false)}>
+                    Sign In
+                  </Link>
                 </button>
               </div>
               {/* start user & sign in */}
@@ -67,7 +69,12 @@ const Navbar = () => {
             </div>
           )}
 
-          <div className="text-white text-3xl cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
+          <div
+            className="text-white text-3xl cursor-pointer"
+            onClick={() => {
+              setIsOpen(!isOpen);
+              setIsOpenRounded(!isOpen);
+            }}>
             {isOpen ? <IoCloseSharp /> : <IoIosMenu />}
           </div>
         </div>

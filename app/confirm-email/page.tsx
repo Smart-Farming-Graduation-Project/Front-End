@@ -48,7 +48,7 @@ const ConfirmEmailContent = () => {
   };
 
   return (
-    <div className="form-container relative bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md w-[90%] sm:w-[80%] md:w-[600px]">
+    <div className="form-container relative bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md  w-[95%] md:w-[600px]">
       <div className="text-center" aria-live="polite">
         {loading ? (
           <p className="text-green-600">Confirming your email, please wait...</p>
