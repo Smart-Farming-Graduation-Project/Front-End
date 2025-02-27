@@ -38,11 +38,11 @@ export const fetchCart = createAsyncThunk<CartItem[]>("cart/fetchCart", async ()
 });
 
 // Add Product to Cart
-export const addToCartAPI = createAsyncThunk<void, Product>("cart/addToCartAPI", async (product, { dispatch }) => {
+export const addToCartAPI = createAsyncThunk<void, { product: Product; quantity?: number }>("cart/addToCartAPI", async ({ product, quantity = 1 }, { dispatch }) => {
   dispatch(addToCart(product));
   try {
     await axios.post(
-      `${API_BASE_URL}/Cart/AddProduct/${product.productId}`,
+      `${API_BASE_URL}/Cart/AddProduct/${product.productId}?quantity=${quantity}`,
       {},
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -93,24 +93,6 @@ const cartSlice = createSlice({
       state.carts = state.carts.filter((item) => item.id !== action.payload);
     },
 
-    incrementQuantity: (state, action: PayloadAction<number>) => {
-      const item = state.carts.find((item) => item.id === action.payload);
-      if (item) {
-        item.quantity += 1;
-      }
-    },
-
-    decrementQuantity: (state, action: PayloadAction<number>) => {
-      const item = state.carts.find((item) => item.id === action.payload);
-      if (item) {
-        if (item.quantity > 1) {
-          item.quantity -= 1;
-        } else {
-          state.carts = state.carts.filter((item) => item.id !== action.payload);
-        }
-      }
-    },
-
     clearCart: (state) => {
       state.carts = [];
     },
@@ -133,5 +115,5 @@ const cartSlice = createSlice({
   },
 });
 
-export const { addToCart, removeFromCart, incrementQuantity, decrementQuantity, clearCart } = cartSlice.actions;
+export const { addToCart, removeFromCart, clearCart } = cartSlice.actions;
 export default cartSlice.reducer;

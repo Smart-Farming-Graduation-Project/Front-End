@@ -29,10 +29,9 @@ export const getProductById = async (id: number, token: string) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log("Response:", response);
     return response.data.data;
   } catch (error) {
-    console.error("Error fetching product by id:", error);
+    console.error("Error fetching product by id 5555555:", error);
     return null;
   }
 };
@@ -48,9 +47,8 @@ export const getAvgProduct = async (id: number, token: string) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    return response.data.data.averageRating;
+    return response.data.data.averageRating || 3.5;
   } catch (error) {
-    console.error("Error fetching product by id:", error);
-    console.log("Failed to fetch product by id");
+    console.error("Error fetching getAvgProduct:", error);
   }
 };

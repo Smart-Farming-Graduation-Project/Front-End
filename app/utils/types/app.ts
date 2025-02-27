@@ -38,4 +38,13 @@ type CategoryType = {
   categoryName: string;
   categoryDescription: Product[];
 };
-export type { Product, CategoryType, ProductId, WishListItem, CartItem, ItemProps };
+type ReviewProps = {
+  reviewID: string;
+  userID: string;
+  productID: number;
+  rating: number;
+  reviewText: string;
+  headline: string;
+  reviewDate: string;
+};
+export type { Product, CategoryType, ProductId, WishListItem, CartItem, ItemProps, ReviewProps };

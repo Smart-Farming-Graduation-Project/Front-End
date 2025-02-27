@@ -16,7 +16,6 @@ const Page = () => {
   const dispatch = useDispatch<AppDispatch>();
   const carts = useSelector((state: RootState) => state.carts.carts);
 
-  console.log("Carts:", carts);
   useEffect(() => {
     dispatch(fetchCart());
   }, [dispatch]);

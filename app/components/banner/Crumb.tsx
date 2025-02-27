@@ -1,7 +1,7 @@
 "use client";
 import Image, { StaticImageData } from "next/image";
 import { usePathname, useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import "./Crumb.css";
 import API_BASE_URL from "@/app/utils/api/base";
@@ -21,7 +21,7 @@ const Crumb = ({ crumb, productName, categoryName }: Props) => {
 
   const [catName, setCategoryName] = useState(categoryName ? categoryName : "");
 
-  const fetchCategoryName = async () => {
+  const fetchCategoryName = useCallback(async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/Category/Category/${categoryId}`, {
         headers: {
@@ -32,13 +32,13 @@ const Crumb = ({ crumb, productName, categoryName }: Props) => {
     } catch (error) {
       console.error("Error fetching category name:", error);
     }
-  };
-
+  }, [categoryId, token]);
+  
   useEffect(() => {
     if (!categoryName && categoryId) {
       fetchCategoryName();
     }
-  }, [categoryName, categoryId]);
+  }, [categoryName, categoryId, fetchCategoryName]);
 
   const getCrumbText = () => {
     if (pathname.startsWith("shop")) {

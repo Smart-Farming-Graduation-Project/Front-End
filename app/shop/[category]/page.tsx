@@ -23,25 +23,24 @@ const Category = () => {
   const itemsPerPage = 6;
   const categoryId = Array.isArray(category) ? category[0] : category;
 
-  const fetchProducts = async () => {
-    try {
-      axios
-        .get(`${API_BASE_URL}/Category/Category/${categoryId}`, {
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/Category/Category/${categoryId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        })
-        .then((response) => {
-          setProducts(response.data.data.products);
         });
-    } catch (error) {
-      console.error("Error fetching products by category:", error);
-    }
-  };
+        setProducts(response.data.data.products);
+      } catch (error) {
+        console.error("Error fetching products by category:", error);
+      }
+    };
 
-  useEffect(() => {
-    fetchProducts();
-  }, [categoryId]);
+    if (categoryId && token) {
+      fetchProducts();
+    }
+  }, [categoryId, token]);
 
   useEffect(() => {
     const filtered = products.filter((product) => product.productName.toLowerCase().includes(searchTerm.toLowerCase()));

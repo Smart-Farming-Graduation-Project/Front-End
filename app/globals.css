@@ -2,6 +2,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import "@smastrom/react-rating/style.css";
 
 :root {
   --green: #228b22;
@@ -150,8 +151,6 @@ p {
     @apply bg-background text-foreground;
   }
 }
-
-
 
 @layer base {
   * {

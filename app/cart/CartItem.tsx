@@ -1,11 +1,12 @@
 import React from "react";
 import Image from "next/image";
 import category_img from "../assets/images/apples.png";
-import { decrementQuantity, deleteProductAPI, incrementQuantity } from "../utils/redux/slices/CartSlice";
+import { deleteProductAPI } from "../utils/redux/slices/CartSlice";
 import { useDispatch } from "react-redux";
 import { RiDeleteBinLine } from "react-icons/ri";
 import type { CartItem } from "../utils/types/app";
 import { AppDispatch } from "../utils/redux/store/store";
+import { useRouter } from "next/navigation";
 
 interface CartItemProps {
   product: CartItem;
@@ -13,7 +14,7 @@ interface CartItemProps {
 
 const CartItem = ({ product }: CartItemProps) => {
   const dispatch = useDispatch<AppDispatch>();
-
+  const router = useRouter();
   return (
     <div className="item relative flex gap-4 mb-4 p-4 border border-gray-200 rounded-lg ease shadow-sm hover:shadow-md">
       {/* Delete Button */}
@@ -22,7 +23,7 @@ const CartItem = ({ product }: CartItemProps) => {
       </button>
 
       {/* Product Image */}
-      <div className="img w-[100px] h-[100px] relative flex-shrink-0 overflow-hidden rounded-md">
+      <div className="img w-[100px] h-[100px] relative flex-shrink-0 overflow-hidden rounded-md cursor-pointer" onClick={() => router.push(`/shop/category/${product.productId}`)}>
         {product.productImages?.length ? (
           <Image src={product.productImages[0]} alt={product.productName} fill style={{ objectFit: "cover" }} className="rounded-md" />
         ) : (
@@ -36,15 +37,7 @@ const CartItem = ({ product }: CartItemProps) => {
         {product.productDescription && <p className="text-sm text-gray-600 max-w-[600px] my-1">{product.productDescription}</p>}
 
         {/* Quantity Controls */}
-        <div className="quantity flex items-center gap-2 my-1">
-          <button onClick={() => dispatch(decrementQuantity(product.id))} className="px-2 py-1 bg-gray-200 rounded-md hover:bg-gray-300">
-            -
-          </button>
-          <span className="font-semibold">{product.quantity}</span>
-          <button onClick={() => dispatch(incrementQuantity(product.id))} className="px-2 py-1 bg-gray-200 rounded-md hover:bg-gray-300">
-            +
-          </button>
-        </div>
+        <span className="font-[600]">× {product.quantity}</span>
 
         {/* Price */}
         <p className="price text-green-700 font-semibold my-1">{(product.productPrice * product.quantity).toFixed(2)} EG</p>

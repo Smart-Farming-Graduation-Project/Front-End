@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaHeart, FaStar } from "react-icons/fa";
+import { FaHeart } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { addToWishlistAPI, removeFromWishlistAPI } from "../../utils/redux/slices/wishListSlice";
 import toast from "react-hot-toast";
@@ -15,7 +15,7 @@ import { Product, WishListItem } from "@/app/utils/types/app";
 import { AppDispatch } from "@/app/utils/redux/store/store";
 import { getAvgProduct } from "@/app/utils/api/Products";
 import { getTokenClient } from "@/app/utils/api/getTokenClient";
-
+import { Rating } from "@smastrom/react-rating";
 type CardProps = {
   product: Product;
 };
@@ -39,18 +39,19 @@ const Card = ({ product }: CardProps) => {
   React.useEffect(() => {
     const fetchAvgRating = async () => {
       try {
-        if (product.productId) {
-          const rating = await getAvgProduct(product.productId, token as string);
+        if (product.productId && token) {
+          const rating = await getAvgProduct(product.productId, token);
           setAvgRating(rating);
-          console.log("Rating:", rating);
         }
       } catch (error) {
         console.error("Failed to fetch average rating:", error);
       }
     };
 
-    fetchAvgRating();
-  }, [product.productId]);
+    if (token) {
+      fetchAvgRating();
+    }
+  }, [product.productId, token]);
 
   return (
     <div
@@ -103,16 +104,16 @@ const Card = ({ product }: CardProps) => {
       <div className="card-info py-5 text-center">
         <h4 className="text-lg font-bold">{product.productName}</h4>
         {product.description && <p className="text-sm text-gray-500">{trucnkString(product.description, 50)}</p>}
-        <span className="flex items-center gap-2 text-xl justify-center my-2">
-          <span>{avgRating ? avgRating : 3.5}</span>
-          <FaStar className="text-[#FFD700]" />
+        <span className="flex items-center gap-[3px] justify-center my-2">
+          <Rating style={{ maxWidth: 100 }} value={avgRating ? avgRating : 3.5} readOnly />
+          <span className="text-md text- mt-[1px]">{avgRating ? avgRating : 3.5}</span>
         </span>
         <h3 className="text-green font-extrabold text-xl my-3">{product.price} EG</h3>
         <button
           className="py-2 px-4 rounded-[20px] uppercase border border-yellow flex items-center gap-2 justify-center mx-auto mt-4 hover:shadow ease"
           onClick={(e) => {
             e.stopPropagation();
-            dispatch(addToCartAPI(product));
+            dispatch(addToCartAPI({ product }));
             dispatch(removeFromWishlistAPI(product.productId));
             toast.success("Item added to cart!");
           }}>

@@ -32,7 +32,7 @@ export default function ForgotPassword() {
         <h1 className="text-white text-4xl md:text-6xl text-center mb-2">Welcome To CropGuard</h1>
         <p className="text-white text-center">Protecting Your Crops, Securing Your Future</p>
       </div>
-      <div className="form-container relative bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md w-[90%] sm:w-[80%] md:w-[600px]">
+      <div className="form-container relative bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md  w-[95%] md:w-[600px]">
         <h1 className="text-3xl font-bold mb-4 text-center text-green">Forgot Password</h1>
         {emailSent ? (
           <div className="text-center">
