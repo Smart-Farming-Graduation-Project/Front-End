@@ -88,31 +88,3 @@ export const resendConfirmationEmail = async (email: string) => {
     throw [{ Message: "An unexpected error occurred." }];
   }
 };
-export const registerWithThirdParty = async (provider: "google" | "facebook", idToken: string) => {
-  try {
-    const response = await axios.post(`${API_BASE_URL}/Authentication/register-with-third-party`, {
-      provider,
-      token: idToken,
-    });
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      throw error.response?.data || [{ message: "An unexpected error occurred." }];
-    }
-    throw [{ message: "An unexpected error occurred." }];
-  }
-};
-export const loginWithThirdParty = async (provider: "google" | "facebook", idToken: string) => {
-  try {
-    const response = await axios.post(`${API_BASE_URL}/Authentication/login-with-third-party`, {
-      provider,
-      token: idToken,
-    });
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      throw error.response?.data || [{ message: "An unexpected error occurred." }];
-    }
-    throw [{ message: "An unexpected error occurred." }];
-  }
-};

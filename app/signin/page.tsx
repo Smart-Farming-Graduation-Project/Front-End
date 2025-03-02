@@ -7,11 +7,11 @@ import Link from "next/link";
 import "./signin.css";
 import { IoIosLock, IoMdMail } from "react-icons/io";
 import { FcGoogle } from "react-icons/fc";
-import { FaFacebook } from "react-icons/fa";
-import { loginUser, loginWithThirdParty } from "../utils/api/Auth";
+import { loginUser } from "../utils/api/Auth";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import { auth, facebookProvider, googleProvider, signInWithPopup } from "../utils/api/firebase";
+import FacebookSignButton from "../components/Auth/FacebookSignButton";
+import GoogleSignButton from "../components/Auth/GoogleSignButton";
 export default function SignIn() {
   const [userNameOrEmail, setUserNameOrEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,23 +35,9 @@ export default function SignIn() {
       setError(apiErrors as { message: string });
     }
   };
-  const handleThirdPartyLogin = async (provider: "google" | "facebook") => {
-    try {
-      let result;
-      if (provider === "google") {
-        result = await signInWithPopup(auth, googleProvider);
-      } else {
-        result = await signInWithPopup(auth, facebookProvider);
-      }
 
-      const idToken = await result.user.getIdToken();
-      const response = await loginWithThirdParty(provider, idToken);
-
-      console.log(`${provider} Sign-In Successful:`, response);
-      router.push("/dashboard");
-    } catch (error) {
-      console.error(`${provider} Sign-In Failed:`, error);
-    }
+  const handleThirdPartyLogin = async () => {
+    setError(null);
   };
 
   return (
@@ -98,14 +84,9 @@ export default function SignIn() {
 
           {/* Third-Party Sign In Buttons */}
           <div className="flex flex-col gap-2 mb-4">
-            <Button variant="outline" className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]" onClick={() => handleThirdPartyLogin("google")}>
-              <FcGoogle size={20} />
-              <span>Sign in with Google</span>
-            </Button>
-            <Button variant="outline" className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]" onClick={() => handleThirdPartyLogin("facebook")}>
-              <FaFacebook className="text-blue-600" size={20} />
-              <span>Sign in with Facebook</span>
-            </Button>
+
+            <GoogleSignButton typePage="signin" />
+            <FacebookSignButton typePage="signin" />
           </div>
 
           {/* Forgot Password Link */}
