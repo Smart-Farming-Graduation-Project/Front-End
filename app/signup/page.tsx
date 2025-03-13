@@ -160,27 +160,27 @@ export default function SignUp() {
               <Button type="submit" className="w-full py-[20px] mb-4">
                 Sign Up
               </Button>
-
-              {/* Divider with "or" */}
-              <div className="flex items-center gap-2 mb-4">
-                <div className="flex-1 h-px bg-[#ccc]"></div>
-                <span className="text-sm text-green">OR With</span>
-                <div className="flex-1 h-px bg-[#ccc]"></div>
-              </div>
-
-              {/* Third-Party Sign In Buttons */}
-              <div className="flex flex-col gap-2 mb-4">
-                <GoogleSignButton />
-                <FacebookSignButton typePage="signup" />
-              </div>
-              {/* Already have an account? Sign In */}
-              <div className="text-center">
-                <span className="text-sm">Already have an account? </span>
-                <Link href="/signin" className="text-sm text-green hover:underline">
-                  Sign In
-                </Link>
-              </div>
             </form>
+
+            {/* Divider with "or" */}
+            <div className="flex items-center gap-2 mb-4">
+              <div className="flex-1 h-px bg-[#ccc]"></div>
+              <span className="text-sm text-green">OR With</span>
+              <div className="flex-1 h-px bg-[#ccc]"></div>
+            </div>
+
+            {/* Third-Party Sign In Buttons */}
+            <div className="flex flex-col gap-2 mb-4">
+              <GoogleSignButton typePage="signup" />
+              <FacebookSignButton typePage="signup" />
+            </div>
+            {/* Already have an account? Sign In */}
+            <div className="text-center">
+              <span className="text-sm">Already have an account? </span>
+              <Link href="/signin" className="text-sm text-green hover:underline">
+                Sign In
+              </Link>
+            </div>
           </>
         )}
       </div>

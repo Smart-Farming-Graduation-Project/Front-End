@@ -41,7 +41,8 @@ type CategoryType = {
 type ReviewProps = {
   reviewID: string;
   userID: string;
-  productID: number;
+  firstName: string;
+  lastName: string;
   rating: number;
   reviewText: string;
   headline: string;

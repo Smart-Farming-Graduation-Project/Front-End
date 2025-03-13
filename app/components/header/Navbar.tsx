@@ -13,6 +13,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Product } from "@/app/utils/types/app";
 import "./Navbar.css";
 import { RootState } from "../../utils/redux/store/store";
+import { useAuth } from "@/app/utils/contexts/AuthContext";
+import Cookies from "js-cookie";
 
 const Navbar = ({ setIsOpenRounded }: { setIsOpenRounded: (isOpen: boolean) => void }) => {
   const dispatch = useDispatch();
@@ -32,7 +34,7 @@ const Navbar = ({ setIsOpenRounded }: { setIsOpenRounded: (isOpen: boolean) => v
   ];
   const [isOpen, setIsOpen] = useState(false);
   const { isMobile } = useMobileContext();
-
+  const { user, isLoading, logout } = useAuth();
   return (
     <div className="flex md:items-center md:flex-1">
       {/* Mobile */}
@@ -56,13 +58,20 @@ const Navbar = ({ setIsOpenRounded }: { setIsOpenRounded: (isOpen: boolean) => v
                 <Link href="/cart" className="flex items-center gap-2 text-white" onClick={() => setIsOpen(false)}>
                   <HiOutlineShoppingCart /> Cart
                 </Link>
-                <button
-                  className="w-fit px-[100%] group text-[14px] whitespace-nowrap font-normal text-white flex gap-2 items-center rounded-full border border-white bg-white/0 hover:bg-white/10 hover:transition-all hover:duration-300"
-                  style={{ height: "35px" }}>
-                  <Link href="/signin" onClick={() => setIsOpen(false)}>
-                    Sign In
-                  </Link>
-                </button>
+                {!isLoading && (
+                  <button
+                    className="w-fit px-[100%] group text-[14px] whitespace-nowrap font-normal text-white flex gap-2 items-center rounded-full border border-white bg-white/0 hover:bg-white/10 hover:transition-all hover:duration-300"
+                    style={{ height: "35px" }}>
+                    <Link
+                      href="/signin"
+                      onClick={() => {
+                        logout();
+                        setIsOpen(false);
+                      }}>
+                      {user ? "Sign Out" : "Sign In"}
+                    </Link>
+                  </button>
+                )}
               </div>
               {/* start user & sign in */}
               {/* end user & sign in */}
@@ -94,8 +103,13 @@ const Navbar = ({ setIsOpenRounded }: { setIsOpenRounded: (isOpen: boolean) => v
             ))}
           </ul>
         </nav>
+        {/* {user && (
+            <span className="text-white">
+              welcome <span className=" font-semibold">{user.given_name}</span>
+            </span>
+          )} */}
         {/* start user & sign in */}
-        <div className="nav-icons hidden md:flex items-center justify-end gap-3">
+        <div className="nav-icons hidden md:flex items-center justify-end gap-2">
           <Link href="/wishlist">
             <span>{wishList.length ? wishList.length : 0}</span>
             <FaHeart />
@@ -104,10 +118,14 @@ const Navbar = ({ setIsOpenRounded }: { setIsOpenRounded: (isOpen: boolean) => v
             <span>{carts.length ? carts.length : 0}</span>
             <HiOutlineShoppingCart />
           </Link>
-          <BorderButton>
-            <Link href="/signin">Sign In</Link>
-            <FaArrowRightLong />
-          </BorderButton>
+          {!isLoading && (
+            <BorderButton>
+              <Link href="/signin" onClick={logout}>
+                {user ? "Sign Out" : "Sign In"}
+              </Link>
+              <FaArrowRightLong />
+            </BorderButton>
+          )}
         </div>
         {/* end user & sign in */}
       </div>

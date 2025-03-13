@@ -1,0 +1,13 @@
+.about-container .box .info {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  background: #00000056;
+  color: white;
+  opacity: 0;
+  transition: 0.3s opacity ease-in-out;
+}
+.about-container .box:hover .info {
+  opacity: 1;
+}

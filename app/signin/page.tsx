@@ -6,13 +6,14 @@ import { useState } from "react";
 import Link from "next/link";
 import "./signin.css";
 import { IoIosLock, IoMdMail } from "react-icons/io";
-import { FcGoogle } from "react-icons/fc";
 import { loginUser } from "../utils/api/Auth";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import FacebookSignButton from "../components/Auth/FacebookSignButton";
 import GoogleSignButton from "../components/Auth/GoogleSignButton";
+import { useAuth } from "../utils/contexts/AuthContext";
 export default function SignIn() {
+  const { user, login } = useAuth();
   const [userNameOrEmail, setUserNameOrEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<{ message: string | null } | null>(null);
@@ -28,16 +29,16 @@ export default function SignIn() {
       });
       // Navigate to home/dashboard based on the token received
       // console.log("Login Successful:", data.data.tokens.accessToken);
-      Cookies.set("token", data.data.tokens.accessToken);
-      router.push("/");
+      if (data.statusCode == "OK") {
+        Cookies.set("token", data.data.tokens.accessToken);
+        if (user?.Role === "Admin") router.push("/dashboard");
+        else router.push("/");
+        login(data.data.tokens.accessToken);
+      }
     } catch (apiErrors) {
       console.error("Registration Failed:", apiErrors);
       setError(apiErrors as { message: string });
     }
-  };
-
-  const handleThirdPartyLogin = async () => {
-    setError(null);
   };
 
   return (
@@ -74,36 +75,35 @@ export default function SignIn() {
           <Button type="submit" className="w-full py-3 sm:py-[20px] mb-4">
             Sign In
           </Button>
-
-          {/* Divider with "or" */}
-          <div className="flex items-center gap-2 mb-4">
-            <div className="flex-1 h-px bg-[#ccc]"></div>
-            <span className="text-sm text-green">OR With</span>
-            <div className="flex-1 h-px bg-[#ccc]"></div>
-          </div>
-
-          {/* Third-Party Sign In Buttons */}
-          <div className="flex flex-col gap-2 mb-4">
-
-            <GoogleSignButton typePage="signin" />
-            <FacebookSignButton typePage="signin" />
-          </div>
-
-          {/* Forgot Password Link */}
-          <div className="text-center mb-2">
-            <Link href="/forgot-password" className="text-sm text-green hover:underline">
-              Forgot Password?
-            </Link>
-          </div>
-
-          {/* Do you have an account? Sign Up */}
-          <div className="text-center">
-            <span className="text-sm">Don&apos;t have an account? </span>
-            <Link href="/signup" className="text-sm text-green hover:underline">
-              Sign Up
-            </Link>
-          </div>
         </form>
+
+        {/* Divider with "or" */}
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex-1 h-px bg-[#ccc]"></div>
+          <span className="text-sm text-green">OR With</span>
+          <div className="flex-1 h-px bg-[#ccc]"></div>
+        </div>
+
+        {/* Third-Party Sign In Buttons */}
+        <div className="flex flex-col gap-2 mb-4">
+          <GoogleSignButton typePage="signin" />
+          <FacebookSignButton typePage="signin" />
+        </div>
+
+        {/* Forgot Password Link */}
+        <div className="text-center mb-2">
+          <Link href="/forgot-password" className="text-sm text-green hover:underline">
+            Forgot Password?
+          </Link>
+        </div>
+
+        {/* Do you have an account? Sign Up */}
+        <div className="text-center">
+          <span className="text-sm">Don&apos;t have an account? </span>
+          <Link href="/signup" className="text-sm text-green hover:underline">
+            Sign Up
+          </Link>
+        </div>
       </div>
     </div>
   );
