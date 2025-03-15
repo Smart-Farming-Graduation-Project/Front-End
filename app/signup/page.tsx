@@ -10,8 +10,9 @@ import { FaUser } from "react-icons/fa";
 import { MdOutlinePhoneAndroid } from "react-icons/md";
 import { GiPositionMarker } from "react-icons/gi";
 import { registerUser } from "../utils/api/Auth";
-import FacebookSignButton from "../components/Auth/FacebookSignButton";
+// import FacebookSignButton from "../components/Auth/FacebookSignButton";
 import GoogleSignButton from "../components/Auth/GoogleSignButton";
+import FacebookSignButton from "../components/Auth/FacebookSign";
 export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

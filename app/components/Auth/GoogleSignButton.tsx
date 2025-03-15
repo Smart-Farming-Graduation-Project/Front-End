@@ -8,8 +8,6 @@ import { useRouter } from "next/navigation";
 import API_BASE_URL from "@/app/utils/api/base";
 import Cookies from "js-cookie";
 
-const GOOGLE_CLIENT_ID = "806052617207-h9sqqe0q9ivl7g660deofptssgus6593.apps.googleusercontent.com";
-
 interface PropsType {
   typePage: string;
 }
@@ -79,15 +77,11 @@ const GoogleSignButton = ({ typePage }: PropsType) => {
 
   return (
     <GoogleLogin
-      onSuccess={login} 
+      onSuccess={login}
       onError={handleFailure}
-      useOneTap 
+      useOneTap
       render={({ onClick }) => (
-        <Button
-          variant="outline"
-          className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]"
-          onClick={onClick}
-        >
+        <Button variant="outline" className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]" onClick={onClick}>
           <FcGoogle className="text-xl" />
           <span>{typePage === "signin" ? "Sign in" : "Sign up"} with Google</span>
         </Button>
@@ -98,7 +92,7 @@ const GoogleSignButton = ({ typePage }: PropsType) => {
 
 export default function WrappedGoogleSignButton({ typePage }: { typePage: string }) {
   return (
-    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+    <GoogleOAuthProvider clientId={"806052617207-h9sqqe0q9ivl7g660deofptssgus6593.apps.googleusercontent.com"}>
       <GoogleSignButton typePage={typePage} />
     </GoogleOAuthProvider>
   );

@@ -9,9 +9,10 @@ import { IoIosLock, IoMdMail } from "react-icons/io";
 import { loginUser } from "../utils/api/Auth";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import FacebookSignButton from "../components/Auth/FacebookSignButton";
+// import FacebookSignButton from "../components/Auth/FacebookSignButton";
 import GoogleSignButton from "../components/Auth/GoogleSignButton";
 import { useAuth } from "../utils/contexts/AuthContext";
+import FacebookSignButton from "../components/Auth/FacebookSign";
 export default function SignIn() {
   const { user, login } = useAuth();
   const [userNameOrEmail, setUserNameOrEmail] = useState("");
@@ -29,7 +30,7 @@ export default function SignIn() {
       });
       // Navigate to home/dashboard based on the token received
       // console.log("Login Successful:", data.data.tokens.accessToken);
-      if (data.statusCode == "OK") {
+      if (data.statusCode == 200) {
         Cookies.set("token", data.data.tokens.accessToken);
         if (user?.Role === "Admin") router.push("/dashboard");
         else router.push("/");

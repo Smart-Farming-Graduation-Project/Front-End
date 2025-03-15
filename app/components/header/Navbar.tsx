@@ -28,7 +28,6 @@ const Navbar = ({ setIsOpenRounded }: { setIsOpenRounded: (isOpen: boolean) => v
   const links: Link[] = [
     { name: "Home", url: "/" },
     { name: "Shop", url: "/shop" },
-    { name: "Community", url: "/community" },
     { name: "About", url: "/about" },
     { name: "Contact", url: "/contact" },
   ];

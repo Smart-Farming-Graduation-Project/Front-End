@@ -7,7 +7,7 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <div className="flex h-screen bg-[#f0f0f0]">
+    <div className="flex min-h-screen">
       <Sidebar />
       {children}
     </div>

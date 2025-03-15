@@ -17,11 +17,11 @@ import { AppDispatch } from "@/app/utils/redux/store/store";
 import toast from "react-hot-toast";
 import ReviewItem from "@/app/components/shop/ReviewItem";
 import { createReview, getReviews } from "@/app/utils/api/Review";
+import { useAuth } from "@/app/utils/contexts/AuthContext";
 
 const CardDetails = ({ product }: { product: ProductId }) => {
   const dispatch = useDispatch<AppDispatch>();
-  // get user id from local storage
-  const userId = "6ec7217c-f44f-4cb4-86eb-f5f4d59f3e4e";
+  const { user } = useAuth();
   const [count, setCount] = useState(1);
   const handleIncrement = () => setCount(count + 1);
   const handleDecrement = () => setCount(Math.max(count - 1, 1));
@@ -59,13 +59,7 @@ const CardDetails = ({ product }: { product: ProductId }) => {
       <div className="container">
         <div className="card-details-container grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="img-product rounded-lg overflow-hidden flex justify-center items-center">
-            <Image
-              src={product.images[0]}
-              alt={product.productName}
-              width={500}
-              height={300} 
-              layout="responsive"
-            />
+            <Image src={product.images[0]} alt={product.productName} width={500} height={300} layout="responsive" />
           </div>
           <div className="details">
             <h2 className="font-[700] text-3xl mb-1">{product.productName}</h2>
@@ -121,7 +115,7 @@ const CardDetails = ({ product }: { product: ProductId }) => {
           <h3 className="text-2xl">
             {reviews.length} review{reviews.length === 1 ? "" : "s"} for {product.productName}
           </h3>
-          <div className="reviews-container">{reviews && reviews.length > 0 ? reviews.map((review: ReviewProps) => <ReviewItem key={review.reviewID} review={review} userId={userId} />) : <p>No reviews found for this product.</p>}</div>
+          <div className="reviews-container">{reviews && reviews.length > 0 ? reviews.map((review: ReviewProps) => <ReviewItem key={review.reviewID} review={review} userId={user?.id ?? ""} />) : <p>No reviews found for this product.</p>}</div>
         </div>
         <div className="add-review">
           <Separator className="my-6" />
