@@ -115,7 +115,7 @@ const CardDetails = ({ product }: { product: ProductId }) => {
           <h3 className="text-2xl">
             {reviews.length} review{reviews.length === 1 ? "" : "s"} for {product.productName}
           </h3>
-          <div className="reviews-container">{reviews && reviews.length > 0 ? reviews.map((review: ReviewProps) => <ReviewItem key={review.reviewID} review={review} userId={user?.id ?? ""} />) : <p>No reviews found for this product.</p>}</div>
+          <div className="reviews-container">{reviews && reviews.length > 0 ? reviews.map((review: ReviewProps) => <ReviewItem key={review.reviewID} review={review} userId={user?.sub ?? ""} />) : <p>No reviews found for this product.</p>}</div>
         </div>
         <div className="add-review">
           <Separator className="my-6" />

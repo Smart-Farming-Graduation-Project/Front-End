@@ -9,6 +9,17 @@ import API_BASE_URL from "@/app/utils/api/base";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+type UpdateProduct = {
+  productId: number;
+  productName: string;
+  description: string;
+  price: number;
+  availability: string;
+  categoryName?: string;
+  images: string[];
+  imagesFiles?: File[];
+};
+
 const Manage_Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [newProductName, setNewProductName] = useState("");
@@ -17,7 +28,7 @@ const Manage_Products = () => {
   const [newAvailability, setNewAvailability] = useState("Sale");
   const [newPrice, setNewPrice] = useState("");
   const [newImages, setNewImages] = useState<File[]>([]);
-  const [editProduct, setEditProduct] = useState<Product | null>(null);
+  const [editProduct, setEditProduct] = useState<UpdateProduct | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -55,7 +66,7 @@ const Manage_Products = () => {
       setNewImages(Array.from(e.target.files));
     }
   };
-  // Add Product
+
   const handleAddProduct = async () => {
     if (!newProductName || !newProductDesc || !newCategoryName || !newPrice) {
       console.log("Missing required fields");
@@ -65,7 +76,6 @@ const Manage_Products = () => {
       console.log("No token available");
       return;
     }
-
     try {
       const formData = new FormData();
       formData.append("Name", newProductName.trim());
@@ -76,7 +86,6 @@ const Manage_Products = () => {
       newImages.forEach((image) => {
         formData.append("Images", image);
       });
-
       const response = await axios.post(`${API_BASE_URL}/Product/Product/Create`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -95,12 +104,11 @@ const Manage_Products = () => {
       console.error("Error adding product:", error);
     }
   };
-  // Delete Product
+
   const handleDeleteProduct = async (id: number) => {
     if (!token) {
       return;
     }
-
     try {
       await axios.delete(`${API_BASE_URL}/Product/ProductDelete/${id}`, {
         headers: {
@@ -108,6 +116,7 @@ const Manage_Products = () => {
         },
       });
       setProducts(products.filter((prod) => prod.productId !== id));
+      console.log("Product deleted");
     } catch (error) {
       console.error("Error deleting product:", error);
     } finally {
@@ -129,23 +138,39 @@ const Manage_Products = () => {
       formData.append("CategoryName", editProduct.categoryName?.trim() || "");
       formData.append("Price", editProduct.price.toString());
       formData.append("Availability", editProduct.availability || "Sale");
-      editProduct.images.forEach((image) => {
-        formData.append("Images", image);
-      });
+
+      if (editProduct.imagesFiles && editProduct.imagesFiles.length > 0) {
+        editProduct.imagesFiles.forEach((image: File) => {
+          formData.append("Images", image);
+        });
+      } else if (editProduct.images && editProduct.images.length > 0) {
+        editProduct.images.forEach((image: string) => {
+          formData.append("Images", image);
+        });
+      }
+
       await axios.put(`${API_BASE_URL}/Product/Product/Update`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
-      const response = await axios.get(`${API_BASE_URL}/Product/ProductsList`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.data.succeeded) {
-        setProducts(response.data.data);
-      }
+
+      setProducts(
+        products.map((prod) =>
+          prod.productId === editProduct.productId
+            ? {
+                productId: editProduct.productId,
+                productName: editProduct.productName,
+                description: editProduct.description,
+                price: editProduct.price,
+                availability: editProduct.availability,
+                categoryName: editProduct.categoryName,
+                images: editProduct.imagesFiles ? editProduct.imagesFiles.map((file) => URL.createObjectURL(file)) : editProduct.images,
+              }
+            : prod
+        )
+      );
     } catch (error) {
       console.error("Error updating product:", error);
     } finally {
@@ -224,7 +249,7 @@ const Manage_Products = () => {
                           setEditProduct({
                             ...editProduct,
                             productName: e.target.value,
-                          } as Product)
+                          } as UpdateProduct)
                         }
                         placeholder="Edit product name"
                       />
@@ -237,7 +262,7 @@ const Manage_Products = () => {
                           setEditProduct({
                             ...editProduct,
                             description: e.target.value,
-                          } as Product)
+                          } as UpdateProduct)
                         }
                         placeholder="Edit product description"
                       />
@@ -250,7 +275,7 @@ const Manage_Products = () => {
                           setEditProduct({
                             ...editProduct,
                             categoryName: e.target.value,
-                          } as Product)
+                          } as UpdateProduct)
                         }
                         placeholder="Edit category name"
                       />
@@ -263,7 +288,7 @@ const Manage_Products = () => {
                           setEditProduct({
                             ...editProduct,
                             price: parseFloat(e.target.value) || 0,
-                          } as Product)
+                          } as UpdateProduct)
                         }
                         type="number"
                         placeholder="Edit price"
@@ -277,7 +302,7 @@ const Manage_Products = () => {
                           setEditProduct({
                             ...editProduct,
                             availability: value,
-                          } as Product)
+                          } as UpdateProduct)
                         }>
                         <SelectTrigger>
                           <SelectValue placeholder="Availability" />
@@ -300,7 +325,7 @@ const Manage_Products = () => {
                               ...editProduct,
                               imagesFiles: filesArray,
                               images: filesArray.map((file) => URL.createObjectURL(file)),
-                            } as Product);
+                            } as UpdateProduct);
                           }
                         }}
                         className="w-full"

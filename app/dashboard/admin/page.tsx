@@ -3,7 +3,7 @@ import Manage_Categories from "@/app/components/dashboard/Admin/Manage_Categries
 import Manage_Products from "@/app/components/dashboard/Admin/Manage_Products";
 import React, { useState } from "react";
 const Admin = () => {
-  const [activeTab, setActiveTab] = useState("categories");
+  const [activeTab, setActiveTab] = useState("products");
 
   const tabs = [
     { id: "profile", label: "Profile", content: "Make changes to your account." },
