@@ -31,6 +31,8 @@ jobs:
         with:
           name: node-app
           path: release.zip
+          retention-days: 7 # Automatically delete artifacts after 7 days
+
 
   deploy:
     runs-on: ubuntu-latest
@@ -65,3 +67,14 @@ jobs:
           app-name: 'Crop-Guard-UI'
           slot-name: 'Production'
           package: .
+
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cleanup old workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ secrets.LABEL_TOKEN }}
+          repository: ${{ github.repository }}
+          retain_days: 7
+          keep_minimum_runs: 5
