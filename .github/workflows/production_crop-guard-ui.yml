@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js app to Azure Web App - Crop-Guard
+name: Build and deploy Node.js app to Azure Web App - Crop-Guard-UI
 
 on:
   push:
@@ -31,6 +31,8 @@ jobs:
         with:
           name: node-app
           path: release.zip
+          retention-days: 7 # Automatically delete artifacts after 7 days
+
 
   deploy:
     runs-on: ubuntu-latest
@@ -54,15 +56,25 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_2683E5AE485247028DCC42977538FD47 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_0DE028A942094AEC8A6B641092BE6B2C }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_91100E7F5DED421EB3AE94EFA8FE609E }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_90F8929C4F40415BA30A050F601070DD }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_11799822ABCF4A15BA20B5FBB1BA5F1D }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C259D8C44EC04D3AABC00D48C9DF0BFD }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'Crop-Guard'
+          app-name: 'Crop-Guard-UI'
           slot-name: 'Production'
           package: .
-          
+
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cleanup old workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ secrets.LABEL_TOKEN }}
+          repository: ${{ github.repository }}
+          retain_days: 7
+          keep_minimum_runs: 5
