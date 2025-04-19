@@ -12,7 +12,8 @@ import Cookies from "js-cookie";
 // import FacebookSignButton from "../components/Auth/FacebookSignButton";
 import GoogleSignButton from "../components/Auth/GoogleSignButton";
 import { useAuth } from "../utils/contexts/AuthContext";
-import FacebookSignButton from "../components/Auth/FacebookSign";
+import { FaFacebook } from "react-icons/fa6";
+// import FacebookSignButton from "../components/Auth/FacebookSign";
 export default function SignIn() {
   const { user, login } = useAuth();
   const [userNameOrEmail, setUserNameOrEmail] = useState("");
@@ -88,7 +89,11 @@ export default function SignIn() {
         {/* Third-Party Sign In Buttons */}
         <div className="flex flex-col gap-2 mb-4">
           <GoogleSignButton typePage="signin" />
-          <FacebookSignButton typePage="signin" />
+          {/* <FacebookSignButton typePage="signin" /> */}
+          <Button variant="outline" className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]">
+            <FaFacebook className="text-blue-600" size={20} />
+            <span>Sign in with Facebook</span>
+          </Button>
         </div>
 
         {/* Forgot Password Link */}

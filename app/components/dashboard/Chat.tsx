@@ -5,12 +5,45 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState, useEffect, useRef } from "react";
 import { FaMicrophone, FaPaperPlane } from "react-icons/fa";
 
+interface Message {
+  role: string;
+  text: string;
+  time: string;
+}
+
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognition extends EventTarget {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  maxAlternatives: number;
+  
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+  
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onerror: (event: Event) => void;
+  onend: () => void;
+}
+
+declare global {
+  interface Window {
+    SpeechRecognition: new () => SpeechRecognition;
+    webkitSpeechRecognition: new () => SpeechRecognition;
+  }
+}
+
 export default function ChatBot() {
-  const [messages, setMessages] = useState<{ role: string; text: string; time: string }[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
@@ -18,25 +51,36 @@ export default function ChatBot() {
       textareaRef.current.style.height = `${newHeight}px`;
     }
   }, [input]);
+
   useEffect(() => {
-    let recognition: any;
+    let recognition: SpeechRecognition | null = null;
 
     if (listening) {
-      recognition = new (window as any).webkitSpeechRecognition();
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
       recognition.lang = "en-US";
-      recognition.start();
-      recognition.onresult = (event: any) => {
-        setInput(event.results[0][0].transcript);
+      recognition.interimResults = false;
+      
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        const transcript = event.results[0][0].transcript;
+        setInput(transcript);
       };
+      
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error", event);
+        setListening(false);
+      };
+      
       recognition.onend = () => setListening(false);
+      
+      recognition.start();
     }
 
     return () => {
-      if (recognition) {
-        recognition.stop();
-      }
+      recognition?.stop();
     };
   }, [listening]);
+
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -58,10 +102,8 @@ export default function ChatBot() {
       }
 
       const data = await response.json();
-
-      // Ensure the correct response structure
       const botResponse = data.data || "Bot did not return a response.";
-      console.log("Bot response:", botResponse);
+      
       setMessages([
         ...newMessages,
         {
@@ -72,11 +114,19 @@ export default function ChatBot() {
       ]);
     } catch (error) {
       console.error("Error fetching response:", error);
-      setMessages([...newMessages, { role: "bot", text: "Error fetching response.", time: timestamp }]);
+      setMessages([
+        ...newMessages, 
+        { 
+          role: "bot", 
+          text: "Error fetching response.", 
+          time: new Date().toLocaleTimeString() 
+        }
+      ]);
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <div className="container">
       <div className="h-[calc(100vh-100px)]">

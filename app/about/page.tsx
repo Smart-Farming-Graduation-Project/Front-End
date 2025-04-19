@@ -104,7 +104,7 @@ function About() {
     <div className="">
       <Crumb crumb={img_about} />
       <div className="container p-sec">
-        <Heading heading="Meet Our Team" paragraph="Team Members" />
+        <Heading heading="Meat Our Team" paragraph="Team Members" />
         <p className="text-center -mt-5">
           We are a team from Zagazig University, and this is our graduation project. We are passionate about Engineering and have put a lot of effort into creating this project. We hope you find it useful and informative. Thank you for visiting our page!
         </p>

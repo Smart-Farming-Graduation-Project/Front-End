@@ -12,7 +12,8 @@ import { GiPositionMarker } from "react-icons/gi";
 import { registerUser } from "../utils/api/Auth";
 // import FacebookSignButton from "../components/Auth/FacebookSignButton";
 import GoogleSignButton from "../components/Auth/GoogleSignButton";
-import FacebookSignButton from "../components/Auth/FacebookSign";
+// import FacebookSignButton from "../components/Auth/FacebookSign";
+import { FaFacebook } from "react-icons/fa6";
 export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -173,7 +174,11 @@ export default function SignUp() {
             {/* Third-Party Sign In Buttons */}
             <div className="flex flex-col gap-2 mb-4">
               <GoogleSignButton typePage="signup" />
-              <FacebookSignButton typePage="signup" />
+              {/* <FacebookSignButton typePage="signup" /> */}
+              <Button variant="outline" className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]">
+            <FaFacebook className="text-blue-600" size={20} />
+            <span>Sign up with Facebook</span>
+          </Button>
             </div>
             {/* Already have an account? Sign In */}
             <div className="text-center">

@@ -1,15 +1,13 @@
 "use client";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
-import { Button } from "@/components/ui/button";
-import { FcGoogle } from "react-icons/fc";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import API_BASE_URL from "@/app/utils/api/base";
 import Cookies from "js-cookie";
 
 interface PropsType {
-  typePage: string;
+  typePage: "signin" | "signup";
 }
 
 interface DecodedToken {
@@ -22,11 +20,14 @@ interface DecodedToken {
 const GoogleSignButton = ({ typePage }: PropsType) => {
   const router = useRouter();
 
-  const login = async (credentialResponse: any) => {
+  const login = async (credentialResponse: { credential?: string }) => {
     try {
+      if (!credentialResponse.credential) {
+        throw new Error("No credential received");
+      }
+
       const decoded = jwtDecode<DecodedToken>(credentialResponse.credential);
       console.log("Google User Data:", decoded);
-      console.log("token:", credentialResponse.credential);
 
       const { given_name: firstName, family_name: lastName, email, sub: userId } = decoded;
 
@@ -43,7 +44,7 @@ const GoogleSignButton = ({ typePage }: PropsType) => {
           accessToken: credentialResponse.credential,
           provider,
         });
-        console.log("Google Login Response:", loginResponse);
+        
         if (loginResponse.status === 200) {
           Cookies.set("token", loginResponse.data.data.tokens.accessToken);
           router.push("/");
@@ -58,7 +59,7 @@ const GoogleSignButton = ({ typePage }: PropsType) => {
           accessToken: credentialResponse.credential,
           provider,
         });
-        console.log("Google Register Response:", registerResponse);
+        
         if (registerResponse.status === 201) {
           router.push("/");
         }
@@ -76,23 +77,30 @@ const GoogleSignButton = ({ typePage }: PropsType) => {
   };
 
   return (
-    <GoogleLogin
-      onSuccess={login}
-      onError={handleFailure}
-      useOneTap
-      render={({ onClick }) => (
-        <Button variant="outline" className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]" onClick={onClick}>
-          <FcGoogle className="text-xl" />
-          <span>{typePage === "signin" ? "Sign in" : "Sign up"} with Google</span>
-        </Button>
-      )}
-    />
+    <div className="w-full">
+      <GoogleLogin
+        onSuccess={login}
+        onError={handleFailure}
+        useOneTap
+        shape="rectangular"
+        size="large"
+        text={typePage === "signin" ? "signin_with" : "signup_with"}
+        width="100%"
+      />
+    </div>
   );
 };
 
-export default function WrappedGoogleSignButton({ typePage }: { typePage: string }) {
+export default function WrappedGoogleSignButton({ typePage }: { typePage: "signin" | "signup" }) {
+  const clientId = process.env.GOOGLE_CLIENT_ID || "806052617207-h9sqqe0q9ivl7g660deofptssgus6593.apps.googleusercontent.com";
+  
+  if (!clientId) {
+    console.error("Google Client ID is missing");
+    return null;
+  }
+
   return (
-    <GoogleOAuthProvider clientId={"806052617207-h9sqqe0q9ivl7g660deofptssgus6593.apps.googleusercontent.com"}>
+    <GoogleOAuthProvider clientId={clientId}>
       <GoogleSignButton typePage={typePage} />
     </GoogleOAuthProvider>
   );
