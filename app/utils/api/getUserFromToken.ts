@@ -1,5 +1,5 @@
 // import { jwtDecode } from "jwt-decode";
-// import getToken from "./getTokenServer";
+// import { getTokenClient } from "./getTokenClient";
 // interface TokenType {
 //   id: string;
 //   name: string;
@@ -9,7 +9,7 @@
 // }
 
 // const getUserFromToken = (): TokenType | null => {
-//   const token = getToken();
+//   const token = getTokenClient();
 //   if (!token) return null;
 //   try {
 //     return jwtDecode<TokenType>(token);

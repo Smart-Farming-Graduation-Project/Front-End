@@ -41,10 +41,21 @@ type CategoryType = {
 type ReviewProps = {
   reviewID: string;
   userID: string;
-  productID: number;
+  firstName: string;
+  lastName: string;
   rating: number;
   reviewText: string;
   headline: string;
   reviewDate: string;
 };
-export type { Product, CategoryType, ProductId, WishListItem, CartItem, ItemProps, ReviewProps };
+type UserPostProps = {
+  id: number;
+  userId: string;
+  title: string;
+  content: string;
+  voteCount: number;
+  createdAt: string;
+  updatedAt?: string;
+};
+
+export type { Product, CategoryType, ProductId, WishListItem, CartItem, ItemProps, ReviewProps, UserPostProps };

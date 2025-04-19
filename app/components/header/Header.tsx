@@ -22,7 +22,6 @@ const Header = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   return (
     <header className={` fixed py-[8px] z-40 rounded-xl  ${isScrolled ? "opacity-100" : "opacity-0 pointer-events-none"} ${isOpenRounded ? "rounded-bl-none rounded-br-none" : ""}`}>
       <div className="container gap-4 flex items-center justify-between">
@@ -33,7 +32,7 @@ const Header = () => {
           </Link>
         </div>
         {/* end logo */}
-        <Navbar setIsOpenRounded={setIsOpenRounded}/>
+        <Navbar setIsOpenRounded={setIsOpenRounded} />
       </div>
     </header>
   );

@@ -9,12 +9,11 @@ import { IoIosLock, IoMdMail } from "react-icons/io";
 import { FaUser } from "react-icons/fa";
 import { MdOutlinePhoneAndroid } from "react-icons/md";
 import { GiPositionMarker } from "react-icons/gi";
+import { registerUser } from "../utils/api/Auth";
+// import FacebookSignButton from "../components/Auth/FacebookSignButton";
+import GoogleSignButton from "../components/Auth/GoogleSignButton";
+// import FacebookSignButton from "../components/Auth/FacebookSign";
 import { FaFacebook } from "react-icons/fa6";
-import { FcGoogle } from "react-icons/fc";
-import { registerUser, registerWithThirdParty } from "../utils/api/Auth";
-import { signInWithPopup } from "firebase/auth";
-import { useRouter } from "next/navigation";
-import { auth, facebookProvider, googleProvider } from "../utils/api/firebase";
 export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,7 +26,6 @@ export default function SignUp() {
   const [passwordError, setPasswordError] = useState("");
   const [error, setError] = useState<{ message: string | null } | null>(null);
   const [emailSent, setEmailSent] = useState(false);
-  const router = useRouter();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,25 +62,6 @@ export default function SignUp() {
       setError(apiErrors as { message: string });
     }
   };
-  const handleThirdPartySignUp = async (provider: "google" | "facebook") => {
-    try {
-      let result;
-      if (provider === "google") {
-        result = await signInWithPopup(auth, googleProvider);
-      } else {
-        result = await signInWithPopup(auth, facebookProvider);
-      }
-
-      const idToken = await result.user.getIdToken();
-      const response = await registerWithThirdParty(provider, idToken);
-
-      console.log(`${provider} Sign-Up Successful:`, response);
-      router.push("/dashboard");
-    } catch (error) {
-      console.error(`${provider} Sign-Up Failed:`, error);
-    }
-  };
-
   return (
     <div className="landing-auth pt-20 pb-10">
       <div className="relative mb-4">
@@ -183,34 +162,31 @@ export default function SignUp() {
               <Button type="submit" className="w-full py-[20px] mb-4">
                 Sign Up
               </Button>
-
-              {/* Divider with "or" */}
-              <div className="flex items-center gap-2 mb-4">
-                <div className="flex-1 h-px bg-[#ccc]"></div>
-                <span className="text-sm text-green">OR With</span>
-                <div className="flex-1 h-px bg-[#ccc]"></div>
-              </div>
-
-              {/* Third-Party Sign In Buttons */}
-              <div className="flex flex-col gap-2 mb-4">
-                <Button variant="outline" className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]" onClick={() => handleThirdPartySignUp("google")}>
-                  <FcGoogle size={20} />
-                  <span>Sign up with Google</span>
-                </Button>
-                <Button variant="outline" className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]" onClick={() => handleThirdPartySignUp("facebook")}>
-                  <FaFacebook className="text-blue-600" size={20} />
-                  <span>Sign up with Facebook</span>
-                </Button>
-              </div>
-
-              {/* Already have an account? Sign In */}
-              <div className="text-center">
-                <span className="text-sm">Already have an account? </span>
-                <Link href="/signin" className="text-sm text-green hover:underline">
-                  Sign In
-                </Link>
-              </div>
             </form>
+
+            {/* Divider with "or" */}
+            <div className="flex items-center gap-2 mb-4">
+              <div className="flex-1 h-px bg-[#ccc]"></div>
+              <span className="text-sm text-green">OR With</span>
+              <div className="flex-1 h-px bg-[#ccc]"></div>
+            </div>
+
+            {/* Third-Party Sign In Buttons */}
+            <div className="flex flex-col gap-2 mb-4">
+              <GoogleSignButton typePage="signup" />
+              {/* <FacebookSignButton typePage="signup" /> */}
+              <Button variant="outline" className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]">
+            <FaFacebook className="text-blue-600" size={20} />
+            <span>Sign up with Facebook</span>
+          </Button>
+            </div>
+            {/* Already have an account? Sign In */}
+            <div className="text-center">
+              <span className="text-sm">Already have an account? </span>
+              <Link href="/signin" className="text-sm text-green hover:underline">
+                Sign In
+              </Link>
+            </div>
           </>
         )}
       </div>

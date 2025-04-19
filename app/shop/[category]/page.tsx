@@ -20,7 +20,7 @@ const Category = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCategory, setFilteredCategory] = useState<Product[]>(products);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 8;
   const categoryId = Array.isArray(category) ? category[0] : category;
 
   useEffect(() => {
