@@ -65,7 +65,7 @@ const Sidebar = () => {
               title="Live"
               onClick={() => handleLinkClick("/dashboard/live")}>
               <RiLiveFill size={20} />
-              {isSidebarOpen && <span className="text-sm">Live</span>}
+              {isSidebarOpen && <span className="text-sm">Live Tracking</span>}
             </Link>
           </li>
           <li className="mb-4">

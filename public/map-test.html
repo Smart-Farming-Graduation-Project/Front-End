@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <title>نظام تتبع العربة - Azure Rover</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Azure Maps SDK -->
+    <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.css"
+      type="text/css"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+      }
+
+      #map {
+        width: 100%;
+        height: 100vh;
+      }
+
+      #dashboard {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        width: 300px;
+      }
+
+      .status-item {
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .status-label {
+        font-weight: 600;
+        color: #555;
+      }
+
+      .status-value {
+        text-align: left;
+      }
+
+      .online {
+        color: #4caf50;
+      }
+
+      .offline {
+        color: #f44336;
+      }
+
+      #telemetryInfo {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        max-width: 300px;
+      }
+
+      #controls {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .control-btn {
+        background: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #0078d4;
+        font-size: 18px;
+      }
+
+      .rover-icon {
+        font-size: 24px;
+        transition: transform 0.5s ease;
+      }
+
+      .pulse {
+        animation: pulse 1s ease;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      #mapFooter {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        background: rgba(255, 255, 255, 0.7);
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 10px;
+        z-index: 1000;
+      }
+
+      #locationInfo {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 8px;
+        border-radius: 5px;
+        z-index: 1000;
+        max-width: 200px;
+      }
+
+      #connectionDialog {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        z-index: 2000;
+        display: none;
+      }
+
+      .connection-form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .connection-form input {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .connection-form button {
+        padding: 10px;
+        background: #0078d4;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="dashboard">
+      <h3><i class="fas fa-satellite-dish"></i> حالة التتبع</h3>
+      <div class="status-item">
+        <span class="status-label">الحالة:</span>
+        <span class="status-value" id="connectionStatus"
+          ><i class="fas fa-circle online"></i> متصل</span
+        >
+      </div>
+      <div class="status-item">
+        <span class="status-label">آخر تحديث:</span>
+        <span class="status-value" id="lastUpdate">--</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">الموقع:</span>
+        <span class="status-value" id="position">--</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">IoT Hub:</span>
+        <span class="status-value" id="iotHubStatus"
+          ><i class="fas fa-circle offline"></i> غير متصل</span
+        >
+      </div>
+      <button
+        id="connectBtn"
+        style="
+          margin-top: 10px;
+          width: 100%;
+          padding: 8px;
+          background: #0078d4;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        "
+      >
+        <i class="fas fa-plug"></i> الاتصال بـ IoT Hub
+      </button>
+    </div>
+
+    <div id="locationInfo">
+      <i class="fas fa-map-marker-alt"></i> المنطقة: Qesm El Sherouk
+    </div>
+
+    <div id="map"></div>
+
+    <div id="telemetryInfo">
+      <h4><i class="fas fa-chart-line"></i> بيانات التتبع</h4>
+      <div id="telemetryDetails">
+        <p>
+          <i class="fas fa-map-pin"></i> <strong>خط العرض:</strong>
+          <span id="telemetryLat">--</span>
+        </p>
+        <p>
+          <i class="fas fa-map-pin"></i> <strong>خط الطول:</strong>
+          <span id="telemetryLon">--</span>
+        </p>
+        <p>
+          <i class="fas fa-clock"></i> <strong>آخر تحديث:</strong>
+          <span id="telemetryTime">--</span>
+        </p>
+      </div>
+    </div>
+
+    <div id="controls">
+      <button class="control-btn" id="zoomInBtn" title="تكبير">
+        <i class="fas fa-plus"></i>
+      </button>
+      <button class="control-btn" id="zoomOutBtn" title="تصغير">
+        <i class="fas fa-minus"></i>
+      </button>
+      <button class="control-btn" id="locateBtn" title="تحديد موقع العربة">
+        <i class="fas fa-location-arrow"></i>
+      </button>
+      <button class="control-btn" id="styleBtn" title="تغيير نمط الخريطة">
+        <i class="fas fa-layer-group"></i>
+      </button>
+    </div>
+
+    <div id="mapFooter">
+      <span>🚜</span> <span>©2025 OSM ©2025 TomTom</span> |
+      <span>Feedback</span>
+    </div>
+
+    <div id="connectionDialog">
+      <h3><i class="fas fa-plug"></i> اتصال IoT Hub</h3>
+      <div class="connection-form">
+        <input
+          type="text"
+          id="iotHubName"
+          placeholder="اسم IoT Hub"
+          value="opt-ee.azure-devices.net"
+        />
+        <input
+          type="text"
+          id="deviceId"
+          placeholder="معرف الجهاز"
+          value="test"
+        />
+        <input
+          type="text"
+          id="sharedAccessKey"
+          placeholder="مفتاح الوصول"
+          value="FpfrIjrSuZ6p3Om/G5+5WGJbp4ThBB/mMrb3n9Dq7h0="
+        />
+        <button id="confirmConnect">اتصال</button>
+      </div>
+    </div>
+
+    <script>
+      // الإعدادات
+      const config = {
+        azureMapsKey:
+          "6ujQZ58T0Lf3sMEm5spRgTnO9cykk74FVTkhFnwr22xzYHScUukwJQQJ99BDACYeBjFxOwjyAAAgAZMP4OPS",
+        apiUrl: "http://localhost:5120/api/Rover",
+        updateInterval: 5000,
+        defaultPosition: [31.566926, 30.123142],
+        defaultZoom: 17,
+      };
+
+      // المتغيرات العامة
+      let map,
+        roverMarker,
+        dataSource,
+        positionsHistory = [];
+      let currentBearing = 0;
+      let isFollowing = true;
+      let currentMapStyle = "road";
+      let iotHubConnected = false;
+      let lastPositionTime = null;
+
+      // تهيئة الخريطة
+      function initMap() {
+        map = new atlas.Map("map", {
+          center: config.defaultPosition,
+          zoom: config.defaultZoom,
+          style: "road",
+          authOptions: {
+            authType: "subscriptionKey",
+            subscriptionKey: config.azureMapsKey,
+          },
+        });
+
+        map.events.add("ready", function () {
+          // مصدر البيانات
+          dataSource = new atlas.source.DataSource();
+          map.sources.add(dataSource);
+
+          // علامة العربة
+          roverMarker = new atlas.HtmlMarker({
+            position: config.defaultPosition,
+            htmlContent: '<div class="rover-icon">🚜</div>',
+            anchor: "center",
+          });
+          map.markers.add(roverMarker);
+
+          // طبقة خط المسار
+          map.layers.add(
+            new atlas.layer.LineLayer(dataSource, null, {
+              strokeColor: "#0078D4",
+              strokeWidth: 4,
+            })
+          );
+
+          // إعداد عناصر التحكم
+          setupControls();
+
+          // بدء التحديث
+          updateLocation();
+        });
+      }
+
+      // حساب الاتجاه بتحسينات لمنع الدوران العشوائي
+      function calculateBearing(start, end) {
+        // إذا كانت المسافة صغيرة جداً، لا تغير الاتجاه
+        const distance = Math.sqrt(
+          Math.pow(end[0] - start[0], 2) + Math.pow(end[1] - start[1], 2)
+        );
+        if (distance < 0.0001) return currentBearing;
+
+        const startLat = (start[1] * Math.PI) / 180;
+        const startLng = (start[0] * Math.PI) / 180;
+        const endLat = (end[1] * Math.PI) / 180;
+        const endLng = (end[0] * Math.PI) / 180;
+
+        const y = Math.sin(endLng - startLng) * Math.cos(endLat);
+        const x =
+          Math.cos(startLat) * Math.sin(endLat) -
+          Math.sin(startLat) * Math.cos(endLat) * Math.cos(endLng - startLng);
+        let bearing = (Math.atan2(y, x) * 180) / Math.PI;
+        bearing = (bearing + 360) % 360;
+
+        // تطبيق تنعيم للاتجاه لتجنب التغيرات المفاجئة
+        if (Math.abs(bearing - currentBearing) > 180) {
+          if (bearing > currentBearing) {
+            bearing -= 360;
+          } else {
+            bearing += 360;
+          }
+        }
+
+        return bearing;
+      }
+
+      // تحديث الموقع
+      async function updateLocation() {
+        try {
+          const response = await fetch(config.apiUrl);
+          if (!response.ok) throw new Error("Network error");
+
+          const data = await response.json();
+          const newPosition = [data.longitude, data.latitude];
+          const now = new Date();
+          lastPositionTime = now;
+
+          // حساب الاتجاه إذا كان هناك موقع سابق
+          if (positionsHistory.length > 0) {
+            const prevPosition = positionsHistory[positionsHistory.length - 1];
+            currentBearing = calculateBearing(prevPosition, newPosition);
+          }
+
+          // تحديث موقع العلامة مع الحركة السلسة
+          updateRoverMarker(newPosition, now);
+
+          // إضافة الموقع الجديد للسجل
+          positionsHistory.push(newPosition);
+
+          // تحديث خط المسار
+          updatePathLine();
+
+          // تحديث واجهة المستخدم
+          updateUI(newPosition, now);
+
+          // تكبير الخريطة عند أول تحديث
+          if (positionsHistory.length === 1) {
+            map.setCamera({
+              center: newPosition,
+              zoom: 17,
+            });
+          }
+
+          // متابعة العربة إذا كان الوضع مفعل
+          if (isFollowing) {
+            map.setCamera({
+              center: newPosition,
+              zoom: map.getCamera().zoom, // الحفاظ على مستوى التكبير الحالي
+            });
+          }
+        } catch (error) {
+          console.error("خطأ في جلب البيانات:", error);
+          document.getElementById("connectionStatus").innerHTML =
+            '<i class="fas fa-circle offline"></i> خطأ في الاتصال';
+
+          // إذا مرت أكثر من دقيقة بدون تحديث
+          if (lastPositionTime && new Date() - lastPositionTime > 60000) {
+            document.getElementById("connectionStatus").innerHTML =
+              '<i class="fas fa-circle offline"></i> اتصال مقطوع';
+          }
+        }
+
+        // جدولة التحديث التالي
+        setTimeout(updateLocation, config.updateInterval);
+      }
+
+      // تحديث علامة العربة بحركة أكثر سلاسة
+      function updateRoverMarker(position, time) {
+        // تأثير النبض عند التحديث
+        roverMarker.setOptions({
+          position: position,
+          htmlContent: `<div class="rover-icon pulse" style="transform: rotate(${currentBearing}deg)">🚜</div>`,
+        });
+
+        // إزالة تأثير النبض بعد ثانية
+        setTimeout(() => {
+          roverMarker.setOptions({
+            htmlContent: `<div class="rover-icon" style="transform: rotate(${currentBearing}deg)">🚜</div>`,
+          });
+        }, 1000);
+      }
+
+      // تحديث خط المسار
+      function updatePathLine() {
+        if (positionsHistory.length > 1) {
+          dataSource.clear();
+          dataSource.add(
+            new atlas.data.Feature(
+              new atlas.data.LineString(positionsHistory),
+              { color: "#0078D4" }
+            )
+          );
+        }
+      }
+
+      // تحديث واجهة المستخدم
+      function updateUI(position, time) {
+        // لوحة المعلومات
+        document.getElementById("connectionStatus").innerHTML =
+          '<i class="fas fa-circle online"></i> متصل';
+        document.getElementById("lastUpdate").textContent =
+          time.toLocaleTimeString() + " " + time.toLocaleDateString();
+        document.getElementById("position").textContent =
+          position[1].toFixed(6) + "°, " + position[0].toFixed(6) + "°";
+
+        // بيانات التتبع
+        document.getElementById("telemetryLat").textContent =
+          position[1].toFixed(6) + "°";
+        document.getElementById("telemetryLon").textContent =
+          position[0].toFixed(6) + "°";
+        document.getElementById("telemetryTime").textContent =
+          time.toLocaleTimeString();
+      }
+
+      // إعداد عناصر التحكم
+      function setupControls() {
+        // تكبير
+        document
+          .getElementById("zoomInBtn")
+          .addEventListener("click", function () {
+            map.setCamera({
+              zoom: map.getCamera().zoom + 1,
+            });
+            isFollowing = false;
+          });
+
+        // تصغير
+        document
+          .getElementById("zoomOutBtn")
+          .addEventListener("click", function () {
+            map.setCamera({
+              zoom: map.getCamera().zoom - 1,
+            });
+            isFollowing = false;
+          });
+
+        // تحديد موقع العربة
+        document
+          .getElementById("locateBtn")
+          .addEventListener("click", function () {
+            if (positionsHistory.length > 0) {
+              const lastPos = positionsHistory[positionsHistory.length - 1];
+              map.setCamera({
+                center: lastPos,
+                zoom: 17,
+              });
+              isFollowing = true;
+            }
+          });
+
+        // تغيير نمط الخريطة
+        document
+          .getElementById("styleBtn")
+          .addEventListener("click", function () {
+            currentMapStyle = currentMapStyle === "road" ? "satellite" : "road";
+            map.setStyle({
+              style: currentMapStyle,
+            });
+          });
+
+        // زر الاتصال بـ IoT Hub
+        document
+          .getElementById("connectBtn")
+          .addEventListener("click", function () {
+            document.getElementById("connectionDialog").style.display = "block";
+          });
+
+        // تأكيد الاتصال
+        document
+          .getElementById("confirmConnect")
+          .addEventListener("click", function () {
+            const hubName = document.getElementById("iotHubName").value;
+            const deviceId = document.getElementById("deviceId").value;
+            const accessKey = document.getElementById("sharedAccessKey").value;
+
+            if (hubName && deviceId && accessKey) {
+              connectToIoTHub(hubName, deviceId, accessKey);
+              document.getElementById("connectionDialog").style.display =
+                "none";
+            } else {
+              alert("الرجاء إدخال جميع البيانات المطلوبة");
+            }
+          });
+
+        // اكتشاف حركة الخريطة لتحديد إذا توقف المتابعة
+        map.events.add("moveend", function () {
+          if (isFollowing && positionsHistory.length > 0) {
+            const center = map.getCamera().center;
+            const lastPos = positionsHistory[positionsHistory.length - 1];
+            const distance = Math.sqrt(
+              Math.pow(center[0] - lastPos[0], 2) +
+                Math.pow(center[1] - lastPos[1], 2)
+            );
+
+            if (distance > 0.001) {
+              isFollowing = false;
+            }
+          }
+        });
+      }
+
+      // محاكاة اتصال IoT Hub (في تطبيق حقيقي، هذا سيتصل بخدمة backend)
+      function connectToIoTHub(hubName, deviceId, accessKey) {
+        document.getElementById("iotHubStatus").innerHTML =
+          '<i class="fas fa-sync-alt fa-spin"></i> جاري الاتصال...';
+
+        // محاكاة اتصال IoT Hub
+        setTimeout(() => {
+          iotHubConnected = true;
+          document.getElementById(
+            "iotHubStatus"
+          ).innerHTML = `<i class="fas fa-circle online"></i> متصل بـ ${hubName}/${deviceId}`;
+          document.getElementById("connectBtn").innerHTML =
+            '<i class="fas fa-plug"></i> قطع الاتصال';
+
+          // تغيير زر الاتصال ليعمل كزر قطع اتصال
+          document.getElementById("connectBtn").onclick = function () {
+            disconnectFromIoTHub();
+          };
+        }, 2000);
+      }
+
+      // قطع الاتصال بـ IoT Hub
+      function disconnectFromIoTHub() {
+        iotHubConnected = false;
+        document.getElementById("iotHubStatus").innerHTML =
+          '<i class="fas fa-circle offline"></i> غير متصل';
+        document.getElementById("connectBtn").innerHTML =
+          '<i class="fas fa-plug"></i> الاتصال بـ IoT Hub';
+
+        // إعادة تعيين زر الاتصال
+        document.getElementById("connectBtn").onclick = function () {
+          document.getElementById("connectionDialog").style.display = "block";
+        };
+      }
+
+      // بدء التطبيق
+      initMap();
+    </script>
+  </body>
+</html>
