@@ -32,7 +32,7 @@ const ModelPage = () => {
                     src="/model-page.html"
                     title="Disease Detection Interface"
                     allowFullScreen
-                    className="w-full h-[calc(100vh-200px)] min-h-[400px]"
+                    className="w-full h-[calc(100vh-200px)] min-h-[600px]"
                     style={{ border: "none" }}
                     aria-label="AI model interface for disease detection"
                     loading="lazy"

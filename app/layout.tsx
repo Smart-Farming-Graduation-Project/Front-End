@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const hiddenPages = ["/signin", "/dashboard", "/dashboard/chat", "/dashboard/community", "/dashboard/live", "/dashboard/admin", "/forgot-password", "/signup"];
+  const hiddenPages = ["/signin", "/dashboard", "/dashboard/ai", "/dashboard/chat", "/dashboard/community", "/dashboard/live", "/dashboard/admin", "/forgot-password", "/signup"];
   const shouldHide = hiddenPages.includes(pathname);
 
   return (
