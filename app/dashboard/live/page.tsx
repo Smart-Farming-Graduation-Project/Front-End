@@ -3,7 +3,6 @@ import React from "react";
 const LiveRover = () => {
   return (
     <section className="flex-1 px-4 py-8 md:px-6 lg:px-8">
-      {/* Header with improved spacing and hierarchy */}
       <div className="mb-8 space-y-2">
         <div className="flex items-center gap-3">
           <h1 className="text-3xl font-bold text-gray-900 md:text-4xl dark:text-white">
@@ -12,12 +11,12 @@ const LiveRover = () => {
           <span className="inline-flex h-3 w-3 rounded-full bg-green-400 animate-pulse" aria-hidden="true"></span>
         </div>
         <p className="text-gray-600 dark:text-gray-300">
-          Real-time tracking 
+          Real-time tracking
         </p>
         <div className="h-1 w-20 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full"></div>
       </div>
 
-      {/* Live Map with better responsive design */}
+
       <div className="rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition-all duration-300 hover:shadow-2xl">
         <div className="p-1 bg-gray-50 dark:bg-gray-700 flex items-center justify-between">
           <div className="flex space-x-2">
@@ -29,7 +28,7 @@ const LiveRover = () => {
             LIVE STREAM • UPDATED JUST NOW
           </span>
         </div>
-        
+
         <iframe
           src="/map-test.html"
           title="Live Rover Stream"
