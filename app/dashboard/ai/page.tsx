@@ -27,12 +27,11 @@ const ModelPage = () => {
                         AI MODEL • READY FOR PREDICTION
                     </span>
                 </div>
-
                 <iframe
                     src="/model-page.html"
                     title="Disease Detection Interface"
                     allowFullScreen
-                    className="w-full h-[calc(100vh-200px)] min-h-[600px]"
+                    className="w-full h-[calc(100vh-200px)] min-h-[400px]"
                     style={{ border: "none" }}
                     aria-label="AI model interface for disease detection"
                     loading="lazy"
