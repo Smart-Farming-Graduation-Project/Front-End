@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Plant Disease Detection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Poppins", Arial, sans-serif;
+        background: linear-gradient(135deg, #eef2f7, #d9e4f5);
+        margin: 0;
+        padding: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      .container {
+        background: #ffffff;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 600px;
+        width: 100%;
+        animation: fadeIn 0.5s ease-in-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h1 {
+        color: #007bff;
+        margin-bottom: 1.5rem;
+        font-size: 2rem;
+      }
+
+      .upload-section {
+        margin-bottom: 1.5rem;
+      }
+
+      .upload-label {
+        display: inline-block;
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: #ffffff;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        font-weight: 600;
+      }
+
+      .upload-label:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+      }
+
+      #image-input {
+        display: none;
+      }
+
+      .drag-drop-area {
+        border: 2px dashed #007bff;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        background: #f9f9f9;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+
+      .drag-drop-area:hover {
+        background: #f0f0f0;
+      }
+
+      .drag-drop-area p {
+        color: #007bff;
+        margin: 0;
+      }
+
+      .result-section {
+        margin-top: 1.5rem;
+        display: none;
+      }
+
+      #processed-image {
+        max-width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        margin-top: 1rem;
+      }
+
+      .loading-spinner {
+        display: none;
+        margin: 1rem auto;
+      }
+
+      .loading-spinner::after {
+        content: "";
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .error-message {
+        color: #dc3545;
+        margin-top: 1rem;
+        display: none;
+      }
+
+      .success-message {
+        color: #28a745;
+        margin-top: 1rem;
+        display: none;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: #e0e0e0;
+        border-radius: 4px;
+        margin-top: 1rem;
+        overflow: hidden;
+        display: none;
+      }
+
+      .progress-bar-inner {
+        height: 100%;
+        width: 0;
+        background: #007bff;
+        transition: width 0.3s ease;
+      }
+
+      .button-container {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 1.5rem;
+      }
+
+      .button-container button {
+        flex: 1;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        font-weight: 600;
+        border: none;
+        color: #ffffff;
+      }
+
+      .button-container button:hover {
+        transform: translateY(-2px);
+      }
+
+      #reupload-button {
+        background: linear-gradient(135deg, #28a745, #218838);
+      }
+
+      #download-button {
+        background: linear-gradient(135deg, #17a2b8, #138496);
+      }
+
+      #get-feedback-button {
+        background: linear-gradient(135deg, #ffc107, #e0a800);
+      }
+
+      .feedback-section {
+        margin-top: 1.5rem;
+        text-align: left;
+      }
+
+      .feedback-section h2 {
+        color: #007bff;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+      }
+
+      .feedback-list {
+        background: #f9f9f9;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .feedback-item {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .feedback-item h3 i.fa-chevron-down {
+        margin-left: auto; /* Move icon to the right */
+        color: #007bff;
+        transition: transform 0.2s ease;
+      }
+      .feedback-item h3 i.fa-chevron-down.rotate {
+        transform: rotate(180deg); /* Rotate icon when expanded */
+      }
+      .feedback-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .feedback-item h3 {
+        color: #007bff;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+      }
+
+      .feedback-item h3 i {
+        color: #ffc107;
+      }
+
+      .feedback-item .summary,
+      .feedback-item .full-solution {
+        margin: 0;
+        color: #555;
+        line-height: 1.5;
+      }
+
+      .feedback-item .full-solution {
+        margin-top: 0.5rem;
+        display: none;
+      }
+
+      .feedback-item .full-solution.show {
+        display: block;
+      }
+      .feedback-item ul {
+        margin: 0;
+        padding-left: 1.5rem;
+      }
+
+      .feedback-item ul li {
+        margin-bottom: 0.5rem;
+        color: #555;
+      }
+
+      .feedback-item ul li::before {
+        content: "•";
+        color: #007bff;
+        font-weight: bold;
+        display: inline-block;
+        width: 1em;
+        margin-left: -1em;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 1.5rem;
+        }
+
+        .button-container {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .button-container button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Plant Disease Detection</h1>
+      <div class="upload-section">
+        <label for="image-input" class="upload-label">Upload Image</label>
+        <input type="file" id="image-input" accept="image/*" />
+        <div class="drag-drop-area" id="drag-drop-area">
+          <p>Or drag and drop an image here</p>
+        </div>
+      </div>
+      <div class="progress-bar" id="progress-bar">
+        <div class="progress-bar-inner" id="progress-bar-inner"></div>
+      </div>
+      <div class="result-section">
+        <img id="processed-image" src="#" alt="Processed Image" />
+        <div class="results-list" id="results-list"></div>
+      </div>
+      <div class="loading-spinner"></div>
+      <div class="error-message" id="error-message">
+        An error occurred. Please try again.
+      </div>
+      <div class="success-message" id="success-message">
+        Image processed successfully!
+      </div>
+      <div class="button-container" id="button-container" style="display: none">
+        <button id="reupload-button" class="upload-label">
+          Re-upload Image
+        </button>
+        <button id="download-button" class="download-button">
+          Download Image
+        </button>
+        <button id="get-feedback-button" class="get-feedback-button">
+          Get Feedback
+        </button>
+      </div>
+      <div class="feedback-section" id="feedback-section" style="display: none">
+        <h2>Feedback</h2>
+        <div class="feedback-list" id="feedback-list"></div>
+      </div>
+    </div>
+
+    <script>
+      // Define the formatFeedback function
+      function formatFeedback(text) {
+        // Replace newline characters with <br> tags for HTML display
+        return text.replace(/\n/g, "<br>");
+      }
+
+      const imageInput = document.getElementById("image-input");
+      const dragDropArea = document.getElementById("drag-drop-area");
+      const progressBar = document.getElementById("progress-bar");
+      const progressBarInner = document.getElementById("progress-bar-inner");
+      const resultSection = document.querySelector(".result-section");
+      const loadingSpinner = document.querySelector(".loading-spinner");
+      const errorMessage = document.getElementById("error-message");
+      const successMessage = document.getElementById("success-message");
+      const buttonContainer = document.getElementById("button-container");
+      const reuploadButton = document.getElementById("reupload-button");
+      const downloadButton = document.getElementById("download-button");
+      const getFeedbackButton = document.getElementById("get-feedback-button");
+      const resultsList = document.getElementById("results-list");
+      const feedbackSection = document.getElementById("feedback-section");
+      const feedbackList = document.getElementById("feedback-list");
+
+      let imageId = null; // Store the imageId for fetching feedback
+      let processedImageUrl = null;
+
+      // Handle file input change
+      imageInput.addEventListener("change", handleFileUpload);
+
+      // Handle re-upload button click
+      reuploadButton.addEventListener("click", () => {
+        resetUI();
+      });
+
+      // Handle download button click
+      downloadButton.addEventListener("click", () => {
+        if (processedImageUrl) {
+          // Create a temporary <a> element to trigger the download
+          const a = document.createElement("a");
+          a.href = processedImageUrl;
+          a.download = `processed-image-${Date.now()}.jpg`; // Set the download filename
+          document.body.appendChild(a);
+          a.click(); // Trigger the download
+          document.body.removeChild(a); // Clean up
+        } else {
+          alert("No image available to download.");
+        }
+      });
+
+      // Handle get feedback button click
+      getFeedbackButton.addEventListener("click", async () => {
+        if (!imageId) {
+          alert("No image ID found. Please upload an image first.");
+          return;
+        }
+
+        loadingSpinner.style.display = "block";
+        feedbackSection.style.display = "none"; // Hide feedback section initially
+        feedbackList.innerHTML = ""; // Clear previous feedback
+
+        try {
+          const response = await fetch(
+            `https://crop-pilot-api.azurewebsites.net/api/AIModel/feedback/${imageId}`
+          );
+          const result = await response.json();
+
+          if (result.succeeded && result.data.length > 0) {
+            result.data.forEach((item) => {
+              const feedbackItem = document.createElement("div");
+              feedbackItem.className = "feedback-item";
+              feedbackItem.innerHTML = `
+                          <h3>
+                              <i class="fas fa-leaf"></i> ${item.disease}
+                              <i class="fas fa-chevron-down"></i>
+                          </h3>
+                          <!-- <p class="summary">${formatFeedback(
+                            item.solution.split("\n").slice(0, 2).join("<br>")
+                          )}</p> -->
+                          <p class="full-solution">${formatFeedback(
+                            item.solution
+                          )}</p>
+                      `;
+              const header = feedbackItem.querySelector("h3");
+              const chevron = feedbackItem.querySelector(".fa-chevron-down");
+              const fullSolution = feedbackItem.querySelector(".full-solution");
+
+              header.addEventListener("click", () => {
+                fullSolution.classList.toggle("show");
+                chevron.classList.toggle("rotate"); // Rotate chevron icon
+              });
+
+              feedbackList.appendChild(feedbackItem);
+            });
+            feedbackSection.style.display = "block"; // Show feedback section
+          } else {
+            feedbackList.innerHTML = "<p>No feedback available.</p>";
+          }
+        } catch (error) {
+          console.error("Error fetching feedback:", error);
+          feedbackList.innerHTML =
+            "<p>Failed to fetch feedback. Please try again.</p>";
+        } finally {
+          loadingSpinner.style.display = "none";
+        }
+      });
+
+      // Reset the UI
+      function resetUI() {
+        imageInput.value = ""; // Clear the file input
+        resultSection.style.display = "none";
+        errorMessage.style.display = "none";
+        successMessage.style.display = "none";
+        buttonContainer.style.display = "none";
+        resultsList.innerHTML = ""; // Clear the results list
+        document.getElementById("processed-image").src = "#"; // Clear the image
+        imageId = null; // Reset imageId
+        feedbackSection.style.display = "none"; // Hide feedback section
+        feedbackList.innerHTML = ""; // Clear feedback list
+      }
+
+      // Handle drag and drop
+      dragDropArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dragDropArea.style.background = "#f0f0f0";
+      });
+
+      dragDropArea.addEventListener("dragleave", () => {
+        dragDropArea.style.background = "#f9f9f9";
+      });
+
+      dragDropArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dragDropArea.style.background = "#f9f9f9";
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith("image/")) {
+          handleFileUpload(file);
+        } else {
+          alert("Please upload a valid image file.");
+        }
+      });
+
+      function handleFileUpload(event) {
+        const file = event.target?.files?.[0] || event;
+        if (file && file.type.startsWith("image/")) {
+          const formData = new FormData();
+          formData.append("image", file);
+
+          // Show loading spinner and reset UI
+          loadingSpinner.style.display = "block";
+          resultSection.style.display = "none";
+          errorMessage.style.display = "none";
+          successMessage.style.display = "none";
+          buttonContainer.style.display = "none";
+          progressBar.style.display = "block";
+          progressBarInner.style.width = "0";
+          const apiUrl =
+            "https://crop-pilot-api.azurewebsites.net/api/AIModel/predict"; // Updated API endpoint
+
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", apiUrl, true);
+
+          // Track upload progress
+          xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable) {
+              const percentComplete = (e.loaded / e.total) * 100;
+              progressBarInner.style.width = `${percentComplete}%`;
+            }
+          };
+
+          xhr.onload = () => {
+            if (xhr.status === 200) {
+              const response = xhr.response; // No need to parse, responseType is set to 'json'
+              console.log("Response:", response);
+              if (
+                response.succeeded &&
+                response.data &&
+                response.data.imageId &&
+                response.data.imageUrl
+              ) {
+                imageId = response.data.imageId; // Store the imageId
+                const imageUrl = response.data.imageUrl.replace(/\\/g, "/");
+                processedImageUrl = response.data.imageUrl.replace(/\\/g, "/");
+
+                // Set the processed image source
+                document.getElementById("processed-image").src = `${imageUrl}`;
+                resultSection.style.display = "block"; // Show the result section
+                successMessage.style.display = "block"; // Show the success message
+                buttonContainer.style.display = "flex"; // Show the buttons
+              } else {
+                console.error("Invalid response:", response);
+                errorMessage.style.display = "block"; // Show error if response is invalid
+              }
+            } else {
+              console.error("Request failed with status:", xhr.status);
+              errorMessage.style.display = "block"; // Show error if request fails
+            }
+          };
+
+          xhr.onerror = () => {
+            console.error("Request failed. Check the network or server.");
+            errorMessage.style.display = "block";
+            loadingSpinner.style.display = "none";
+            progressBar.style.display = "none";
+          };
+
+          xhr.onloadend = () => {
+            loadingSpinner.style.display = "none";
+            progressBar.style.display = "none";
+          };
+
+          xhr.responseType = "json"; // Set response type to JSON
+          xhr.send(formData); // Send the request
+        } else {
+          alert("Please upload a valid image file.");
+        }
+      }
+    </script>
+  </body>
+</html>

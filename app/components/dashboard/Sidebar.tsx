@@ -2,8 +2,9 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import { GiMagicHat } from "react-icons/gi";
-import { RiAdminFill, RiLiveFill } from "react-icons/ri";
-import { TbHomeStats, TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand } from "react-icons/tb";
+import { RiAdminFill } from "react-icons/ri";
+import { MdOutlineTrackChanges } from "react-icons/md";
+import { TbHomeStats, TbPlant2, TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbVirusSearch } from "react-icons/tb";
 import { FaPeopleGroup } from "react-icons/fa6";
 import logo from "../../assets/images/Logo.png";
 import Image from "next/image";
@@ -32,9 +33,8 @@ const Sidebar = () => {
         </button>
       )}
       <div
-        className={`p-2 bg-gradient-to-r from-[#033d20] to-green shadow-lg transition-all duration-300 ${isSidebarOpen ? "w-56" : "w-[72px]"} ${
-          isMobile ? (isSidebarOpen ? "absolute top-0 left-0 z-50 min-h-screen" : "hidden") : "relative h-screen"
-        }`}>
+        className={`p-2 bg-gradient-to-r from-[#033d20] to-green shadow-lg transition-all duration-300 ${isSidebarOpen ? "w-56" : "w-[72px]"} ${isMobile ? (isSidebarOpen ? "absolute top-0 left-0 z-50 min-h-screen" : "hidden") : "relative h-screen"
+          }`}>
         <div className="p-4 text-[#9CA3AF] hover:text-white transition-all duration-300">
           <button onClick={toggleSidebar} className="focus:outline-none flex items-center w-full">
             {isSidebarOpen ? (
@@ -64,10 +64,21 @@ const Sidebar = () => {
               className={`px-4 py-2 cursor-pointer flex items-center gap-2 ${activeLink === "/dashboard/live" ? "bg-white text-green rounded-lg" : "text-[#9CA3AF] hover:text-white"}`}
               title="Live"
               onClick={() => handleLinkClick("/dashboard/live")}>
-              <RiLiveFill size={20} />
-              {isSidebarOpen && <span className="text-sm">Live</span>}
+              <MdOutlineTrackChanges size={20} />
+              {isSidebarOpen && <span className="text-sm">Live Tracking</span>}
             </Link>
           </li>
+          <li className="mb-4">
+            <Link
+              href="/dashboard/ai"
+              className={`px-4 py-2 cursor-pointer flex items-center gap-2 ${activeLink === "/dashboard/ai" ? "bg-white text-green rounded-lg" : "text-[#9CA3AF] hover:text-white"}`}
+              title="Ai Model"
+              onClick={() => handleLinkClick("/dashboard/ai")}>
+              <TbVirusSearch size={20} />
+              {isSidebarOpen && <span className="text-sm">Ai Model</span>}
+            </Link>
+          </li>
+
           <li className="mb-4">
             <Link
               href="/dashboard/chat"
@@ -76,6 +87,17 @@ const Sidebar = () => {
               onClick={() => handleLinkClick("/dashboard/chat")}>
               <GiMagicHat size={20} />
               {isSidebarOpen && <span className="text-sm">Chat</span>}
+            </Link>
+          </li>
+
+          <li className="mb-4">
+            <Link
+              href="/dashboard/farmDashboard"
+              className={`px-4 py-2 cursor-pointer flex items-center gap-2 ${activeLink === "/dashboard/farmDashboard" ? "bg-white text-green rounded-lg" : "text-[#9CA3AF] hover:text-white"}`}
+              title="Farm Dashboard"
+              onClick={() => handleLinkClick("/dashboard/farmDashboard")}>
+              <TbPlant2 size={20} />
+              {isSidebarOpen && <span className="text-sm">Farm Dashboard</span>}
             </Link>
           </li>
           <li className="mb-4">

@@ -3,6 +3,7 @@ export const getTokenClient = () => {
   return Cookies.get("token");
 };
 export const deleteTokenClient = () => {
-  localStorage.removeItem("token"); 
-  console.log("Token deleted!");
+  Cookies.remove("token");
+  Cookies.remove("refreshToken");
+  // console.log("Token deleted!");
 };

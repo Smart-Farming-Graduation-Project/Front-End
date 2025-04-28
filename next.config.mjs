@@ -1,7 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["graduationprojetct.blob.core.windows.net"],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'graduationprojetct.blob.core.windows.net',
+        port: '',
+        pathname: '**',
+      },
+    ],
   },
 };
 
