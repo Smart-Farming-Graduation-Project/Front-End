@@ -8,11 +8,11 @@ import API_BASE_URL from "@/app/utils/api/base";
 import { useAuth } from "@/app/utils/contexts/AuthContext";
 import Image from "next/image";
 import avatar from "@/app/assets/images/abdo.jpg";
-import { FaArrowUp, FaArrowDown, FaReply } from "react-icons/fa";
+import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import EditComment from "./EditComment";
 import DeleteComment from "./DeleteComment";
 import { HiDotsVertical } from "react-icons/hi";
-
+import moment from "moment";
 type CommentProps = {
   id: number;
   postId: number;
@@ -245,7 +245,7 @@ const Comments = ({ postId, isOpen, onCommentAdded }: CommentsProps) => {
                   <Image src={avatar} alt="User Avatar" width={32} height={32} className="rounded-full object-cover" />
                   <div>
                     <span className="font-medium text-[#1f2937] text-sm">{comment.userId}</span>
-                    <span className="block text-xs text-[#6b7280]">{new Date(comment.createdAt).toLocaleString()}</span>
+                    <span className="block text-xs text-[#6b7280]">{moment(comment.createdAt).fromNow()}</span>
                   </div>
                 </div>
                 

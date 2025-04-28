@@ -8,14 +8,8 @@ import "./signin.css";
 import { IoIosLock, IoMdMail } from "react-icons/io";
 import { loginUser } from "../utils/api/Auth";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
-// import GoogleSignButton from "../components/Auth/GoogleSignButton";
 import { useAuth } from "../utils/contexts/AuthContext";
-import { FaFacebook } from "react-icons/fa6";
 import ExternalAuthButton from "../components/Auth/ExternalAuthButton";
-// import FacebookSignButton from "../components/Auth/FacebookSign";
-
-// import FacebookSignButton from "../components/Auth/FacebookSignButton";
 export default function SignIn() {
   const { user, login, isLoading } = useAuth();
   const [userNameOrEmail, setUserNameOrEmail] = useState("");
@@ -23,7 +17,7 @@ export default function SignIn() {
   const [error, setError] = useState<{ message: string | null } | null>(null);
   const router = useRouter();
   useEffect(() => {
-    console.log("User:", user);
+    // console.log("User:", user);
     if (user || isLoading) {
       if (user?.Role === "Admin" || user?.Role === "SuperAdmin") {
         router.push("/dashboard");
@@ -31,7 +25,7 @@ export default function SignIn() {
         router.push("/");
       }
     }
-  }, [user, router]);
+  }, [user, router, isLoading]);
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);

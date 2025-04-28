@@ -11,11 +11,6 @@ import { MdOutlinePhoneAndroid } from "react-icons/md";
 import { GiPositionMarker } from "react-icons/gi";
 import { registerUser } from "../utils/api/Auth";
 import ExternalAuthButton from "../components/Auth/ExternalAuthButton";
-// import FacebookSignButton from "../components/Auth/FacebookSignButton";
-// import GoogleSignButton from "../components/Auth/GoogleSignButton";
-// import FacebookSignButton from "../components/Auth/FacebookSign";
-import { FaFacebook } from "react-icons/fa6";
-// import FacebookSignButton from "../components/Auth/FacebookSignButton";
 export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
