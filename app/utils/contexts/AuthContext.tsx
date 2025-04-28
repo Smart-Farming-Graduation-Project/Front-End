@@ -1,53 +1,45 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
+import Cookies from "js-cookie";
 import { getTokenClient, deleteTokenClient } from "../api/getTokenClient";
+import { useSession, signOut } from "next-auth/react";
+import { refreshToken } from "../api/Auth";
 
 interface TokenType {
-  sub: string; // User ID
-  given_name?: string; // First name (optional)
-  family_name?: string; // Last name (optional)
-  email?: string; // Email (optional)
-  Role?: string; // User role
-  iss: string; // Token issuer
-  jti: string; // JWT ID
-  exp: number; // Expiration time
-  nbf: number; // Not valid before time
-  iat: number; // Issued at time
-  // Add any other claims your backend includes
+  sub: string;
+  id: string;
+  given_name: string;
+  email: string;
+  Role: string;
+  iss: string;
+  jti: number;
+  exp: number;
 }
 
 interface AuthContextType {
   user: TokenType | null;
   isLoading: boolean;
-  isAuthenticated: boolean;
   logout: () => void;
-  login: (token: string) => void;
-  token: string | null;
+  login: (accessToken: string, refreshTokenValue: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
-  isAuthenticated: false,
   logout: () => {},
   login: () => {},
-  token: null,
 });
-
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<TokenType | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { data: session } = useSession();
 
-  const updateUser = (newToken?: string) => {
-    const currentToken = newToken || getTokenClient();
+  const updateUser = (token?: string) => {
+    const currentToken = token || getTokenClient();
 
     if (!currentToken) {
       setUser(null);
-      setToken(null);
-      setIsAuthenticated(false);
       setIsLoading(false);
       return;
     }
@@ -55,94 +47,97 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const decoded = jwtDecode<TokenType>(currentToken);
 
-      // Check if token is expired
       if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-        console.log("Token expired, logging out");
         setUser(null);
-        setToken(null);
-        setIsAuthenticated(false);
-        deleteTokenClient(); // Clear the expired token
-      } else {
-        setUser(decoded);
-        setToken(currentToken);
-        setIsAuthenticated(true);
+        return;
       }
-    } catch (error) {
-      console.error("Error decoding token:", error);
+
+      setUser(decoded);
+    } catch {
       setUser(null);
-      setToken(null);
-      setIsAuthenticated(false);
-      deleteTokenClient(); // Clear the invalid token
     } finally {
       setIsLoading(false);
     }
   };
 
+  const refreshTokenHandler = async () => {
+    try {
+      const accessToken = Cookies.get("token");
+      const refreshTokenValue = Cookies.get("refreshToken");
+
+      if (!accessToken || !refreshTokenValue) {
+        setUser(null);
+        setIsLoading(false);
+        return;
+      }
+
+      const response = await refreshToken(accessToken, refreshTokenValue);
+
+      if (response.statusCode === 200) {
+        Cookies.set("token", response.data.tokens.accessToken);
+        Cookies.set("refreshToken", response.data.tokens.refreshToken);
+        updateUser(response.data.tokens.accessToken);
+      } else {
+        logout();
+      }
+    } catch (error) {
+      console.error("Token refresh failed:", error);
+      logout();
+    }
+  };
+
   const logout = () => {
     deleteTokenClient();
+    signOut({ callbackUrl: "/signin" });
     setUser(null);
-    setToken(null);
-    setIsAuthenticated(false);
   };
 
-  const login = (newToken: string) => {
-    if (!newToken) {
-      console.error("Attempted to login with empty token");
-      return;
+  const login = (accessToken: string, refreshTokenValue: string) => {
+    Cookies.set("token", accessToken);
+    Cookies.set("refreshToken", refreshTokenValue);
+    updateUser(accessToken);
+  };
+
+  // Check if token is close to expiry (e.g., less than 5 minutes)
+  const isTokenExpiringSoon = (token: string): boolean => {
+    try {
+      const decoded = jwtDecode<TokenType>(token);
+      const currentTime = Date.now() / 1000;
+
+      // Refresh if token expires in less than 5 minutes
+      return decoded.exp - currentTime < 300;
+    } catch {
+      return false;
     }
-
-    // Store token in localStorage
-    localStorage.setItem("token", newToken);
-
-    // Update user state
-    updateUser(newToken);
   };
 
-  // Auto-refresh the token state on focus or storage changes
   useEffect(() => {
-    const handleStorageChange = () => {
-      updateUser();
-    };
+    if (!user) return;
 
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        updateUser();
+    const token = Cookies.get("token");
+    if (!token) return;
+
+    const checkInterval = setInterval(() => {
+      if (isTokenExpiringSoon(token)) {
+        refreshTokenHandler();
       }
-    };
+    }, 60000);
 
-    // Check token on mount
-    updateUser();
+    return () => clearInterval(checkInterval);
+  }, [user]);
 
-    // Set up event listeners
-    window.addEventListener("storage", handleStorageChange);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    // Set up periodic token validation (optional)
-    const tokenCheckInterval = setInterval(() => {
+  useEffect(() => {
+    if (session?.backendToken) {
+      login(session.backendToken, session.refreshToken || "");
+    } else {
       updateUser();
-    }, 60000); // Check every minute
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      clearInterval(tokenCheckInterval);
-    };
-  }, []);
+    }
+  }, [session]);
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isLoading,
-        isAuthenticated,
-        logout,
-        login,
-        token,
-      }}
-    >
+    <AuthContext.Provider value={{ user, isLoading, logout, login }}>
       {children}
     </AuthContext.Provider>
   );
 };
-
 export const useAuth = () => useContext(AuthContext);

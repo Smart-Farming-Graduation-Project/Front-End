@@ -86,7 +86,7 @@ export default function ExternalAuthButton({
       );
 
       if (data.token) {
-        login(data.token);
+        login(data.token, data.refreshToken);
         router.push("/");
         toast.success(
           `${

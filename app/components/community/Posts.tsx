@@ -11,6 +11,7 @@ import API_BASE_URL from "@/app/utils/api/base";
 import { useAuth } from "@/app/utils/contexts/AuthContext";
 import EditPost from "./EditPost";
 import DeletePost from "./DeletePost";
+import Comments from "./Comments";
 import { UserPostProps } from "@/app/utils/types/app";
 
 type VoteState = {
@@ -25,6 +26,8 @@ const Posts = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<UserPostProps | null>(null);
   const [voteStates, setVoteStates] = useState<VoteState>({});
+  const [commentsOpenPostId, setCommentsOpenPostId] = useState<number | null>(null);
+  const [commentCounts, setCommentCounts] = useState<Record<number, number>>({});
 
   const { user, isLoading } = useAuth();
   const token = getTokenClient();
@@ -42,6 +45,7 @@ const Posts = () => {
           },
         });
         setPosts(response.data.data);
+        fetchCommentCounts(response.data.data);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching posts:", error);
@@ -52,10 +56,36 @@ const Posts = () => {
     fetchPosts();
   }, [token]);
 
+  const fetchCommentCounts = async (postsData: UserPostProps[]) => {
+    if (!token || !postsData.length) return;
+
+    const counts: Record<number, number> = {};
+
+    for (const post of postsData) {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/Comments/GetComments/${post.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        counts[post.id] = (response.data.data || []).length;
+      } catch (error) {
+        console.error(`Error fetching comment count for post ${post.id}:`, error);
+        counts[post.id] = 0;
+      }
+    }
+
+    setCommentCounts(counts);
+  };
+
   if (isLoading) return <p>Loading...</p>;
 
   const toggleMenu = (postId: number) => {
     setMenuOpenId(menuOpenId === postId ? null : postId);
+  };
+
+  const toggleComments = (postId: number) => {
+    setCommentsOpenPostId(commentsOpenPostId === postId ? null : postId);
   };
 
   const handleEditUpdate = (updatedPost: { id: number; title: string; content: string }) => {
@@ -96,7 +126,6 @@ const Posts = () => {
           },
         }
       );
-      console.log("Voted:", postId, voteType);
       setPosts(posts.map((post) => (post.id === postId ? { ...post, voteCount: post.voteCount + voteCountChange } : post)));
       setVoteStates((prev) => ({
         ...prev,
@@ -124,7 +153,6 @@ const Posts = () => {
           "Content-Type": "application/json",
         },
       });
-      console.log("Vote removed:", postId);
       setPosts(
         posts.map((post) =>
           post.id === postId
@@ -139,6 +167,13 @@ const Posts = () => {
     } catch (error) {
       console.error("Error removing vote:", error);
     }
+  };
+
+  const handleCommentAdded = (postId: number) => {
+    setCommentCounts((prev) => ({
+      ...prev,
+      [postId]: (prev[postId] || 0) + 1,
+    }));
   };
 
   return (
@@ -205,9 +240,13 @@ const Posts = () => {
                   onClick={() => (voteStates[post.id] === "down" ? handleRemoveVote(post.id) : handleVote(post.id, -1))}>
                   <FaArrowDown className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" className="flex items-center gap-1 text-[#6b7280] hover:text-[#22c55e]">
+                <Button 
+                  variant="ghost" 
+                  className="flex items-center gap-1 text-[#6b7280] hover:text-[#22c55e]"
+                  onClick={() => toggleComments(post.id)}
+                >
                   <FaComment className="w-4 h-4" />
-                  <span>Comments (0)</span>
+                  <span>{commentCounts[post.id] || 0}</span>
                 </Button>
               </div>
               <Button variant="ghost" className="flex items-center gap-1 text-[#6b7280] hover:text-[#22c55e]">
@@ -215,6 +254,15 @@ const Posts = () => {
                 <span>Share</span>
               </Button>
             </div>
+            
+            {/* Comments Section */}
+            {commentsOpenPostId === post.id && (
+              <Comments 
+                postId={post.id} 
+                isOpen={true} 
+                onCommentAdded={handleCommentAdded} 
+              />
+            )}
           </div>
         ))
       )}
