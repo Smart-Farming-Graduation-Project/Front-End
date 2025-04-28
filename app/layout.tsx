@@ -8,6 +8,7 @@ import "./globals.css";
 import React from "react";
 import { usePathname } from "next/navigation";
 import { AuthProvider } from "./utils/contexts/AuthContext";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export default function RootLayout({
   children,
@@ -15,22 +16,35 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const hiddenPages = ["/signin", "/dashboard", "/dashboard/farmDashboard", "/dashboard/ai", "/dashboard/chat", "/dashboard/community", "/dashboard/live", "/dashboard/admin", "/forgot-password", "/signup"];
+  const hiddenPages = [
+    "/signin",
+    "/dashboard",
+    "/dashboard/farmDashboard",
+    "/dashboard/ai",
+    "/dashboard/chat",
+    "/dashboard/community",
+    "/dashboard/live",
+    "/dashboard/admin",
+    "/forgot-password",
+    "/signup",
+  ];
   const shouldHide = hiddenPages.includes(pathname);
 
   return (
     <Provider store={store}>
-      <html lang="en">
-        <body>
-          <AuthProvider>
-            <MobileHandlerProvider>
-              {!shouldHide && <Header />}
-              {children}
-              {!shouldHide && <Footer />}
-            </MobileHandlerProvider>
-          </AuthProvider>
-        </body>
-      </html>
+      <GoogleOAuthProvider clientId="806052617207-h9sqqe0q9ivl7g660deofptssgus6593.apps.googleusercontent.com">
+        <html lang="en">
+          <body>
+            <AuthProvider>
+              <MobileHandlerProvider>
+                {!shouldHide && <Header />}
+                {children}
+                {!shouldHide && <Footer />}
+              </MobileHandlerProvider>
+            </AuthProvider>
+          </body>
+        </html>
+      </GoogleOAuthProvider>
     </Provider>
   );
 }
