@@ -2,24 +2,33 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import "./signin.css";
 import { IoIosLock, IoMdMail } from "react-icons/io";
 import { loginUser } from "../utils/api/Auth";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-// import FacebookSignButton from "../components/Auth/FacebookSignButton";
 import GoogleSignButton from "../components/Auth/GoogleSignButton";
 import { useAuth } from "../utils/contexts/AuthContext";
 import { FaFacebook } from "react-icons/fa6";
-// import FacebookSignButton from "../components/Auth/FacebookSign";
+import FacebookSignButton from "../components/Auth/FacebookSignButton";
 export default function SignIn() {
-  const { user, login } = useAuth();
+  const { user, login , isLoading } = useAuth();
   const [userNameOrEmail, setUserNameOrEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<{ message: string | null } | null>(null);
   const router = useRouter();
+  useEffect(() => {
+    console.log("User:", user);
+    if (user || isLoading) {
+      if (user?.Role === "Admin" || user?.Role === "SuperAdmin") {
+        router.push("/dashboard");
+      } else {
+        router.push("/");
+      }
+    }
+  }, [user, router]);
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -29,16 +38,15 @@ export default function SignIn() {
         userNameOrEmail,
         password,
       });
-      // Navigate to home/dashboard based on the token received
-      // console.log("Login Successful:", data.data.tokens.accessToken);
-      if (data.statusCode == 200) {
-        Cookies.set("token", data.data.tokens.accessToken);
-        if (user?.Role === "Admin") router.push("/dashboard");
-        else router.push("/");
-        login(data.data.tokens.accessToken);
+      
+      if (data.statusCode === 200) {
+        await login(
+          data.data.tokens.accessToken,
+          data.data.tokens.refreshToken
+        );
       }
     } catch (apiErrors) {
-      console.error("Registration Failed:", apiErrors);
+      console.error("Login Failed:", apiErrors);
       setError(apiErrors as { message: string });
     }
   };
@@ -89,11 +97,11 @@ export default function SignIn() {
         {/* Third-Party Sign In Buttons */}
         <div className="flex flex-col gap-2 mb-4">
           <GoogleSignButton typePage="signin" />
-          {/* <FacebookSignButton typePage="signin" /> */}
-          <Button variant="outline" className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]">
+          <FacebookSignButton typePage="signin" />
+          {/* <Button variant="outline" className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]">
             <FaFacebook className="text-blue-600" size={20} />
             <span>Sign in with Facebook</span>
-          </Button>
+          </Button> */}
         </div>
 
         {/* Forgot Password Link */}

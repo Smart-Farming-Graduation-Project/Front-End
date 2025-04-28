@@ -88,3 +88,21 @@ export const resendConfirmationEmail = async (email: string) => {
     throw [{ Message: "An unexpected error occurred." }];
   }
 };
+
+export const refreshToken = async (accessToken: string, refreshToken: string) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/Authentication/RefreshToken`, {
+      tokens: {
+        accessToken,
+        refreshToken
+      }
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("Error refreshing token:", error.response?.data);
+      throw error.response?.data || { message: "Failed to refresh authentication tokens." };
+    }
+    throw { message: "An unexpected error occurred while refreshing tokens." };
+  }
+};
