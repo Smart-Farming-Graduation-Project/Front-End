@@ -12,7 +12,7 @@ import Footer from "./components/footer/Footer";
 import { MobileHandlerProvider } from "./utils/contexts/MobileHandler";
 import { AuthProvider } from "./utils/contexts/AuthContext";
 import LoadingWrapper from "./utils/contexts/LoadingWrapper";
-// import DataFetchProvider from "./utils/contexts/DataFetchProvider";
+import DataFetchProvider from "./utils/contexts/DataFetchProvider";
 
 import "./globals.css";
 
@@ -55,11 +55,11 @@ export default function RootLayout({
             <SessionProvider>
               <AuthProvider>
                 <MobileHandlerProvider>
-                  {/* <DataFetchProvider> */}
+                  <DataFetchProvider>
                     <LoadingWrapper minimumLoadTime={800} message="Loading...">
                       <AppContent>{children}</AppContent>
                     </LoadingWrapper>
-                  {/* </DataFetchProvider> */}
+                  </DataFetchProvider>
                 </MobileHandlerProvider>
               </AuthProvider>
             </SessionProvider>
