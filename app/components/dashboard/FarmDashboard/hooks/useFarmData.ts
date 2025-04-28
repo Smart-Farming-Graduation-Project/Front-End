@@ -1,22 +1,13 @@
 "use client";
 import { faker } from "@faker-js/faker";
 import { useState, useEffect, useCallback } from "react";
-import {
-  generateCropYieldData,
-  generateAlerts,
-  generateFieldData,
-} from "../utils/dataGenerators";
-import type {
-  CropYieldData,
-  EmergencyAlert,
-  Field,
-  FarmStatus,
-} from "../utils/types";
+import { generateCropYieldData, generateAlerts, generateFieldData } from "../utils/dataGenerators";
+import type { CropYieldData, EmergencyAlert, Field, FarmStatus } from "../utils/types";
 
 export const useFarmData = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
-  const [farmStatus, setFarmStatus] = useState<FarmStatus>({
+  const farmStatus = {
     activeMachines: 3,
     cropHealth: "Good",
     irrigationStatus: "Active",
@@ -24,18 +15,14 @@ export const useFarmData = () => {
     pestRisk: "Low",
     waterReservoir: faker.number.int({ min: 30, max: 100 }),
     solarGeneration: faker.number.int({ min: 50, max: 200 }),
-  });
-  const [cropYieldData, setCropYieldData] = useState<CropYieldData[]>(
-    generateCropYieldData()
-  );
+  };
+  const [cropYieldData, setCropYieldData] = useState<CropYieldData[]>(generateCropYieldData());
   // const [soilMoistureData, setSoilMoistureData] = useState<SoilMoistureData[]>(
   //   generateSoilMoistureData()
   // );
   const [alerts, setAlerts] = useState<EmergencyAlert[]>(generateAlerts());
   const [fieldData, setFieldData] = useState<Field[]>(generateFieldData());
-  const [unreadAlerts, setUnreadAlerts] = useState(
-    alerts.filter((alert) => !alert.read).length
-  );
+  const [unreadAlerts, setUnreadAlerts] = useState(alerts.filter((alert) => !alert.read).length);
 
   const refreshFarmData = useCallback(async () => {
     setLoading(true);
@@ -47,9 +34,7 @@ export const useFarmData = () => {
       setFieldData(generateFieldData());
       setError(null);
     } catch (err) {
-      setError(
-        err instanceof Error ? err : new Error("Failed to refresh farm data")
-      );
+      setError(err instanceof Error ? err : new Error("Failed to refresh farm data"));
     } finally {
       setLoading(false);
     }
@@ -66,13 +51,7 @@ export const useFarmData = () => {
       (prev: any) => {
         const newData = [...prev];
         const randomIndex = Math.floor(Math.random() * newData.length);
-        newData[randomIndex].moisture = Math.max(
-          20,
-          Math.min(
-            90,
-            newData[randomIndex].moisture + (Math.random() > 0.5 ? 5 : -5)
-          )
-        );
+        newData[randomIndex].moisture = Math.max(20, Math.min(90, newData[randomIndex].moisture + (Math.random() > 0.5 ? 5 : -5)));
         return newData;
       };
 
@@ -106,11 +85,7 @@ export const useFarmData = () => {
   }, []);
 
   const markAlertAsRead = useCallback((alertId: string) => {
-    setAlerts((prev) =>
-      prev.map((alert) =>
-        alert.id === alertId ? { ...alert, read: true } : alert
-      )
-    );
+    setAlerts((prev) => prev.map((alert) => (alert.id === alertId ? { ...alert, read: true } : alert)));
   }, []);
 
   const markAllAlertsAsRead = useCallback(() => {

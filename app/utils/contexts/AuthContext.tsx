@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import { getTokenClient, deleteTokenClient } from "../api/getTokenClient";
@@ -30,12 +30,13 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
   login: () => {},
 });
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<TokenType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { data: session } = useSession();
 
-  const updateUser = (token?: string) => {
+  const updateUser = useCallback((token?: string) => {
     const currentToken = token || getTokenClient();
 
     if (!currentToken) {
@@ -58,9 +59,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const refreshTokenHandler = async () => {
+  const logout = useCallback(() => {
+    deleteTokenClient();
+    signOut({ callbackUrl: "/signin" });
+    setUser(null);
+  }, []);
+
+  const refreshTokenHandler = useCallback(async () => {
     try {
       const accessToken = Cookies.get("token");
       const refreshTokenValue = Cookies.get("refreshToken");
@@ -84,27 +91,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error("Token refresh failed:", error);
       logout();
     }
-  };
+  }, [logout, updateUser]);
 
-  const logout = () => {
-    deleteTokenClient();
-    signOut({ callbackUrl: "/signin" });
-    setUser(null);
-  };
+  const login = useCallback(
+    (accessToken: string, refreshTokenValue: string) => {
+      Cookies.set("token", accessToken);
+      Cookies.set("refreshToken", refreshTokenValue);
+      updateUser(accessToken);
+    },
+    [updateUser]
+  );
 
-  const login = (accessToken: string, refreshTokenValue: string) => {
-    Cookies.set("token", accessToken);
-    Cookies.set("refreshToken", refreshTokenValue);
-    updateUser(accessToken);
-  };
-
-  // Check if token is close to expiry (e.g., less than 5 minutes)
   const isTokenExpiringSoon = (token: string): boolean => {
     try {
       const decoded = jwtDecode<TokenType>(token);
       const currentTime = Date.now() / 1000;
 
-      // Refresh if token expires in less than 5 minutes
       return decoded.exp - currentTime < 300;
     } catch {
       return false;
@@ -124,7 +126,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, 60000);
 
     return () => clearInterval(checkInterval);
-  }, [user,refreshTokenHandler]);
+  }, [user, refreshTokenHandler]);
 
   useEffect(() => {
     if (session?.backendToken) {
@@ -132,12 +134,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       updateUser();
     }
-  }, [session , login]);
+  }, [session, login, updateUser]);
 
-  return (
-    <AuthContext.Provider value={{ user, isLoading, logout, login }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ user, isLoading, logout, login }}>{children}</AuthContext.Provider>;
 };
+
 export const useAuth = () => useContext(AuthContext);
