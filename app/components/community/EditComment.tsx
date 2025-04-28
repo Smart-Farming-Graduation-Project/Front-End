@@ -42,7 +42,11 @@ const EditComment = ({ comment, isOpen, onClose, onUpdate }: EditCommentProps) =
           },
         }
       );
-      
+      if (response.status !== 200) {
+        console.error("Failed to update comment:", response.data);
+        return;
+      }
+      // Update the comment in the parent component
       onUpdate({ id: comment.id, content: commentContent });
       onClose();
     } catch (error) {

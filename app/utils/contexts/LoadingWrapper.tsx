@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Loading from "@/app/components/utils/Loading";
 import { useAuth } from "./AuthContext";
-import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 
 interface LoadingWrapperProps {
@@ -12,7 +11,7 @@ interface LoadingWrapperProps {
   message?: string;
 }
 
-const LoadingWrapper = ({ children, minimumLoadTime = 1200, message = "Loading..." }: LoadingWrapperProps) => {
+const LoadingWrapper = ({ children, minimumLoadTime = 1200}: LoadingWrapperProps) => {
   const { isLoading: authLoading } = useAuth();
   const [delayElapsed, setDelayElapsed] = useState(false);
   const [routeChanging, setRouteChanging] = useState(false);

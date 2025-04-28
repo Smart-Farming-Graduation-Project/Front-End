@@ -124,7 +124,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, 60000);
 
     return () => clearInterval(checkInterval);
-  }, [user]);
+  }, [user,refreshTokenHandler]);
 
   useEffect(() => {
     if (session?.backendToken) {
@@ -132,7 +132,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       updateUser();
     }
-  }, [session]);
+  }, [session , login]);
 
   return (
     <AuthContext.Provider value={{ user, isLoading, logout, login }}>

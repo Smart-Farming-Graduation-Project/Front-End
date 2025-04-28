@@ -1,4 +1,4 @@
-import { NextAuthOptions, Session } from "next-auth";
+import { NextAuthOptions } from "next-auth"; // Remove Session since it's not used
 import FacebookProvider from "next-auth/providers/facebook";
 import GoogleProvider from "next-auth/providers/google";
 import axios from "axios";
@@ -17,6 +17,11 @@ declare module "next-auth" {
   }
 }
 
+interface ExtendedProfile {
+  sub?: string;
+  id?: string;
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     FacebookProvider({
@@ -24,8 +29,7 @@ export const authOptions: NextAuthOptions = {
       clientSecret: "be37206c56544dbe47a065e644914777",
     }),
     GoogleProvider({
-      clientId:
-        "806052617207-h9sqqe0q9ivl7g660deofptssgus6593.apps.googleusercontent.com",
+      clientId: "806052617207-h9sqqe0q9ivl7g660deofptssgus6593.apps.googleusercontent.com",
       clientSecret: "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",
     }),
   ],
@@ -35,18 +39,12 @@ export const authOptions: NextAuthOptions = {
         try {
           let response;
 
-          if (
-            account.provider === "google" ||
-            account.provider === "facebook"
-          ) {
-            response = await axios.post(
-              `${API_BASE_URL}/Authentication/login-with-third-party`,
-              {
-                userId: profile?.sub || (profile as any)?.id,
-                accessToken: account.access_token,
-                provider: account.provider,
-              }
-            );
+          if (account.provider === "google" || account.provider === "facebook") {
+            response = await axios.post(`${API_BASE_URL}/Authentication/login-with-third-party`, {
+              userId: profile?.sub || (profile as ExtendedProfile)?.id,
+              accessToken: account.access_token,
+              provider: account.provider,
+            });
 
             const backendToken = response.data.data.tokens.accessToken;
             const refreshToken = response.data.data.tokens.refreshToken;

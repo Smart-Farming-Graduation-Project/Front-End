@@ -9,7 +9,7 @@ import { getTokenClient } from "@/app/utils/api/getTokenClient";
 import { ReviewProps } from "@/app/utils/types/app";
 import toast from "react-hot-toast";
 import { deleteReview, updateReview } from "@/app/utils/api/Review";
-
+import moment from "moment";
 type propsType = {
   userId: string;
   review: ReviewProps;
@@ -54,7 +54,7 @@ const ReviewItem = ({ review, userId }: propsType) => {
       <div className="flex justify-between">
         <div className="flex items-center gap-3 mb-1">
           <h4 className="font-semibold text-gray-900 text-lg">{review.firstName + " " + review.lastName}</h4>
-          <span className="text-sm text-green">{review.reviewDate.slice(0, 10)}</span>
+          <span className="text-sm text-green">{moment(review.reviewDate).fromNow()}</span>
         </div>
         {review.userID === userId && (
           <div className="controls relative">

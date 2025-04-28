@@ -75,12 +75,12 @@ export const useWeatherData = (city: string = "Cairo"): WeatherHookResult => {
 
   useEffect(() => {
     fetchData();
-  }, [city]);
+  }, [city , fetchData]);
 
   useEffect(() => {
     const interval = setInterval(fetchData, 300000);
     return () => clearInterval(interval);
-  }, [city]);
+  }, [city, fetchData]);
 
   return {
     currentWeather: data.current,

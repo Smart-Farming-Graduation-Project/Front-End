@@ -3,13 +3,11 @@ import { faker } from "@faker-js/faker";
 import { useState, useEffect, useCallback } from "react";
 import {
   generateCropYieldData,
-  generateSoilMoistureData,
   generateAlerts,
   generateFieldData,
 } from "../utils/dataGenerators";
 import type {
   CropYieldData,
-  SoilMoistureData,
   EmergencyAlert,
   Field,
   FarmStatus,
@@ -80,13 +78,13 @@ export const useFarmData = () => {
 
       // Occasionally add a new alert
       if (Math.random() > 0.9) {
-        const newAlertTypes = [
-          "Irrigation",
-          "Pest",
-          "Equipment",
-          "Weather",
-          "Soil",
-        ] as const;
+        // const newAlertTypes = [
+        //   "Irrigation",
+        //   "Pest",
+        //   "Equipment",
+        //   "Weather",
+        //   "Soil",
+        // ] as const;
         // const newAlert: EmergencyAlert = {
         //   id: crypto.randomUUID(),
         //   type: newAlertTypes[Math.floor(Math.random() * newAlertTypes.length)],

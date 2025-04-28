@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { GiMagicHat } from "react-icons/gi";
 import { RiAdminFill } from "react-icons/ri";
 import { MdOutlineTrackChanges } from "react-icons/md";
-import { TbHomeStats, TbPlant2, TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbVirusSearch } from "react-icons/tb";
+import { TbPlant2, TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbVirusSearch } from "react-icons/tb";
 import { FaPeopleGroup } from "react-icons/fa6";
 import logo from "../../assets/images/Logo.png";
 import Image from "next/image";
@@ -48,14 +48,14 @@ const Sidebar = () => {
           </button>
         </div>
         <ul className="mt-4">
-          <li className="mb-4">
+        <li className="mb-4">
             <Link
               href="/dashboard"
-              className={`px-4 py-2 cursor-pointer flex items-center gap-2 ${activeLink === "/dashboard" ? "bg-white text-green rounded-lg" : "text-[#9CA3AF] hover:text-white"}`}
-              title="Home"
+              className={`px-4 py-2 cursor-pointer flex items-center gap-2 ${activeLink === "/dashboard/farmDashboard" ? "bg-white text-green rounded-lg" : "text-[#9CA3AF] hover:text-white"}`}
+              title="Farm Dashboard"
               onClick={() => handleLinkClick("/dashboard")}>
-              <TbHomeStats size={20} />
-              {isSidebarOpen && <span className="text-sm">Home</span>}
+              <TbPlant2 size={20} />
+              {isSidebarOpen && <span className="text-sm">Farm Dashboard</span>}
             </Link>
           </li>
           <li className="mb-4">
@@ -90,16 +90,7 @@ const Sidebar = () => {
             </Link>
           </li>
 
-          <li className="mb-4">
-            <Link
-              href="/dashboard/farmDashboard"
-              className={`px-4 py-2 cursor-pointer flex items-center gap-2 ${activeLink === "/dashboard/farmDashboard" ? "bg-white text-green rounded-lg" : "text-[#9CA3AF] hover:text-white"}`}
-              title="Farm Dashboard"
-              onClick={() => handleLinkClick("/dashboard/farmDashboard")}>
-              <TbPlant2 size={20} />
-              {isSidebarOpen && <span className="text-sm">Farm Dashboard</span>}
-            </Link>
-          </li>
+
           <li className="mb-4">
             <Link
               href="/dashboard/community"
