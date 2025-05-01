@@ -106,7 +106,7 @@ const SoilQualityButton = ({
     return () => {
       document.body.classList.remove("overflow-hidden");
     };
-  }, [isOpen]);
+  }, [isOpen , fetchSoilData]);
 
   const getRatingColor = (rating: string) => {
     switch (rating.toLowerCase()) {

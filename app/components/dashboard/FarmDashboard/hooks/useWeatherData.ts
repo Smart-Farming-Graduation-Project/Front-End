@@ -1,9 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
-import {
-  fetchCurrentWeather,
-  fetchWeatherForecast,
-} from "../utils/api/weatherService";
+import { useState, useEffect, useCallback } from "react"; 
+import { fetchCurrentWeather, fetchWeatherForecast } from "../utils/api/weatherService";
 import type { WeatherData, WeatherForecast } from "../utils/types";
 
 interface WeatherHookResult {
@@ -39,15 +36,12 @@ export const useWeatherData = (city: string = "Cairo"): WeatherHookResult => {
     forecast: null as string | null,
   });
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading({ current: true, forecast: true });
       setError({ current: null, forecast: null });
 
-      const [current, forecast] = await Promise.allSettled([
-        fetchCurrentWeather(city),
-        fetchWeatherForecast(city),
-      ]);
+      const [current, forecast] = await Promise.allSettled([fetchCurrentWeather(city), fetchWeatherForecast(city)]);
 
       if (current.status === "fulfilled") {
         setData((prev) => ({ ...prev, current: current.value }));
@@ -56,9 +50,7 @@ export const useWeatherData = (city: string = "Cairo"): WeatherHookResult => {
       }
 
       if (forecast.status === "fulfilled") {
-        const forecastData = Array.isArray(forecast.value)
-          ? forecast.value
-          : [forecast.value];
+        const forecastData = Array.isArray(forecast.value) ? forecast.value : [forecast.value];
         setData((prev) => ({ ...prev, forecast: forecastData }));
       } else {
         setError((prev) => ({ ...prev, forecast: forecast.reason.message }));
@@ -71,16 +63,16 @@ export const useWeatherData = (city: string = "Cairo"): WeatherHookResult => {
     } finally {
       setLoading({ current: false, forecast: false });
     }
-  };
+  }, [city]); // Add city as a dependency
 
   useEffect(() => {
     fetchData();
-  }, [city , fetchData]);
+  }, [fetchData]); // Now fetchData will only change when city changes
 
   useEffect(() => {
     const interval = setInterval(fetchData, 300000);
     return () => clearInterval(interval);
-  }, [city, fetchData]);
+  }, [fetchData]); // Same here
 
   return {
     currentWeather: data.current,

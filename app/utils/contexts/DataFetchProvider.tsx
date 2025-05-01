@@ -1,6 +1,5 @@
 "use client";
-
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { fetchCart } from "../redux/slices/CartSlice";
 import { fetchWishlist } from "../redux/slices/wishListSlice";
@@ -14,13 +13,15 @@ export default function DataFetchProvider({
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const { user, isLoading } = useAuth();
+  const [hasFetched, setHasFetched] = useState(false); // << ADD THIS
 
   useEffect(() => {
-    if (user && !isLoading) {
+    if (user && !isLoading && !hasFetched) {
       dispatch(fetchCart());
       dispatch(fetchWishlist());
+      setHasFetched(true); // << ONLY ONCE
     }
-  }, [dispatch, user, isLoading]);
+  }, [dispatch, user, isLoading, hasFetched]);
 
   return <>{children}</>;
 }
