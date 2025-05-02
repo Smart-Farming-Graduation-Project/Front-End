@@ -5,17 +5,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Image from "next/image";
-import avatar from "@/app/assets/images/abdo.jpg";
 import { Textarea } from "@/components/ui/textarea";
 import { getTokenClient } from "@/app/utils/api/getTokenClient";
 import API_BASE_URL from "@/app/utils/api/base";
+import { useAuth } from "@/app/utils/contexts/AuthContext";
+import UserDetails from "./UserDetails";
 
 const AddPost = () => {
   const [isAddPostDialogOpen, setIsAddPostDialogOpen] = useState(false);
   const [postTitle, setPostTitle] = useState("");
   const [postContent, setPostContent] = useState("");
-
+  const { user } = useAuth();
   const token = getTokenClient();
 
   const handleAddPost = async () => {
@@ -46,6 +46,7 @@ const AddPost = () => {
       setPostTitle("");
       setPostContent("");
       setIsAddPostDialogOpen(false);
+      window.location.reload();
     } catch (error) {
       console.error("Error creating post:", error);
     }
@@ -54,7 +55,8 @@ const AddPost = () => {
   return (
     <div className="p-4">
       <div className="flex items-center gap-4 bg-[#f2f3f3] p-4 rounded-lg">
-        <Image src={avatar} alt="Profile" width={40} height={40} className="w-10 h-10 rounded-full object-cover" />
+        {user && <UserDetails userId={user.sub} imageSize={40} />}
+        
         <Dialog open={isAddPostDialogOpen} onOpenChange={setIsAddPostDialogOpen}>
           <DialogTrigger asChild>
             <Button variant="outline" className="w-full text-start text-[#6b7280] border-[#e5e7eb] hover:bg-[#f3f4f6] py-6 rounded-lg">

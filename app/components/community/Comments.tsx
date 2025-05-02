@@ -6,13 +6,13 @@ import { Input } from "@/components/ui/input";
 import { getTokenClient } from "@/app/utils/api/getTokenClient";
 import API_BASE_URL from "@/app/utils/api/base";
 import { useAuth } from "@/app/utils/contexts/AuthContext";
-import Image from "next/image";
-import avatar from "@/app/assets/images/abdo.jpg";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import EditComment from "./EditComment";
 import DeleteComment from "./DeleteComment";
 import { HiDotsVertical } from "react-icons/hi";
 import moment from "moment";
+import UserDetails from "./UserDetails";
+
 type CommentProps = {
   id: number;
   postId: number;
@@ -47,7 +47,7 @@ const Comments = ({ postId, isOpen, onCommentAdded }: CommentsProps) => {
       setLoading(false);
       return;
     }
-    
+
     setLoading(true);
     try {
       const response = await axios.get(`${API_BASE_URL}/Comments/GetComments/${postId}`, {
@@ -56,13 +56,13 @@ const Comments = ({ postId, isOpen, onCommentAdded }: CommentsProps) => {
         },
       });
       setComments(response.data.data || []);
-      
+
       const initialVoteStates: Record<number, "up" | "down" | null> = {};
       (response.data.data || []).forEach((comment: CommentProps) => {
         initialVoteStates[comment.id] = null;
       });
       setVoteStates(initialVoteStates);
-      
+
       setLoading(false);
     } catch (error) {
       console.error("Error fetching comments:", error);
@@ -94,7 +94,7 @@ const Comments = ({ postId, isOpen, onCommentAdded }: CommentsProps) => {
           },
         }
       );
-      
+
       const newCommentData = {
         id: response.data.data.id,
         content: newComment.trim(),
@@ -103,9 +103,9 @@ const Comments = ({ postId, isOpen, onCommentAdded }: CommentsProps) => {
         parentCommentId: 0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        voteCount: 0
+        voteCount: 0,
       };
-      setComments(prevComments => [...prevComments, newCommentData]);
+      setComments((prevComments) => [...prevComments, newCommentData]);
       setNewComment("");
       if (onCommentAdded) {
         onCommentAdded(postId);
@@ -120,13 +120,11 @@ const Comments = ({ postId, isOpen, onCommentAdded }: CommentsProps) => {
   };
 
   const handleUpdateComment = (updatedComment: { id: number; content: string }) => {
-    setComments(comments.map(comment => 
-      comment.id === updatedComment.id ? { ...comment, content: updatedComment.content } : comment
-    ));
+    setComments(comments.map((comment) => (comment.id === updatedComment.id ? { ...comment, content: updatedComment.content } : comment)));
   };
 
   const handleDeleteComment = (commentId: number) => {
-    setComments(comments.filter(comment => comment.id !== commentId));
+    setComments(comments.filter((comment) => comment.id !== commentId));
   };
 
   const handleVote = async (commentId: number, voteType: 1 | -1) => {
@@ -134,16 +132,16 @@ const Comments = ({ postId, isOpen, onCommentAdded }: CommentsProps) => {
       console.log("No token available");
       return;
     }
-  
+
     const currentVote = voteStates[commentId];
     let voteCountChange: number = voteType;
-  
+
     if (currentVote === "up" && voteType === -1) {
       voteCountChange = -2;
     } else if (currentVote === "down" && voteType === 1) {
       voteCountChange = 2;
     }
-  
+
     try {
       await axios.post(
         `${API_BASE_URL}/Votes/Vote`,
@@ -159,11 +157,9 @@ const Comments = ({ postId, isOpen, onCommentAdded }: CommentsProps) => {
           },
         }
       );
-      
-      setComments(comments.map((comment) => 
-        comment.id === commentId ? { ...comment, voteCount: comment.voteCount + voteCountChange } : comment
-      ));
-      
+
+      setComments(comments.map((comment) => (comment.id === commentId ? { ...comment, voteCount: comment.voteCount + voteCountChange } : comment)));
+
       setVoteStates((prev) => ({
         ...prev,
         [commentId]: voteType === 1 ? "up" : "down",
@@ -172,13 +168,13 @@ const Comments = ({ postId, isOpen, onCommentAdded }: CommentsProps) => {
       console.error("Error voting on comment:", error);
     }
   };
-  
+
   const handleRemoveVote = async (commentId: number) => {
     if (!token) {
       console.log("No token available");
       return;
     }
-  
+
     try {
       await axios.delete(`${API_BASE_URL}/Votes/DeleteVote`, {
         data: {
@@ -190,22 +186,18 @@ const Comments = ({ postId, isOpen, onCommentAdded }: CommentsProps) => {
           "Content-Type": "application/json",
         },
       });
-      
+
       setComments(
         comments.map((comment) =>
           comment.id === commentId
             ? {
                 ...comment,
-                voteCount: voteStates[commentId] === "up" 
-                  ? comment.voteCount - 1 
-                  : voteStates[commentId] === "down" 
-                    ? comment.voteCount + 1 
-                    : comment.voteCount,
+                voteCount: voteStates[commentId] === "up" ? comment.voteCount - 1 : voteStates[commentId] === "down" ? comment.voteCount + 1 : comment.voteCount,
               }
             : comment
         )
       );
-      
+
       setVoteStates((prev) => ({ ...prev, [commentId]: null }));
     } catch (error) {
       console.error("Error removing vote from comment:", error);
@@ -217,20 +209,15 @@ const Comments = ({ postId, isOpen, onCommentAdded }: CommentsProps) => {
   return (
     <div className="comments-section mt-4 border-t pt-4">
       <h3 className="text-lg font-semibold mb-4">Comments</h3>
-      
+
       {/* Add Comment Form */}
       <div className="flex gap-2 mb-6">
-        <Input
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Write a comment..."
-          className="flex-grow"
-        />
+        <Input value={newComment} onChange={(e) => setNewComment(e.target.value)} placeholder="Write a comment..." className="flex-grow" />
         <Button onClick={handleAddComment} className="bg-green text-white">
           Add
         </Button>
       </div>
-      
+
       {/* Comments List */}
       {loading ? (
         <p className="text-[#6b7280]">Loading comments...</p>
@@ -241,14 +228,8 @@ const Comments = ({ postId, isOpen, onCommentAdded }: CommentsProps) => {
           {comments.map((comment) => (
             <div key={comment.id} className="bg-[#f9f9f9] p-3 rounded-lg">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Image src={avatar} alt="User Avatar" width={32} height={32} className="rounded-full object-cover" />
-                  <div>
-                    <span className="font-medium text-[#1f2937] text-sm">{comment.userId}</span>
-                    <span className="block text-xs text-[#6b7280]">{moment(comment.createdAt).fromNow()}</span>
-                  </div>
-                </div>
-                
+                <UserDetails userId={comment.userId} showTimestamp={true} timestamp={moment(comment.createdAt).add(3, "hours").fromNow()} />
+
                 {user?.sub === comment.userId && (
                   <div className="controls relative">
                     <button onClick={() => toggleMenu(comment.id)} className="p-1 hover:bg-[#f3f4f6] rounded">
@@ -262,8 +243,7 @@ const Comments = ({ postId, isOpen, onCommentAdded }: CommentsProps) => {
                             setSelectedComment(comment);
                             setIsEditDialogOpen(true);
                           }}
-                          className="block w-full px-4 py-2 text-sm text-[#374151] hover:bg-[#f3f4f6] text-left"
-                        >
+                          className="block w-full px-4 py-2 text-sm text-[#374151] hover:bg-[#f3f4f6] text-left">
                           Edit
                         </button>
                         <button
@@ -272,8 +252,7 @@ const Comments = ({ postId, isOpen, onCommentAdded }: CommentsProps) => {
                             setSelectedComment(comment);
                             setIsDeleteDialogOpen(true);
                           }}
-                          className="block w-full px-4 py-2 text-sm text-[#dc2626] hover:bg-[#f3f4f6] text-left"
-                        >
+                          className="block w-full px-4 py-2 text-sm text-[#dc2626] hover:bg-[#f3f4f6] text-left">
                           Delete
                         </button>
                       </div>
@@ -281,17 +260,16 @@ const Comments = ({ postId, isOpen, onCommentAdded }: CommentsProps) => {
                   </div>
                 )}
               </div>
-              
-              <p className="mt-2 text-[#4b5563] text-sm">{comment.content}</p>
-              
+
+              <p className="mt-2 text-[#4b5563] text-md">{comment.content}</p>
+
               {/* Comment Actions */}
               <div className="flex items-center gap-3 mt-2">
                 <Button
                   variant="ghost"
                   size="sm"
                   className={`flex items-center gap-1 ${voteStates[comment.id] === "up" ? "text-[#22c55e]" : "text-[#6b7280]"} hover:text-[#22c55e] h-auto py-1 px-2`}
-                  onClick={() => (voteStates[comment.id] === "up" ? handleRemoveVote(comment.id) : handleVote(comment.id, 1))}
-                >
+                  onClick={() => (voteStates[comment.id] === "up" ? handleRemoveVote(comment.id) : handleVote(comment.id, 1))}>
                   <FaArrowUp className="w-3 h-3 mr-1" />
                   <span className="text-xs">{comment.voteCount}</span>
                 </Button>
@@ -299,20 +277,15 @@ const Comments = ({ postId, isOpen, onCommentAdded }: CommentsProps) => {
                   variant="ghost"
                   size="sm"
                   className={`flex items-center gap-1 ${voteStates[comment.id] === "down" ? "text-[#ef4444]" : "text-[#6b7280]"} hover:text-[#ef4444] h-auto py-1 px-2`}
-                  onClick={() => (voteStates[comment.id] === "down" ? handleRemoveVote(comment.id) : handleVote(comment.id, -1))}
-                >
+                  onClick={() => (voteStates[comment.id] === "down" ? handleRemoveVote(comment.id) : handleVote(comment.id, -1))}>
                   <FaArrowDown className="w-3 h-3" />
                 </Button>
-                {/* <Button variant="ghost" size="sm" className="text-[#6b7280] hover:text-[#22c55e] h-auto py-1 px-2">
-                  <FaReply className="w-3 h-3 mr-1" />
-                  <span className="text-xs">Reply</span>
-                </Button> */}
               </div>
             </div>
           ))}
         </div>
       )}
-      
+
       {/* Edit & Delete Dialogs */}
       {selectedComment && (
         <>

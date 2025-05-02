@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { FaShareAlt, FaComment, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { HiDotsVertical } from "react-icons/hi";
@@ -12,8 +13,11 @@ import { useAuth } from "@/app/utils/contexts/AuthContext";
 import EditPost from "./EditPost";
 import DeletePost from "./DeletePost";
 import Comments from "./Comments";
+import UserDetails from "./UserDetails";
 import { UserPostProps } from "@/app/utils/types/app";
 import moment from "moment";
+import { useRouter } from "next/navigation";
+
 type VoteState = {
   [postId: number]: "up" | "down" | null;
 };
@@ -31,6 +35,7 @@ const Posts = () => {
 
   const { user, isLoading } = useAuth();
   const token = getTokenClient();
+  const router = useRouter();
 
   const fetchCommentCounts = useCallback(
     async (postsData: UserPostProps[]) => {
@@ -189,13 +194,14 @@ const Posts = () => {
         posts.map((post) => (
           <div key={post.id} className="post mb-6 bg-[#f7f7f78c] p-2 rounded-lg shadow-md font-[cairo] w-full max-w-full">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Image src={avatar} alt="User Avatar" width={40} height={40} className="w-10 h-10 rounded-full object-cover" />
-                <div>
-                  <span className="font-medium text-[#1f2937] font-[roboto]">{post.userId}</span>
-                  <span className="block text-sm text-[#6b7280] font-[roboto]">{moment(post.createdAt).fromNow()}</span>
+                <div className="flex items-center gap-3">
+                <UserDetails 
+                  userId={post.userId} 
+                  showTimestamp={true} 
+                  timestamp={moment(post.createdAt).add(3, 'hours').fromNow()} 
+                  imageSize={40}
+                />
                 </div>
-              </div>
               {user?.sub === post.userId && (
                 <div className="controls relative">
                   <button onClick={() => toggleMenu(post.id)} className="p-1 hover:bg-[#f3f4f6] rounded">
@@ -226,7 +232,9 @@ const Posts = () => {
                 </div>
               )}
             </div>
-            <h2 className="mt-2 text-xl font-semibold text-[#1f2937] font-[cairo]">{post.title}</h2>
+            <Link href={`/dashboard/community/${post.id}`} className="hover:underline">
+              <h2 className="mt-2 text-xl font-semibold text-[#1f2937] font-[cairo]">{post.title}</h2>
+            </Link>
             <p className="mt-2 text-[#4b5563]">{post.content}</p>
             <div className="flex flex-wrap items-center justify-between gap-2 mt-4">
               <div className="flex flex-wrap items-center gap-2">
@@ -243,7 +251,11 @@ const Posts = () => {
                   onClick={() => (voteStates[post.id] === "down" ? handleRemoveVote(post.id) : handleVote(post.id, -1))}>
                   <FaArrowDown className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" className="flex items-center gap-1 text-[#6b7280] hover:text-[#22c55e]" onClick={() => toggleComments(post.id)}>
+                <Button 
+                  variant="ghost" 
+                  className="flex items-center gap-1 text-[#6b7280] hover:text-[#22c55e]" 
+                  onClick={() => router.push(`/dashboard/community/${post.id}`)}
+                >
                   <FaComment className="w-4 h-4" />
                   <span>{commentCounts[post.id] || 0}</span>
                 </Button>

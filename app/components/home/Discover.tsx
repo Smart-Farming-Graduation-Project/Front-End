@@ -8,8 +8,8 @@ import { FaArrowRightLong } from "react-icons/fa6";
 const Discover = () => {
   return (
     <div className="discover">
-      <div className="flex gap-6 md:gap-8 flex-col justify-between md:flex-row md:items-center">
-        <div className="w-[550px] mx-auto px-[15px] max-w-full md:w-[50%]">
+      <div className="flex flex-col justify-between md:flex-row md:items-center">
+        <div className="mx-auto px-[15px] max-w-full md:w-[50%]">
           <div className="info mb-[40px]">
             <h2 className="text-[3rem] sm:text-[4rem] leading-[55px] mb-6 max-w-full">Discover Freshness, Every Day</h2>
             <p className=" max-w-full w-[512px]">Welcome to CropGuard! Dive into our selection of the freshest fruits and vegetables, straight from local farms to your table.</p>

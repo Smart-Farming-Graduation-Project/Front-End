@@ -1,6 +1,7 @@
 "use client";
 import Manage_Categories from "@/app/components/dashboard/Admin/Manage_Categries";
 import Manage_Products from "@/app/components/dashboard/Admin/Manage_Products";
+import Manage_Users from "@/app/components/dashboard/Admin/Manage_Users";
 import React, { useState } from "react";
 const Admin = () => {
   const [activeTab, setActiveTab] = useState("products");
@@ -9,6 +10,7 @@ const Admin = () => {
     { id: "profile", label: "Profile", content: "Make changes to your account." },
     { id: "categories", label: "Categories", content: <Manage_Categories /> },
     { id: "products", label: "Products", content: <Manage_Products /> },
+    { id: "users", label: "Users", content: <Manage_Users /> },
   ];
 
   return (

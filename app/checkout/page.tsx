@@ -1,3 +1,5 @@
+"use client"
+import { useSearchParams } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -9,10 +11,15 @@ import Crumb from "@/app/components/banner/Crumb";
 import img_about from "../assets/images/landing.jpeg";
 
 export default function Checkout() {
+  const searchParams = useSearchParams();
+  const discount = parseFloat(searchParams.get('discount') || '0');
+  const coupon = searchParams.get('coupon') || '';
+  
   const total = 1000;
   const shippingCost = 30;
-  const finalTotal = total + shippingCost;
+  const finalTotal = total + shippingCost - discount;
   const itemsCount = 5;
+  
   return (
     <div>
       <Crumb crumb={img_about} />
@@ -20,7 +27,7 @@ export default function Checkout() {
         <div className="grid gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl  font-semibold text-gray-900">Payment</CardTitle>
+              <CardTitle className="text-2xl font-semibold text-gray-900">Payment</CardTitle>
               <CardDescription>Enter your payment details</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -107,36 +114,67 @@ export default function Checkout() {
             </CardContent>
           </Card>
         </div>
+        
         <div className="grid gap-6">
           <Card>
             <CardHeader className="">
-              <CardTitle className="text-2xl  font-semibold text-gray-900">Order Summary</CardTitle>
+              <CardTitle className="text-2xl font-semibold text-gray-900">Order Summary</CardTitle>
               <CardDescription>Review your order details</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-1 ">
+            <CardContent className="space-y-3">
+              {coupon && (
+                <div className="p-3 bg-gray-50 rounded-lg border border-gray-100 mb-3">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <div className="text-green">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
+                          <circle cx="12" cy="12" r="4"></circle>
+                        </svg>
+                      </div>
+                      <span className="font-medium">Coupon: {coupon}</span>
+                    </div>
+                    <span className="text-green font-medium">-{discount} EG</span>
+                  </div>
+                </div>
+              )}
+              
               <div className="flex justify-between text-lg">
                 <span>Subtotal:</span>
                 <span className="font-semibold">{total} EG</span>
               </div>
+              
+              {discount > 0 && (
+                <div className="flex justify-between text-lg text-green">
+                  <span>Discount:</span>
+                  <span className="font-semibold">-{discount} EG</span>
+                </div>
+              )}
+              
               <div className="flex justify-between text-lg">
                 <span>Shipping:</span>
                 <span className="font-semibold">{shippingCost} EG</span>
               </div>
+              
               <Separator className="!my-3" />
+              
               <div className="flex justify-between text-xl font-bold text-green-600">
                 <span>Total:</span>
                 <span>{finalTotal} EG</span>
               </div>
+              
               <div className="flex justify-between text-md text-gray-700">
                 <span>Items:</span>
                 <span>{itemsCount}</span>
               </div>
+              
               <div className="flex justify-between text-md text-gray-700">
                 <span>Delivery:</span>
                 <span>Standard (3-5 days)</span>
               </div>
             </CardContent>
           </Card>
+          
           <Button size="lg" className="w-full">
             Place Order
           </Button>
