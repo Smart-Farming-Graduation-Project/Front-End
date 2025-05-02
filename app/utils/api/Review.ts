@@ -1,20 +1,38 @@
 import API_BASE_URL from "./base";
 import axios from "axios";
+import { ReviewProps } from "../types/app";
 
-export const getReviews = async (productId: number, token: string) => {
+export const getReviews = async (
+  productId: number,
+  token: string
+): Promise<ReviewProps[]> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/Reviews/GetReviews/${productId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data.data;
+    const response = await axios.get(
+      `${API_BASE_URL}/Reviews/GetReviews/${productId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const reviews = response.data?.data;
+
+    // Always return an array
+    return Array.isArray(reviews) ? reviews : [];
   } catch (error) {
     console.error("Failed to fetch reviews:", error);
+    return []; // Fallback to empty array to avoid undefined
   }
 };
 
-export const createReview = async (productId: number, rating: number, reviewText: string, headline: string, token: string) => {
+export const createReview = async (
+  productId: number,
+  rating: number,
+  reviewText: string,
+  headline: string,
+  token: string
+) => {
   try {
     const response = await axios.post(
       `${API_BASE_URL}/Reviews/CreateReview`,
@@ -41,28 +59,42 @@ export const createReview = async (productId: number, rating: number, reviewText
     throw error;
   }
 };
+
 export const deleteReview = async (reviewId: number, token: string) => {
   try {
-    const response = await axios.delete(`${API_BASE_URL}/Reviews/DeleteReview/${reviewId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axios.delete(
+      `${API_BASE_URL}/Reviews/DeleteReview/${reviewId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Failed to delete review:", error);
+    throw error;
   }
 };
 
-export const updateReview = async (reviewId: number, updatedReview: { rating: number; reviewText: string; headline: string }, token: string) => {
+export const updateReview = async (
+  reviewId: number,
+  updatedReview: { rating: number; reviewText: string; headline: string },
+  token: string
+) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/Reviews/UpdateReview/${reviewId}`, updatedReview, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axios.put(
+      `${API_BASE_URL}/Reviews/UpdateReview/${reviewId}`,
+      updatedReview,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Failed to update review:", error);
+    throw error;
   }
 };
