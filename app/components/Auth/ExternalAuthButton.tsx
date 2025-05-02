@@ -30,10 +30,7 @@ interface AuthRequest {
   provider: string;
 }
 
-export default function ExternalAuthButton({
-  provider,
-  typePage,
-}: ProviderButtonProps) {
+export default function ExternalAuthButton({ provider, typePage }: ProviderButtonProps) {
   const router = useRouter();
   const { user, login, isLoading } = useAuth();
 
@@ -60,7 +57,7 @@ export default function ExternalAuthButton({
   useEffect(() => {
     // console.log("User:", user);
     if (user || isLoading) {
-      if (user?.Role === "Admin" || user?.Role === "SuperAdmin") {
+      if (user?.Role.includes("Manager") || user?.Role.includes("Admin") || user?.Role.includes("Farmer")) {
         router.push("/dashboard");
       } else {
         router.push("/");
@@ -69,17 +66,13 @@ export default function ExternalAuthButton({
   }, [user, router, isLoading]);
   const handleAuthSuccess = async (response: AuthRequest) => {
     try {
-      const endpoint =
-        typePage === "signin"
-          ? "/Authentication/login-with-third-party"
-          : "/Authentication/register-with-third-party";
+      const endpoint = typePage === "signin" ? "/Authentication/login-with-third-party" : "/Authentication/register-with-third-party";
 
       const requestData = {
         ...(typePage === "signup" && {
           firstName: response.firstName || "Unknown",
           lastName: response.lastName || "User",
-          email:
-            response.email || `${response.userId}@${response.provider}.com`,
+          email: response.email || `${response.userId}@${response.provider}.com`,
           address: "Not provided",
           profileImage: response.profileImage || "",
         }),
@@ -102,17 +95,11 @@ export default function ExternalAuthButton({
       }
       if (typePage === "signin" && data.data.isAuthenticated === true) {
         login(data.data.tokens.accessToken, data.data.tokens.refreshToken);
-        toast.success(
-          `${
-            response.provider.charAt(0).toUpperCase() +
-            response.provider.slice(1)
-          } authentication successful`
-        );
+        toast.success(`${response.provider.charAt(0).toUpperCase() + response.provider.slice(1)} authentication successful`);
       }
     } catch (error: any) {
       console.error(`${provider} auth error:`, error);
-      const errorMessage =
-        error.response?.data?.message || "Authentication failed";
+      const errorMessage = error.response?.data?.message || "Authentication failed";
       toast.error(errorMessage);
     }
   };
@@ -121,31 +108,19 @@ export default function ExternalAuthButton({
       window.FB.login(
         (response: any) => {
           if (response.authResponse) {
-            window.FB.api(
-              "/me",
-              { fields: "first_name,last_name,email,picture" },
-              (userInfo: any) => {
-                handleAuthSuccess({
-                  firstName: userInfo.first_name,
-                  lastName: userInfo.last_name,
-                  email: userInfo.email,
-                  userId: response.authResponse.userID,
-                  accessToken: response.authResponse.accessToken,
-                  profileImage: userInfo.picture?.data?.url,
-                  provider: "facebook",
-                });
-                console.log(
-                  "Facebook User Info:",
-                  userInfo.first_name,
-                  userInfo.last_name,
-                  userInfo.email,
-                  response.authResponse.userID,
-                  response.authResponse.accessToken,
-                  userInfo.picture?.data?.url
-                );
-                console.log("Facebook Auth Response:", response.authResponse);
-              }
-            );
+            window.FB.api("/me", { fields: "first_name,last_name,email,picture" }, (userInfo: any) => {
+              handleAuthSuccess({
+                firstName: userInfo.first_name,
+                lastName: userInfo.last_name,
+                email: userInfo.email,
+                userId: response.authResponse.userID,
+                accessToken: response.authResponse.accessToken,
+                profileImage: userInfo.picture?.data?.url,
+                provider: "facebook",
+              });
+              console.log("Facebook User Info:", userInfo.first_name, userInfo.last_name, userInfo.email, response.authResponse.userID, response.authResponse.accessToken, userInfo.picture?.data?.url);
+              console.log("Facebook Auth Response:", response.authResponse);
+            });
           } else {
             toast.error("Facebook login failed or was cancelled");
           }
@@ -159,12 +134,9 @@ export default function ExternalAuthButton({
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        const userInfo = await axios.get(
-          "https://www.googleapis.com/oauth2/v3/userinfo",
-          {
-            headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-          }
-        );
+        const userInfo = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        });
         // console.log("Google User Info:", userInfo.data);
 
         handleAuthSuccess({
@@ -213,25 +185,15 @@ export default function ExternalAuthButton({
 
   if (provider === "facebook") {
     return (
-      <Button
-        variant="outline"
-        className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]"
-        onClick={handleFacebookLogin}
-      >
+      <Button variant="outline" className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]" onClick={handleFacebookLogin}>
         <ProviderIcon />
-        <span>
-          {typePage === "signin" ? "Sign in" : "Sign up"} with Facebook
-        </span>
+        <span>{typePage === "signin" ? "Sign in" : "Sign up"} with Facebook</span>
       </Button>
     );
   }
 
   return (
-    <Button
-      variant="outline"
-      className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]"
-      onClick={() => handleGoogleLogin()}
-    >
+    <Button variant="outline" className="w-full flex items-center justify-center gap-2 py-3 sm:py-[20px]" onClick={() => handleGoogleLogin()}>
       <ProviderIcon />
       <span>{typePage === "signin" ? "Sign in" : "Sign up"} with Google</span>
     </Button>

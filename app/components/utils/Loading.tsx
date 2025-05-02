@@ -10,7 +10,7 @@ const Loading = () => {
     // Progress bar animation
     const progressInterval = setInterval(() => {
       setLoadingProgress((prev) => {
-        const newValue = prev + Math.random() * 5;
+        const newValue = prev + Math.random() * 20 + 10;
         return newValue > 100 ? 100 : newValue;
       });
     }, 150);
