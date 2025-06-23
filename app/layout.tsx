@@ -5,7 +5,6 @@ import { SessionProvider } from "next-auth/react";
 import { Provider } from "react-redux";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { usePathname } from "next/navigation";
-import Head from "next/head";
 
 import { store } from "./utils/redux/store/store";
 import Header from "./components/header/Header";
@@ -14,55 +13,58 @@ import { MobileHandlerProvider } from "./utils/contexts/MobileHandler";
 import { AuthProvider } from "./utils/contexts/AuthContext";
 import LoadingWrapper from "./utils/contexts/LoadingWrapper";
 import DataFetchProvider from "./utils/contexts/DataFetchProvider";
+import ProtectedRouteProvider from "./utils/contexts/ProtectedRouteProvider";
+import AdminGuard from "./utils/contexts/AdminGuard";
+import DataInitializer from "./utils/contexts/DataInitializer";
+import { Toaster } from "react-hot-toast";
 
 import "./globals.css";
+import './utils/api/axiosInterceptor';
 
-const hiddenPages = [
-  "/signin",
-  "/dashboard",
-  "/dashboard/farmDashboard",
-  "/dashboard/ai",
-  "/dashboard/chat",
-  "/dashboard/community",
-  "/dashboard/live",
-  "/dashboard/admin",
-  "/forgot-password",
-  "/signup",
-];
+const hiddenPages = ["/signin", "/dashboard", "/dashboard/farmDashboard", "/dashboard/ai", "/dashboard/chat", "/dashboard/community", "/dashboard/live", "/dashboard/admin", "/forgot-password", "/signup"];
 
+const adminPathPatterns = [/^\/dashboard\/admin(\/.*)?$/];
+const protectedPages = ["/cart", "/wishlist", "/checkout"];
 const hiddenPathPatterns = [/^\/dashboard\/community\/\d+$/];
+const protectedPathPatterns = [/^\/checkout\/.*$/];
 
 function AppContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  const isExactMatch = hiddenPages.includes(pathname);
-  const isPatternMatch =
-    pathname && hiddenPathPatterns.some((pattern) => pattern.test(pathname));
+  const isExactMatch = hiddenPages.includes(pathname || "");
+  const isPatternMatch = pathname && hiddenPathPatterns.some((pattern) => pattern.test(pathname));
+  const isAdminRoute = pathname && adminPathPatterns.some((pattern) => pattern.test(pathname));
 
   const shouldHide = isExactMatch || isPatternMatch;
 
+  let content = children;
+
+  content = (
+    <ProtectedRouteProvider protectedPaths={protectedPages} protectedPathPatterns={protectedPathPatterns}>
+      {content}
+    </ProtectedRouteProvider>
+  );
+
+  if (isAdminRoute) {
+    content = <AdminGuard>{content}</AdminGuard>;
+  }
+
   return (
     <>
+      <DataInitializer />
       {!shouldHide && <Header />}
-      {children}
+      {content}
       {!shouldHide && <Footer />}
     </>
   );
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
-        <title>Crop Guard | Smart Farming</title>
-        <meta
-          name="description"
-          content="Crop Guard - Protecting your crops, securing your future"
-        />
+        <title>Crop Guard | Smart Farming Solution</title>
+        <meta name="description" content="Crop Guard - Protecting your crops, securing your future" />
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body>
@@ -71,11 +73,12 @@ export default function RootLayout({
             <SessionProvider>
               <AuthProvider>
                 <MobileHandlerProvider>
-                  {/* <DataFetchProvider> */}
-                  <LoadingWrapper minimumLoadTime={800} message="Loading...">
-                    <AppContent>{children}</AppContent>
-                  </LoadingWrapper>
-                  {/* </DataFetchProvider> */}
+                  <DataFetchProvider>
+                    <LoadingWrapper minimumLoadTime={300} message="Loading...">
+                      <AppContent>{children}</AppContent>
+                      <Toaster />
+                    </LoadingWrapper>
+                  </DataFetchProvider>
                 </MobileHandlerProvider>
               </AuthProvider>
             </SessionProvider>

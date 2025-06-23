@@ -179,204 +179,450 @@ const Manage_Products = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-4">
-      <div className="flex flex-col gap-2 mb-4">
-        <div className="w-full text-start mb-2">
-          <Label>Product name</Label>
-          <Input placeholder="Product name" value={newProductName} onChange={(e) => setNewProductName(e.target.value)} required className="w-full" />
+    <div className="w-full max-w-full overflow-hidden">
+      {/* Add Product Form */}
+      <div className="bg-white rounded-lg shadow-sm p-3 md:p-4 mb-6">
+        <h3 className="text-lg font-semibold mb-4">Add New Product</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+          <div className="space-y-3">
+            <div>
+              <Label className="text-sm">Product name</Label>
+              <Input
+                placeholder="Product name"
+                value={newProductName}
+                onChange={(e) => setNewProductName(e.target.value)}
+                className="w-full text-sm"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Product description</Label>
+              <Input
+                placeholder="Product description"
+                value={newProductDesc}
+                onChange={(e) => setNewProductDesc(e.target.value)}
+                className="w-full text-sm"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Category name</Label>
+              <Input
+                placeholder="Category name"
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                className="w-full text-sm"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <Label className="text-sm">Price</Label>
+              <Input
+                placeholder="Price"
+                value={newPrice}
+                onChange={(e) => setNewPrice(e.target.value)}
+                type="number"
+                className="w-full text-sm"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Availability</Label>
+              <Select value={newAvailability} onValueChange={(value) => setNewAvailability(value)}>
+                <SelectTrigger className="text-sm">
+                  <SelectValue placeholder="Availability" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Sale">Sale</SelectItem>
+                  <SelectItem value="Lease">Lease</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-sm">Images</Label>
+              <Input
+                type="file"
+                multiple
+                onChange={handleImageChange}
+                className="w-full text-sm"
+              />
+            </div>
+          </div>
         </div>
-        <div className="w-full text-start mb-2">
-          <Label>Product description</Label>
-          <Input placeholder="Product description" value={newProductDesc} onChange={(e) => setNewProductDesc(e.target.value)} required className="w-full" />
-        </div>
-        <div className="w-full text-start mb-2">
-          <Label>Category name</Label>
-          <Input placeholder="Category name" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} required className="w-full" />
-        </div>
-        <div className="w-full text-start mb-2">
-          <Label>Price</Label>
-          <Input placeholder="Price" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} type="number" required className="w-full" />
-        </div>
-        <div className="w-full text-start mb-2">
-          <Label>Availability</Label>
-          <Select value={newAvailability} onValueChange={(value) => setNewAvailability(value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Availability" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Sale">Sale</SelectItem>
-              <SelectItem value="Lease">Lease</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="w-full text-start mb-2">
-          <Label>Images</Label>
-          <Input type="file" multiple onChange={handleImageChange} className="w-full" />
-        </div>
-        <Button onClick={handleAddProduct} className="bg-green text-[#ffffff] w-full">
+        <Button
+          onClick={handleAddProduct}
+          className="bg-green text-white w-full mt-4 text-sm md:text-base"
+        >
           Add Product
         </Button>
       </div>
-      <ul className="space-y-2">
-        {loading && <p>Loading...</p>}
-        {products.map((product) => (
-          <li key={product.productId} className="flex flex-col md:flex-row items-center justify-between p-2 bg-[#f3f4f6] rounded-md">
-            <div className="text-start">
-              <span className="font-medium">{product.productName}</span>
-              <span className="block text-sm text-[#4b5563]">{product.description}</span>
-              <span className="block text-sm text-[#4b5563]">Category: {product.categoryName}</span>
-              <span className="block text-sm text-[#4b5563]">Price: EG{product.price}</span>
-              <span className="block text-sm text-[#4b5563]">Images: {product.images && product.images.length > 0 ? product.images[0] : "No images"}</span>
+
+      {/* Products List */}
+      <div className="bg-white rounded-lg shadow-sm">
+        <div className="p-3 md:p-4 border-b">
+          <h3 className="text-lg font-semibold">Products ({products.length})</h3>
+        </div>
+
+        <div className="divide-y">
+          {products.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">
+              <p>No products found</p>
             </div>
-            <div className="flex gap-2">
-              <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="text-[#1f2937] border-[#e5e7eb] hover:bg-[#e5e7eb]" onClick={() => setEditProduct(product)}>
-                    Edit
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle className="mb-2">Edit Product</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div className="w-full text-start">
-                      <Label>Product name</Label>
-                      <Input
-                        value={editProduct?.productName || ""}
-                        onChange={(e) =>
-                          setEditProduct({
-                            ...editProduct,
-                            productName: e.target.value,
-                          } as UpdateProduct)
-                        }
-                        placeholder="Edit product name"
-                      />
+          ) : (
+            products.map((product) => (
+              <div key={product.productId} className="p-3 md:p-4">
+                {/* Mobile Layout */}
+                <div className="block md:hidden space-y-3">
+                  <div>
+                    <h4 className="font-medium text-base">{product.productName}</h4>
+                    <p className="text-sm text-gray-600 mt-1 line-clamp-2">{product.description}</p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="text-gray-500">Category:</span>
+                      <p className="font-medium">{product.categoryName}</p>
                     </div>
-                    <div className="w-full text-start">
-                      <Label>Product description</Label>
-                      <Input
-                        value={editProduct?.description || ""}
-                        onChange={(e) =>
-                          setEditProduct({
-                            ...editProduct,
-                            description: e.target.value,
-                          } as UpdateProduct)
-                        }
-                        placeholder="Edit product description"
-                      />
-                    </div>
-                    <div className="w-full text-start">
-                      <Label>Category name</Label>
-                      <Input
-                        value={editProduct?.categoryName || ""}
-                        onChange={(e) =>
-                          setEditProduct({
-                            ...editProduct,
-                            categoryName: e.target.value,
-                          } as UpdateProduct)
-                        }
-                        placeholder="Edit category name"
-                      />
-                    </div>
-                    <div className="w-full text-start">
-                      <Label>Price</Label>
-                      <Input
-                        value={editProduct?.price.toString() || ""}
-                        onChange={(e) =>
-                          setEditProduct({
-                            ...editProduct,
-                            price: parseFloat(e.target.value) || 0,
-                          } as UpdateProduct)
-                        }
-                        type="number"
-                        placeholder="Edit price"
-                      />
-                    </div>
-                    <div className="w-full text-start">
-                      <Label>Availability</Label>
-                      <Select
-                        value={editProduct?.availability || "Sale"}
-                        onValueChange={(value) =>
-                          setEditProduct({
-                            ...editProduct,
-                            availability: value,
-                          } as UpdateProduct)
-                        }>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Availability" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Sale">Sale</SelectItem>
-                          <SelectItem value="Lease">Lease</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="w-full text-start">
-                      <Label>Images</Label>
-                      <Input
-                        type="file"
-                        multiple
-                        onChange={(e) => {
-                          if (e.target.files) {
-                            const filesArray = Array.from(e.target.files);
-                            setEditProduct({
-                              ...editProduct,
-                              imagesFiles: filesArray,
-                              images: filesArray.map((file) => URL.createObjectURL(file)),
-                            } as UpdateProduct);
-                          }
-                        }}
-                        className="w-full"
-                      />
-                      {editProduct?.images && editProduct.images.length > 0 && (
-                        <div className="mt-2">
-                          <p className="text-sm text-[#4b5563]">Current Images:</p>
-                          {editProduct.images.map((image, index) => (
-                            <span key={index} className="block text-sm text-[#4b5563]">
-                              {image}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                    <div>
+                      <span className="text-gray-500">Price:</span>
+                      <p className="font-medium text-green">EG {product.price}</p>
                     </div>
                   </div>
-                  <DialogFooter className="mt-4">
-                    <Button onClick={handleEditProduct} className="bg-green text-[#ffffff]">
-                      Save
-                    </Button>
-                    <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="text-[#1f2937] border-[#e5e7eb]">
-                      Cancel
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-              <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="destructive" className="bg-[#ef4444] text-[#ffffff] hover:bg-[#dc2626]">
-                    Delete
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Delete Product</DialogTitle>
-                  </DialogHeader>
-                  <p>Are you sure you want to delete &quot;{product.productName}&quot;?</p>
-                  <DialogFooter>
-                    <Button onClick={() => handleDeleteProduct(product.productId)} className="bg-[#ef4444] text-[#ffffff]">
-                      Delete
-                    </Button>
-                    <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="text-[#1f2937] border-[#e5e7eb]">
-                      Cancel
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </li>
-        ))}
-      </ul>
+
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 text-xs"
+                            onClick={() => setEditProduct(product)}
+                          >
+                            Edit
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle className="mb-2">Edit Product</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div className="w-full text-start">
+                              <Label>Product name</Label>
+                              <Input
+                                value={editProduct?.productName || ""}
+                                onChange={(e) =>
+                                  setEditProduct({
+                                    ...editProduct,
+                                    productName: e.target.value,
+                                  } as UpdateProduct)
+                                }
+                                placeholder="Edit product name"
+                              />
+                            </div>
+                            <div className="w-full text-start">
+                              <Label>Product description</Label>
+                              <Input
+                                value={editProduct?.description || ""}
+                                onChange={(e) =>
+                                  setEditProduct({
+                                    ...editProduct,
+                                    description: e.target.value,
+                                  } as UpdateProduct)
+                                }
+                                placeholder="Edit product description"
+                              />
+                            </div>
+                            <div className="w-full text-start">
+                              <Label>Category name</Label>
+                              <Input
+                                value={editProduct?.categoryName || ""}
+                                onChange={(e) =>
+                                  setEditProduct({
+                                    ...editProduct,
+                                    categoryName: e.target.value,
+                                  } as UpdateProduct)
+                                }
+                                placeholder="Edit category name"
+                              />
+                            </div>
+                            <div className="w-full text-start">
+                              <Label>Price</Label>
+                              <Input
+                                value={editProduct?.price.toString() || ""}
+                                onChange={(e) =>
+                                  setEditProduct({
+                                    ...editProduct,
+                                    price: parseFloat(e.target.value) || 0,
+                                  } as UpdateProduct)
+                                }
+                                type="number"
+                                placeholder="Edit price"
+                              />
+                            </div>
+                            <div className="w-full text-start">
+                              <Label>Availability</Label>
+                              <Select
+                                value={editProduct?.availability || "Sale"}
+                                onValueChange={(value) =>
+                                  setEditProduct({
+                                    ...editProduct,
+                                    availability: value,
+                                  } as UpdateProduct)
+                                }>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Availability" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Sale">Sale</SelectItem>
+                                  <SelectItem value="Lease">Lease</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="w-full text-start">
+                              <Label>Images</Label>
+                              <Input
+                                type="file"
+                                multiple
+                                onChange={(e) => {
+                                  if (e.target.files) {
+                                    const filesArray = Array.from(e.target.files);
+                                    setEditProduct({
+                                      ...editProduct,
+                                      imagesFiles: filesArray,
+                                      images: filesArray.map((file) => URL.createObjectURL(file)),
+                                    } as UpdateProduct);
+                                  }
+                                }}
+                                className="w-full"
+                              />
+                              {editProduct?.images && editProduct.images.length > 0 && (
+                                <div className="mt-2">
+                                  <p className="text-sm text-[#4b5563]">Current Images:</p>
+                                  {editProduct.images.map((image, index) => (
+                                    <span key={index} className="block text-sm text-[#4b5563]">
+                                      {image}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <DialogFooter className="mt-4">
+                            <Button onClick={handleEditProduct} className="bg-green text-[#ffffff]">
+                              Save
+                            </Button>
+                            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="text-[#1f2937] border-[#e5e7eb]">
+                              Cancel
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+
+                      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="flex-1 text-xs"
+                          >
+                            Delete
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Delete Product</DialogTitle>
+                          </DialogHeader>
+                          <p>Are you sure you want to delete &quot;{product.productName}&quot;?</p>
+                          <DialogFooter>
+                            <Button onClick={() => handleDeleteProduct(product.productId)} className="bg-[#ef4444] text-[#ffffff]">
+                              Delete
+                            </Button>
+                            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="text-[#1f2937] border-[#e5e7eb]">
+                              Cancel
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Desktop Layout */}
+                <div className="hidden md:flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-base truncate">{product.productName}</h4>
+                    <p className="text-sm text-gray-600 truncate">{product.description}</p>
+                    <div className="flex gap-4 text-sm text-gray-500 mt-1">
+                      <span>Category: {product.categoryName}</span>
+                      <span>Price: EG {product.price}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 ml-4">
+                    <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setEditProduct(product)}
+                        >
+                          Edit
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle className="mb-2">Edit Product</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div className="w-full text-start">
+                            <Label>Product name</Label>
+                            <Input
+                              value={editProduct?.productName || ""}
+                              onChange={(e) =>
+                                setEditProduct({
+                                  ...editProduct,
+                                  productName: e.target.value,
+                                } as UpdateProduct)
+                              }
+                              placeholder="Edit product name"
+                            />
+                          </div>
+                          <div className="w-full text-start">
+                            <Label>Product description</Label>
+                            <Input
+                              value={editProduct?.description || ""}
+                              onChange={(e) =>
+                                setEditProduct({
+                                  ...editProduct,
+                                  description: e.target.value,
+                                } as UpdateProduct)
+                              }
+                              placeholder="Edit product description"
+                            />
+                          </div>
+                          <div className="w-full text-start">
+                            <Label>Category name</Label>
+                            <Input
+                              value={editProduct?.categoryName || ""}
+                              onChange={(e) =>
+                                setEditProduct({
+                                  ...editProduct,
+                                  categoryName: e.target.value,
+                                } as UpdateProduct)
+                              }
+                              placeholder="Edit category name"
+                            />
+                          </div>
+                          <div className="w-full text-start">
+                            <Label>Price</Label>
+                            <Input
+                              value={editProduct?.price.toString() || ""}
+                              onChange={(e) =>
+                                setEditProduct({
+                                  ...editProduct,
+                                  price: parseFloat(e.target.value) || 0,
+                                } as UpdateProduct)
+                              }
+                              type="number"
+                              placeholder="Edit price"
+                            />
+                          </div>
+                          <div className="w-full text-start">
+                            <Label>Availability</Label>
+                            <Select
+                              value={editProduct?.availability || "Sale"}
+                              onValueChange={(value) =>
+                                setEditProduct({
+                                  ...editProduct,
+                                  availability: value,
+                                } as UpdateProduct)
+                              }>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Availability" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Sale">Sale</SelectItem>
+                                <SelectItem value="Lease">Lease</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="w-full text-start">
+                            <Label>Images</Label>
+                            <Input
+                              type="file"
+                              multiple
+                              onChange={(e) => {
+                                if (e.target.files) {
+                                  const filesArray = Array.from(e.target.files);
+                                  setEditProduct({
+                                    ...editProduct,
+                                    imagesFiles: filesArray,
+                                    images: filesArray.map((file) => URL.createObjectURL(file)),
+                                  } as UpdateProduct);
+                                }
+                              }}
+                              className="w-full"
+                            />
+                            {editProduct?.images && editProduct.images.length > 0 && (
+                              <div className="mt-2">
+                                <p className="text-sm text-[#4b5563]">Current Images:</p>
+                                {editProduct.images.map((image, index) => (
+                                  <span key={index} className="block text-sm text-[#4b5563]">
+                                    {image}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <DialogFooter className="mt-4">
+                          <Button onClick={handleEditProduct} className="bg-green text-[#ffffff]">
+                            Save
+                          </Button>
+                          <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="text-[#1f2937] border-[#e5e7eb]">
+                            Cancel
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+
+                    <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button variant="destructive" size="sm">
+                          Delete
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Delete Product</DialogTitle>
+                        </DialogHeader>
+                        <p>Are you sure you want to delete &quot;{product.productName}&quot;?</p>
+                        <DialogFooter>
+                          <Button onClick={() => handleDeleteProduct(product.productId)} className="bg-[#ef4444] text-[#ffffff]">
+                            Delete
+                          </Button>
+                          <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="text-[#1f2937] border-[#e5e7eb]">
+                            Cancel
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 };

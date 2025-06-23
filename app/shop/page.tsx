@@ -6,12 +6,10 @@ import LatestProducts from "../components/shop/LatestProducts";
 import { Toaster } from "react-hot-toast";
 import { getCategories } from "../utils/api/Categories";
 import { getMostSells } from "../utils/api/Products";
-import { getTokenServer } from "../utils/api/getTokenServer";
 
 export default async function Shop() {
-  const token = getTokenServer();
-  const categories = await getCategories(token as string);
-  const mostSells = await getMostSells(token as string);
+  const categories = await getCategories();
+  const mostSells = await getMostSells();
   return (
     <main>
       <div>

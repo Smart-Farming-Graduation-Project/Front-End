@@ -21,17 +21,9 @@ const Manage_Categories = () => {
 
   useEffect(() => {
     const getCategories = async () => {
-      if (!token) {
-        setLoading(false);
-        return;
-      }
 
       try {
-        const response = await axios.get(`${API_BASE_URL}/Category/CategoryList`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(`${API_BASE_URL}/Category/CategoryList`);
         if (response.data.succeeded) {
           setCategories(response.data.data);
         } else {
@@ -45,7 +37,7 @@ const Manage_Categories = () => {
     };
 
     getCategories();
-  }, [token]);
+  }, []);
 
   // Add Category
   const handleAddCategory = async () => {

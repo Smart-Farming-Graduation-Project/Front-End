@@ -5,10 +5,15 @@ import "./Header.css";
 import Logo from "../../assets/images/Logo.png";
 import Navbar from "./Navbar";
 import Link from "next/link";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/utils/redux/store/store";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(true);
   const [isOpenRounded, setIsOpenRounded] = useState(false);
+
+  const cartCount = useSelector((state: RootState) => state.carts.cartCount);
+  const wishlistCount = useSelector((state: RootState) => state.wishList.wishlistCount);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,7 +33,7 @@ const Header = () => {
         {/* start logo */}
         <div className="h-full flex-shrink-0 flex items-center">
           <Link href="/">
-            <Image src={Logo} alt="logo" className="object-cover" width={130} height={56} />
+            <Image src={Logo} alt="Crop Guard Logo" width={120} height={60} style={{ width: "auto", height: "auto" }} priority />
           </Link>
         </div>
         {/* end logo */}
