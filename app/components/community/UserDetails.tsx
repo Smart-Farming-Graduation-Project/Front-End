@@ -22,6 +22,7 @@ const UserDetails = ({ userId, showTimestamp = false, timestamp, imageSize = 32 
     imageUrl: string | null;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -69,15 +70,31 @@ const UserDetails = ({ userId, showTimestamp = false, timestamp, imageSize = 32 
     ? `${userData.firstName} ${userData.lastName}`.trim() || "Unknown User" 
     : isLoading ? "Loading..." : "Unknown User";
 
+  // Determine which image to use
+  const getImageSrc = () => {
+    if (imageError || !userData?.imageUrl) {
+      return defaultAvatar;
+    }
+    return userData.imageUrl;
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   return (
     <div className="flex items-center gap-2">
-      <Image 
-        src={userData?.imageUrl || defaultAvatar} 
-        alt={`${fullName}'s avatar`} 
-        width={imageSize} 
-        height={imageSize} 
-        className="rounded-full object-cover" 
-      />
+      <div className={`relative rounded-full overflow-hidden bg-gray-100`} style={{ width: imageSize, height: imageSize }}>
+        <Image 
+          src={getImageSrc()}
+          alt={`${fullName}'s avatar`} 
+          fill
+          className="object-cover"
+          onError={handleImageError}
+          sizes={`${imageSize}px`}
+          priority={imageSize >= 40}
+        />
+      </div>
       <div>
         <span className="font-medium text-[#1f2937] text-sm">{fullName}</span>
         {showTimestamp && timestamp && (

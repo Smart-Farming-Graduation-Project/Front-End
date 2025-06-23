@@ -3,7 +3,7 @@ import img_about from "../assets/images/landing.jpeg";
 import Crumb from "../components/banner/Crumb";
 import Heading from "../components/utils/Heading";
 import Image from "next/image";
-import abdo from "../assets/images/abdo.jpg";
+import abdo from "../assets/images/abdo.png";
 import teamimg from "../assets/images/member-1.jpeg";
 import "./about.css";
 import Link from "next/link";
@@ -11,93 +11,93 @@ function About() {
   const teams = [
     {
       name: "Abdulrahman Ibrahim",
-      role: "Full Stack web Developer",
+      role: "Frontend Developer",
       img: abdo,
-      linkedin: "https://www.linkedin.com/in/abdo-ibrahim/",
+      linkedin: "https://www.linkedin.com/in/abdo-ibrahim",
     },
     {
-      name: "John Doe",
-      role: "Full Stack web Developer",
-      img: teamimg,
-      linkedin: "",
+      name: "Reda Elsayed",
+      role: "Backend Developer",
+      img: abdo,
+      linkedin: "https://www.linkedin.com/in/redaelsayed/",
     },
     {
-      name: "John Doe",
-      role: "Full Stack web Developer",
-      img: teamimg,
-      linkedin: "",
+      name: "Mohamed Elofa",
+      role: "Backend Developer",
+      img: abdo,
+      linkedin: "https://www.linkedin.com/in/mohamedelofa",
     },
     {
-      name: "John Doe",
-      role: "Full Stack web Developer",
-      img: teamimg,
-      linkedin: "",
+      name: "Mohamed Elsayed",
+      role: "Backend Developer",
+      img: abdo,
+      linkedin: "https://www.linkedin.com/in/mohamed-elsayed-265328249",
     },
     {
-      name: "John Doe",
-      role: "Full Stack web Developer",
-      img: teamimg,
-      linkedin: "",
+      name: "Ahmed Fathy",
+      role: "Embedded Systems Engineer",
+      img: abdo,
+      linkedin: "https://www.linkedin.com/in/ahmed-fathy0/",
     },
     {
-      name: "John Doe",
-      role: "Full Stack web Developer",
-      img: teamimg,
-      linkedin: "",
+      name: "Ehab Magdy",
+      role: "Embedded Systems Engineer",
+      img: abdo,
+      linkedin: "https://www.linkedin.com/in/ehabmagdyy/",
     },
     {
-      name: "John Doe",
-      role: "Full Stack web Developer",
-      img: teamimg,
-      linkedin: "",
+      name: "Ziad Ashraf",
+      role: "Embedded Systems Engineer",
+      img: abdo,
+      linkedin: "https://www.linkedin.com/in/ziiaadashraf",
     },
     {
-      name: "John Doe",
-      role: "Full Stack web Developer",
-      img: teamimg,
-      linkedin: "",
+      name: "Mohamed Ashraf",
+      role: "Embedded Systems Engineer",
+      img: abdo,
+      linkedin: "http://www.linkedin.com/in/mohamedashraf7",
     },
     {
-      name: "John Doe",
-      role: "Full Stack web Developer",
-      img: teamimg,
-      linkedin: "",
+      name: "Ahmed Mohamed",
+      role: "AI Research Engineer",
+      img: abdo,
+      linkedin: "https://www.linkedin.com/in/ahmedalmohamdy/",
     },
     {
-      name: "John Doe",
-      role: "Full Stack web Developer",
-      img: teamimg,
-      linkedin: "",
+      name: "Ahmed Mohamed Sharaf",
+      role: "Machine Learning Specialist",
+      img: abdo,
+      linkedin: "https://www.linkedin.com/in/ahmedsharaf9/",
     },
     {
-      name: "John Doe",
-      role: "Full Stack web Developer",
-      img: teamimg,
-      linkedin: "",
+      name: "Mahmoud Ashra",
+      role: "AI Engineer",
+      img: abdo,
+      linkedin: "https://www.linkedin.com/in/mahmoudashrafsaad",
     },
     {
-      name: "John Doe",
-      role: "Full Stack web Developer",
-      img: teamimg,
-      linkedin: "",
+      name: "Marwan Walid",
+      role: "AI Researcher",
+      img: abdo,
+      linkedin: "https://www.linkedin.com/in/marwanwalid",
     },
     {
-      name: "John Doe",
-      role: "Full Stack web Developer",
-      img: teamimg,
-      linkedin: "",
+      name: "Ali Gad",
+      role: "Mobile Developer",
+      img: abdo,
+      linkedin: "https://www.linkedin.com/in/aligadali/",
     },
     {
-      name: "John Doe",
-      role: "Full Stack web Developer",
-      img: teamimg,
-      linkedin: "",
+      name: "Noha Ahmed",
+      role: "Mobile UI/UX Developer",
+      img: abdo,
+      linkedin: "https://www.linkedin.com/in/noha-ahmad-3935b3225",
     },
     {
-      name: "John Doe",
-      role: "Full Stack web Developer",
-      img: teamimg,
-      linkedin: "",
+      name: "Menna Abd Elrahim",
+      role: "Mobile Developer",
+      img: abdo,
+      linkedin: "https://www.linkedin.com/in/menna2024",
     },
   ];
   return (
@@ -106,7 +106,8 @@ function About() {
       <div className="container p-sec">
         <Heading heading="Meat Our Team" paragraph="Team Members" />
         <p className="text-center -mt-5">
-          We are a team from Zagazig University, and this is our graduation project. We are passionate about Engineering and have put a lot of effort into creating this project. We hope you find it useful and informative. Thank you for visiting our page!
+          We are a team from Zagazig University, and this is our graduation project. We are passionate about Engineering and have put a lot of effort into creating this project. We hope you find it useful and informative. Thank you for visiting our
+          page!
         </p>
         <div className="about-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
           {teams.map((team, index) => (
@@ -116,7 +117,7 @@ function About() {
               </div>
               <div className="info absolute w-full h-full flex items-center justify-center flex-col">
                 <span className="text-2xl font-bold text-yellow">{team.name}</span>
-                <span className="block text-gray-500 text-sm">{team.role}</span>
+                <span className="block text-white text-lg">{team.role}</span>
               </div>
             </Link>
           ))}
