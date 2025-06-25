@@ -492,8 +492,10 @@
     <!-- <h1><i class="fas fa-microchip"></i> IoT Dashboard</h1> -->
     <!-- Controls -->
     <div class="controls">
-      <button id="startBtn"><i class="fas fa-play"></i> Start Updates</button>
-      <button id="stopBtn"><i class="fas fa-stop"></i> Stop Updates</button>
+      <button id="startBtn">
+        <i class="fas fa-play"></i> Start Connection
+      </button>
+      <button id="stopBtn"><i class="fas fa-stop"></i> Stop Connection</button>
       <button id="exportBtn">
         <i class="fas fa-download"></i> Export Data
       </button>
@@ -544,15 +546,13 @@
     </div>
 
     <script>
-      // Three.js Opening Scene
       let scene, camera, renderer;
       let farmScene, farmCamera, farmRenderer;
       let darkMode = false;
       function initOpeningScene() {
-        // Scene setup
+       
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x2e8b57); // Dark green farming color (SeaGreen)
-        // Camera setup
+        scene.background = new THREE.Color(0x2e8b57); 
         camera = new THREE.PerspectiveCamera(
           75,
           window.innerWidth / window.innerHeight,
@@ -660,8 +660,8 @@
       // Initialize data arrays
       let temperatureData = [];
       let humidityData = [];
-      let co2Data = [];
-      let pressureData = [];
+      let soilMoistureData = [];
+      let flameData = [];
       let lightData = [];
 
       // Initialize averages and counts arrays
@@ -687,12 +687,12 @@
             data: humidityData,
           },
           {
-            name: "CO2 (ppm)",
-            data: co2Data,
+            name: "Soil Moisture",
+            data: soilMoistureData,
           },
           {
-            name: "Pressure (hPa)",
-            data: pressureData,
+            name: "Flame ",
+            data: flameData,
           },
           {
             name: "Light (lux)",
@@ -756,7 +756,13 @@
         series: [{ name: "Average Values", data: [0, 0, 0, 0, 0] }],
         colors: ["#e74c3c", "#3498db", "#2ecc71", "#9b59b6", "#f1c40f"],
         xaxis: {
-          categories: ["Temperature", "Humidity", "CO2", "Pressure", "Light"],
+          categories: [
+            "Temperature",
+            "Humidity",
+            "Soil Moisture",
+            "Flame",
+            "Light",
+          ],
           labels: {
             style: {
               colors: "#666",
@@ -809,7 +815,7 @@
           height: 350,
         },
         series: [],
-        labels: ["Temperature", "Humidity", "CO2", "Pressure", "Light"],
+        labels: ["Temperature", "Humidity", "Soil Moisture", "Flame", "Light"],
         colors: ["#e74c3c", "#3498db", "#2ecc71", "#9b59b6", "#f1c40f"],
         tooltip: {
           enabled: true,
@@ -848,12 +854,12 @@
         const avgHumidity =
           humidityData.reduce((sum, point) => sum + point.y, 0) /
             humidityData.length || 0;
-        const avgCO2 =
-          co2Data.reduce((sum, point) => sum + point.y, 0) / co2Data.length ||
-          0;
-        const avgPressure =
-          pressureData.reduce((sum, point) => sum + point.y, 0) /
-            pressureData.length || 0;
+        const avgSoilMoisture =
+          soilMoistureData.reduce((sum, point) => sum + point.y, 0) /
+            soilMoistureData.length || 0;
+        const avgFlame =
+          flameData.reduce((sum, point) => sum + point.y, 0) /
+            flameData.length || 0;
         const avgLight =
           lightData.reduce((sum, point) => sum + point.y, 0) /
             lightData.length || 0;
@@ -865,8 +871,8 @@
             data: [
               round(avgTemperature),
               round(avgHumidity),
-              round(avgCO2),
-              round(avgPressure),
+              round(avgSoilMoisture),
+              round(avgFlame),
               round(avgLight),
             ],
           },
@@ -874,26 +880,39 @@
       }
 
       // Function to add data to the charts
-      function addData(label, temperature, humidity, co2, pressure, light) {
+      function addData(
+        label,
+        temperature,
+        humidity,
+        soilMoisture,
+        flame,
+        light
+      ) {
         // Add data to the line chart
         temperatureData.push({ x: label, y: temperature });
         humidityData.push({ x: label, y: humidity });
-        co2Data.push({ x: label, y: co2 });
-        pressureData.push({ x: label, y: pressure });
+        soilMoistureData.push({ x: label, y: soilMoisture });
+        flameData.push({ x: label, y: flame });
         lightData.push({ x: label, y: light });
         lineChart.updateSeries([
           { name: "Temperature (°C)", data: temperatureData },
           { name: "Humidity (%)", data: humidityData },
-          { name: "CO2 (ppm)", data: co2Data },
-          { name: "Pressure (hPa)", data: pressureData },
+          { name: "Soil Moisture (%)", data: soilMoistureData },
+          { name: "Flame (°C)", data: flameData },
           { name: "Light (lux)", data: lightData },
         ]);
 
         // Update averages
         updateAverages();
-        checkThresholds(temperature, humidity, co2, pressure, light);
+        checkThresholds(temperature, humidity, soilMoisture, flame, light);
         // Update the pie chart with the latest data
-        pieChart.updateSeries([temperature, humidity, co2, pressure, light]);
+        pieChart.updateSeries([
+          temperature,
+          humidity,
+          soilMoisture,
+          flame,
+          light,
+        ]);
 
         // Update the 3D chart
         const data3D = [
@@ -902,8 +921,8 @@
             z: [
               temperatureData.map((point) => point.y),
               humidityData.map((point) => point.y),
-              co2Data.map((point) => point.y),
-              pressureData.map((point) => point.y),
+              soilMoistureData.map((point) => point.y),
+              flameData.map((point) => point.y),
               lightData.map((point) => point.y),
             ],
             colorscale: "Viridis",
@@ -972,7 +991,13 @@
         }
 
         // Threshold check with improved notifications
-        function checkThresholds(temperature, humidity, co2, pressure, light) {
+        function checkThresholds(
+          temperature,
+          humidity,
+          soilMoisture,
+          flame,
+          light
+        ) {
           // Clear previous notifications
           document.getElementById("notificationContainer").innerHTML = "";
 
@@ -1005,25 +1030,25 @@
             );
           }
 
-          if (co2 > 1200) {
+          if (soilMoisture < 30) {
             showNotification(
               "alert",
-              "High CO2",
-              `CO2 level is ${co2}ppm (Above 1200ppm threshold)`
+              "Low Soil Moisture",
+              `Soil Moisture level is ${soilMoisture}% (Below 30% threshold)`
             );
-          } else if (co2 > 1000) {
+          } else if (soilMoisture > 50) {
             showNotification(
               "warning",
-              "Elevated CO2",
-              `CO2 level is ${co2}ppm (Approaching threshold)`
+              "Elevated Soil Moisture",
+              `Soil Moisture level is ${soilMoisture}% (Approaching threshold)`
             );
           }
 
-          if (pressure > 1100) {
+          if (flame > 0) {
             showNotification(
               "alert",
-              "High Pressure",
-              `Pressure is ${pressure}hPa (Above 1100hPa threshold)`
+              "High Flame",
+              `Flame level is ${flame}°C (Above 0°C threshold)`
             );
           }
 
@@ -1051,12 +1076,12 @@
           const label = `12:${time.toString().padStart(2, "0")}`;
           const temperature = 20 + Math.random() * 15; // 20-35°C
           const humidity = 40 + Math.random() * 40; // 40-80%
-          const co2 = 400 + Math.random() * 600; // 400-1000 ppm
-          const pressure = 900 + Math.random() * 200; // 900-1100 hPa
+          const soilMoisture = 30 + Math.random() * 40; // 30-70%
+          const flame = Math.random() > 0.5 ? 0 : Math.random() * 100; // 0-100°C, flame is either present or not
           const light = 100 + Math.random() * 900; // 100-1000 lux
-          addData(label, temperature, humidity, co2, pressure, light);
+          addData(label, temperature, humidity, soilMoisture, flame, light);
           time += 5;
-        }, 2000); // Update every 2 seconds
+        }, 5000);
       }
 
       function stopUpdates() {
@@ -1068,8 +1093,8 @@
         const data = {
           temperature: temperatureData,
           humidity: humidityData,
-          co2: co2Data,
-          pressure: pressureData,
+          soilMoisture: soilMoistureData,
+          flame: flameData,
           light: lightData,
         };
         const blob = new Blob([JSON.stringify(data, null, 2)], {

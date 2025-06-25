@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Real-time IoT Dashboard with SignalR" />
+    <title>IoT Monitoring Dashboard</title>
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-streaming@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1"></script>
+
+    <style>
+      :root {
+        --primary: #4361ee;
+        --primary-dark: #3a56d4;
+        --secondary: #3f37c9;
+        --success: #4cc9f0;
+        --warning: #f8961e;
+        --danger: #f72585;
+        --dark: #212529;
+        --light: #f8f9fa;
+
+        --alert-critical: #ef233c;
+        --alert-warning: #ff9e00;
+        --alert-normal: #4ad66d;
+        --alert-info: #4361ee;
+
+        /* Chart Colors */
+        --chart-temp: #f72585;
+        --chart-humidity: #4cc9f0;
+        --chart-bg: #ffffff;
+
+        /* Spacing */
+        --spacing-xs: 0.25rem;
+        --spacing-sm: 0.5rem;
+        --spacing-md: 1rem;
+        --spacing-lg: 1.5rem;
+        --spacing-xl: 2rem;
+
+        /* Border Radius */
+        --radius-sm: 4px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --radius-xl: 16px;
+
+        /* Shadows */
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+        --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+
+        /* Transitions */
+        --transition-fast: 0.15s ease;
+        --transition-normal: 0.3s ease;
+        --transition-slow: 0.5s ease;
+      }
+
+      /* Base Styles */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        height: 100%;
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background-color: #f5f7fa;
+        color: var(--dark);
+        line-height: 1.6;
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      audio {
+        display: none;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-weight: 600;
+        line-height: 1.2;
+        margin-bottom: var(--spacing-md);
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      h3 {
+        font-size: 1.25rem;
+      }
+
+      /* Layout */
+      .container {
+        width: 100%;
+        max-width: 1800px;
+        margin: 0 auto;
+        padding: var(--spacing-md);
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-md) 0;
+        margin-bottom: var(--spacing-lg);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      .header-title {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+      }
+
+      .header-actions {
+        display: flex;
+        gap: var(--spacing-md);
+      }
+
+      .dashboard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-xl);
+      }
+
+      @media (min-width: 1200px) {
+        .dashboard {
+          grid-template-columns: 2fr 1fr;
+        }
+
+        .dashboard-main {
+          grid-column: 1;
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: var(--spacing-lg);
+        }
+
+        .dashboard-sidebar {
+          grid-column: 2;
+          display: grid;
+          grid-template-rows: auto auto;
+          gap: var(--spacing-lg);
+        }
+      }
+
+      /* Cards */
+      .card {
+        background: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        padding: var(--spacing-lg);
+        transition: var(--transition-normal);
+      }
+
+      .card:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-md);
+      }
+
+      .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--dark);
+      }
+
+      /* Charts */
+      .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+      }
+
+      /* Alerts */
+      .alerts-container {
+        max-height: 600px;
+        overflow-y: auto;
+        padding-right: var(--spacing-sm);
+      }
+      .alerts-list {
+        max-height: 500px;
+        overflow-y: auto;
+        padding: var(--spacing-md);
+      }
+
+      .alert {
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+        border-radius: var(--radius-md);
+        background-color: white;
+        box-shadow: var(--shadow-sm);
+        border-left: 4px solid;
+        display: flex;
+        gap: var(--spacing-md);
+        align-items: center;
+        transition: var(--transition-fast);
+      }
+      .alert-item {
+        display: flex;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--spacing-sm);
+        background: white;
+        border-left: 4px solid;
+        transition: transform 0.2s;
+      }
+
+      .alert-item:hover {
+        transform: translateX(2px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      .alert-item.normal {
+        border-left-color: var(--alert-normal);
+      }
+      .alert:hover {
+        transform: translateX(2px);
+      }
+
+      .alert-icon {
+        font-size: 1.25rem;
+        flex-shrink: 0;
+      }
+
+      .alert-content {
+        flex-grow: 1;
+      }
+
+      .alert-title {
+        font-weight: 500;
+        margin-bottom: var(--spacing-xs);
+      }
+
+      .alert-message {
+        font-size: 0.875rem;
+        color: #666;
+      }
+
+      .alert-timestamp {
+        font-size: 0.75rem;
+        color: #999;
+        margin-top: var(--spacing-xs);
+      }
+
+      .alert-critical {
+        border-left-color: var(--alert-critical);
+      }
+
+      .alert-warning {
+        border-left-color: var(--alert-warning);
+      }
+
+      .alert-normal {
+        border-left-color: var(--alert-normal);
+      }
+
+      .alert-info {
+        border-left-color: var(--alert-info);
+      }
+
+      /* Status Indicators */
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--radius-sm);
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .status-critical {
+        background-color: rgba(239, 35, 60, 0.1);
+        color: var(--alert-critical);
+      }
+
+      .status-warning {
+        background-color: rgba(255, 158, 0, 0.1);
+        color: var(--alert-warning);
+      }
+      /* Add to your style section */
+      @keyframes blink {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+      .status-normal {
+        background-color: rgba(74, 214, 109, 0.1);
+        color: var(--alert-normal);
+      }
+
+      /* Data Table */
+      .table-container {
+        overflow-x: auto;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+      }
+
+      .data-table th {
+        background-color: #f8f9fa;
+        padding: var(--spacing-md);
+        text-align: left;
+        font-weight: 600;
+        color: #555;
+        border-bottom: 1px solid #eee;
+      }
+
+      .data-table td {
+        padding: var(--spacing-md);
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+      }
+
+      .data-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .data-table tr:hover td {
+        background-color: #f8f9fa;
+      }
+
+      /* Pagination */
+      .pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: var(--spacing-md);
+        padding: var(--spacing-sm) 0;
+      }
+
+      .pagination-info {
+        font-size: 0.875rem;
+        color: #666;
+      }
+
+      .pagination-controls {
+        display: flex;
+        gap: var(--spacing-sm);
+      }
+
+      .btn {
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: var(--radius-sm);
+        border: none;
+        font-weight: 500;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: var(--transition-fast);
+        display: inline-flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+      }
+
+      .btn-primary {
+        background-color: var(--primary);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background-color: var(--primary-dark);
+      }
+
+      .btn-outline {
+        background-color: transparent;
+        border: 1px solid #ddd;
+        color: #555;
+      }
+
+      .btn-outline:hover {
+        background-color: #f8f9fa;
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* Connection Status */
+      .connection-status {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        font-size: 0.875rem;
+      }
+
+      .connection-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #ccc;
+      }
+
+      .connection-connected .connection-dot {
+        background-color: var(--alert-normal);
+        animation: pulse 2s infinite;
+      }
+
+      .connection-reconnecting .connection-dot {
+        background-color: var(--alert-warning);
+        animation: pulse 1s infinite;
+      }
+
+      .connection-disconnected .connection-dot {
+        background-color: var(--alert-critical);
+      }
+
+      @keyframes pulse {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      /* Loading State */
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255, 255, 255, 0.9);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        gap: var(--spacing-md);
+      }
+
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(67, 97, 238, 0.2);
+        border-radius: 50%;
+        border-top-color: var(--primary);
+        animation: spin 1s ease-in-out infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Utility Classes */
+      .text-muted {
+        color: #666;
+      }
+
+      .text-center {
+        text-align: center;
+      }
+
+      .d-flex {
+        display: flex;
+      }
+
+      .align-items-center {
+        align-items: center;
+      }
+
+      .justify-content-between {
+        justify-content: space-between;
+      }
+
+      .gap-sm {
+        gap: var(--spacing-sm);
+      }
+
+      .gap-md {
+        gap: var(--spacing-md);
+      }
+
+      .mt-sm {
+        margin-top: var(--spacing-sm);
+      }
+
+      .mt-md {
+        margin-top: var(--spacing-md);
+      }
+
+      .mt-lg {
+        margin-top: var(--spacing-lg);
+      }
+
+      /* Animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .fade-in {
+        animation: fadeIn 0.3s ease-out forwards;
+      }
+
+      /* Dark Mode */
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --dark: #f8f9fa;
+          --light: #212529;
+          --chart-bg: #2d3748;
+        }
+
+        body {
+          background-color: #121212;
+          color: #e0e0e0;
+        }
+
+        .card {
+          background-color: #1e1e1e;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .data-table th {
+          background-color: #2d2d2d;
+          color: #b0b0b0;
+        }
+
+        .data-table tr:hover td {
+          background-color: #2d2d2d;
+        }
+
+        .alert {
+          background-color: #2d2d2d;
+        }
+
+        .alert-message {
+          color: #b0b0b0;
+        }
+
+        .loading-overlay {
+          background-color: rgba(30, 30, 30, 0.9);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+      <div class="spinner"></div>
+      <div id="loadingMessage">Connecting to IoT Hub...</div>
+    </div>
+
+    <!-- Main Content (hidden until connection established) -->
+    <div id="appContent" style="display: none">
+      <div class="container">
+        <header class="header">
+          <div class="header-title">
+            <i
+              class="fas fa-chart-line"
+              style="font-size: 1.5rem; color: var(--primary)"
+            ></i>
+            <h1>IoT Monitoring Dashboard</h1>
+          </div>
+          <div class="header-actions">
+            <div id="connectionStatus" class="connection-status">
+              <div class="connection-dot"></div>
+              <span>Connecting...</span>
+            </div>
+            <button id="refreshBtn" class="btn btn-outline">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+          </div>
+        </header>
+
+        <main class="dashboard">
+          <div class="dashboard-main">
+            <!-- Real-time Chart Card -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Environmental Data</h2>
+                <div class="d-flex gap-sm">
+                  <button id="pauseChartBtn" class="btn btn-outline btn-sm">
+                    <i class="fas fa-pause"></i> Pause
+                  </button>
+                  <button id="exportChartBtn" class="btn btn-outline btn-sm">
+                    <i class="fas fa-download"></i> Export
+                  </button>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="iotChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Historical Data Card -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Historical Data</h2>
+                <div class="d-flex gap-sm">
+                  <button id="exportDataBtn" class="btn btn-outline btn-sm">
+                    <i class="fas fa-download"></i> CSV
+                  </button>
+                </div>
+              </div>
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Timestamp</th>
+                      <th>Temperature (°C)</th>
+                      <th>Humidity (%)</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="historyTableBody"></tbody>
+                </table>
+              </div>
+              <div class="pagination">
+                <div class="pagination-info" id="paginationInfo">
+                  Showing 0 of 0 entries
+                </div>
+                <div class="pagination-controls">
+                  <button id="prevPageBtn" class="btn btn-outline" disabled>
+                    <i class="fas fa-chevron-left"></i> Previous
+                  </button>
+                  <button id="nextPageBtn" class="btn btn-outline" disabled>
+                    Next <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-sidebar">
+            <!-- Alerts Card -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Alerts</h2>
+                <button id="clearAlertsBtn" class="btn btn-outline btn-sm">
+                  <i class="fas fa-trash-alt"></i> Clear
+                </button>
+              </div>
+              <div class="alerts-container" id="alertsContainer">
+                <div class="text-center text-muted mt-md">
+                  No alerts received yet
+                </div>
+              </div>
+            </div>
+
+            <!-- Statistics Card -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Statistics</h2>
+              </div>
+              <div id="statsContainer">
+                <div class="d-flex justify-content-between mt-md">
+                  <div>
+                    <div class="text-muted">Current Temp</div>
+                    <h3 id="currentTemp">-- °C</h3>
+                  </div>
+                  <div>
+                    <div class="text-muted">Current Humidity</div>
+                    <h3 id="currentHumidity">-- %</h3>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-lg">
+                  <div>
+                    <div class="text-muted">Max Temp</div>
+                    <h3 id="maxTemp">-- °C</h3>
+                  </div>
+                  <div>
+                    <div class="text-muted">Min Temp</div>
+                    <h3 id="minTemp">-- °C</h3>
+                  </div>
+                </div>
+
+                <div class="mt-lg">
+                  <div class="text-muted">Current Status</div>
+                  <div
+                    id="currentStatus"
+                    class="status-badge status-normal mt-sm"
+                  >
+                    <i class="fas fa-check-circle"></i> Normal
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <footer class="text-center text-muted mt-xl">
+          <p>
+            IoT Monitoring Dashboard &copy; <span id="currentYear"></span> |
+            Version 1.0.0
+          </p>
+        </footer>
+      </div>
+    </div>
+
+    <script>
+      // Configuration
+      const config = {
+        maxDataPoints: 100,
+        alertsLimit: 50,
+        soundSettings: {
+          fireAlarmLoop: true, // Should fire alarm loop until dismissed
+          fireAlarmVolume: 0.7, // 70% volume
+          alertVolume: 0.5, // 50% volume for regular alerts
+        },
+        rowsPerPage: 10,
+        apiEndpoint:
+          "https://alert-mointer-ctfudeh2dfa3f4de.uaenorth-01.azurewebsites.net/api/negotiate?code=C2njEF5Z1jF7wTCz6vuRNl0CCEQqARYos57eZiuB-ZaiAzFuCvBXwA==",
+        reconnectDelay: 5000,
+        criticalTempThreshold: 25,
+        warningTempThreshold: 20,
+        criticalHumidityThreshold: 80,
+        warningHumidityThreshold: 70,
+        flameThreshold: 0, // Any value > 0 indicates fire
+        fireAlertDuration: 10000, // Show fire alert for 10 seconds
+      };
+
+      // State Management
+      const state = {
+        connection: null,
+        chart: null,
+        fireAlert: {
+          active: false,
+          timeout: null,
+          lastValue: 0,
+        },
+        currentPage: 0,
+        dataHistory: [],
+        isChartPaused: false,
+        stats: {
+          currentTemp: null,
+          currentHumidity: null,
+          maxTemp: -Infinity,
+          minTemp: Infinity,
+          status: "normal",
+        },
+      };
+
+      // DOM Elements
+      const elements = {
+        loadingOverlay: document.getElementById("loadingOverlay"),
+        loadingMessage: document.getElementById("loadingMessage"),
+        appContent: document.getElementById("appContent"),
+        connectionStatus: document.getElementById("connectionStatus"),
+        iotChart: document.getElementById("iotChart"),
+        alertsContainer: document.getElementById("alertsContainer"),
+        historyTableBody: document.getElementById("historyTableBody"),
+        paginationInfo: document.getElementById("paginationInfo"),
+        prevPageBtn: document.getElementById("prevPageBtn"),
+        nextPageBtn: document.getElementById("nextPageBtn"),
+        refreshBtn: document.getElementById("refreshBtn"),
+        clearAlertsBtn: document.getElementById("clearAlertsBtn"),
+        pauseChartBtn: document.getElementById("pauseChartBtn"),
+        exportChartBtn: document.getElementById("exportChartBtn"),
+        exportDataBtn: document.getElementById("exportDataBtn"),
+        currentTemp: document.getElementById("currentTemp"),
+        currentHumidity: document.getElementById("currentHumidity"),
+        maxTemp: document.getElementById("maxTemp"),
+        minTemp: document.getElementById("minTemp"),
+        currentStatus: document.getElementById("currentStatus"),
+      };
+
+      // Initialize the application
+      document.addEventListener("DOMContentLoaded", () => {
+        // Set current year in footer
+        document.getElementById("currentYear").textContent =
+          new Date().getFullYear();
+
+        // Initialize Chart
+        initializeChart();
+
+        // Initialize Event Listeners
+        setupEventListeners();
+
+        // Start SignalR Connection
+        connectToSignalR();
+      });
+
+      // Chart Initialization
+      function initializeChart() {
+        const ctx = elements.iotChart.getContext("2d");
+
+        state.chart = new Chart(ctx, {
+          type: "line",
+          data: {
+            datasets: [
+              {
+                label: "Temperature (°C)",
+                borderColor: "rgba(247, 37, 133, 1)",
+                backgroundColor: "rgba(247, 37, 133, 0.1)",
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 5,
+                tension: 0.1,
+                yAxisID: "y",
+                data: [],
+              },
+              {
+                label: "Humidity (%)",
+                borderColor: "rgba(76, 201, 240, 1)",
+                backgroundColor: "rgba(76, 201, 240, 0.1)",
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 5,
+                tension: 0.1,
+                yAxisID: "y1",
+                data: [],
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+              intersect: false,
+              mode: "index",
+            },
+            scales: {
+              x: {
+                type: "realtime",
+                realtime: {
+                  duration: 60000, // Show 60 seconds of data
+                  refresh: 1000,
+                  delay: 100,
+                  onRefresh: (chart) => {
+                    if (state.isChartPaused) return;
+
+                    chart.data.datasets.forEach((dataset) => {
+                      dataset.data.push({
+                        x: Date.now(),
+                        y: dataset.label.includes("Temperature")
+                          ? state.stats.currentTemp || null
+                          : state.stats.currentHumidity || null,
+                      });
+
+                      // Remove older data to keep the chart clean
+                      if (dataset.data.length > config.maxDataPoints) {
+                        dataset.data.shift();
+                      }
+                    });
+                  },
+                },
+                grid: {
+                  display: false,
+                },
+                ticks: {
+                  autoSkip: true,
+                  maxTicksLimit: 10,
+                },
+              },
+              y: {
+                type: "linear",
+                display: true,
+                position: "left",
+                title: {
+                  display: true,
+                  text: "Temperature (°C)",
+                },
+                min: 0,
+                max: 50,
+                grid: {
+                  drawOnChartArea: true,
+                },
+              },
+              y1: {
+                type: "linear",
+                display: true,
+                position: "right",
+                title: {
+                  display: true,
+                  text: "Humidity (%)",
+                },
+                min: 0,
+                max: 100,
+                grid: {
+                  drawOnChartArea: false,
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                position: "top",
+                labels: {
+                  usePointStyle: true,
+                  padding: 20,
+                },
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    let label = context.dataset.label || "";
+                    if (label) {
+                      label += ": ";
+                    }
+                    if (context.parsed.y !== null) {
+                      label += context.parsed.y.toFixed(2);
+                    }
+                    return label;
+                  },
+                },
+              },
+              annotation: {
+                annotations: {
+                  tempWarningLine: {
+                    type: "line",
+                    yMin: config.warningTempThreshold,
+                    yMax: config.warningTempThreshold,
+                    borderColor: "orange",
+                    borderWidth: 1,
+                    borderDash: [6, 6],
+                    label: {
+                      content: "Warning Threshold",
+                      enabled: true,
+                      position: "left",
+                    },
+                  },
+                  tempCriticalLine: {
+                    type: "line",
+                    yMin: config.criticalTempThreshold,
+                    yMax: config.criticalTempThreshold,
+                    borderColor: "red",
+                    borderWidth: 1,
+                    borderDash: [6, 6],
+                    label: {
+                      content: "Critical Threshold",
+                      enabled: true,
+                      position: "left",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      function setupEventListeners() {
+        elements.prevPageBtn.addEventListener("click", () => {
+          if (state.currentPage > 0) {
+            state.currentPage--;
+            renderHistoryTable();
+          }
+        });
+
+        elements.nextPageBtn.addEventListener("click", () => {
+          const totalPages = Math.ceil(
+            state.dataHistory.length / config.rowsPerPage
+          );
+          if (state.currentPage < totalPages - 1) {
+            state.currentPage++;
+            renderHistoryTable();
+          }
+        });
+
+        elements.refreshBtn.addEventListener("click", () => {
+          if (state.connection) {
+            state.connection.stop();
+          }
+          showLoading("Reconnecting to IoT Hub...");
+          connectToSignalR();
+        });
+
+        elements.clearAlertsBtn.addEventListener("click", () => {
+          elements.alertsContainer.innerHTML = `
+            <div class="text-center text-muted mt-md">
+              No alerts received yet
+            </div>
+          `;
+        });
+
+        elements.pauseChartBtn.addEventListener("click", () => {
+          state.isChartPaused = !state.isChartPaused;
+          elements.pauseChartBtn.innerHTML = state.isChartPaused
+            ? '<i class="fas fa-play"></i> Resume'
+            : '<i class="fas fa-pause"></i> Pause';
+        });
+
+        elements.exportChartBtn.addEventListener("click", () => {
+          const link = document.createElement("a");
+          link.download = `iot-chart-${new Date().toISOString()}.png`;
+          link.href = elements.iotChart.toDataURL("image/png");
+          link.click();
+        });
+
+        elements.exportDataBtn.addEventListener("click", () => {
+          if (state.dataHistory.length === 0) {
+            alert("No data to export");
+            return;
+          }
+
+          const headers = [
+            "Timestamp",
+            "Temperature (°C)",
+            "Humidity (%)",
+            "Status",
+          ];
+          const rows = state.dataHistory.map((item) => [
+            item.timestamp,
+            item.temperature,
+            item.humidity,
+            item.status,
+          ]);
+
+          let csvContent = headers.join(",") + "\n";
+          rows.forEach((row) => {
+            csvContent += row.join(",") + "\n";
+          });
+
+          const blob = new Blob([csvContent], {
+            type: "text/csv;charset=utf-8;",
+          });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.setAttribute("href", url);
+          link.setAttribute(
+            "download",
+            `iot-data-${new Date().toISOString()}.csv`
+          );
+          link.style.visibility = "hidden";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
+      }
+
+      async function connectToSignalR() {
+        try {
+          showLoading("Connecting to IoT Hub...");
+          updateConnectionStatus("connecting");
+
+          const response = await fetch(config.apiEndpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(
+              `Negotiation failed: ${response.status} ${response.statusText}`
+            );
+          }
+
+          const { url, accessToken } = await response.json();
+
+          state.connection = new signalR.HubConnectionBuilder()
+            .withUrl(url, { accessTokenFactory: () => accessToken })
+            .configureLogging(signalR.LogLevel.Warning)
+            .withAutomaticReconnect({
+              nextRetryDelayInMilliseconds: (retryContext) => {
+                // Exponential backoff with max delay of 30 seconds
+                return Math.min(retryContext.elapsedMilliseconds * 2, 30000);
+              },
+            })
+            .build();
+
+          state.connection.on("iotmessage", handleIoTSensorData);
+
+          state.connection.onclose(() => {
+            console.log("Connection closed");
+            updateConnectionStatus("disconnected");
+            showLoading("Connection lost. Reconnecting...");
+            setTimeout(connectToSignalR, config.reconnectDelay);
+          });
+
+          state.connection.onreconnecting((error) => {
+            console.log("Connection lost. Reconnecting...", error);
+            updateConnectionStatus("reconnecting");
+            showLoading("Connection lost. Reconnecting...");
+          });
+
+          state.connection.onreconnected((connectionId) => {
+            console.log(
+              "Connection reestablished. New connection ID:",
+              connectionId
+            );
+            updateConnectionStatus("connected");
+            hideLoading();
+          });
+
+          await state.connection.start();
+          console.log(
+            "SignalR connection established. Connection ID:",
+            state.connection.connectionId
+          );
+          updateConnectionStatus("connected");
+          hideLoading();
+        } catch (error) {
+          console.error("Connection failed:", error);
+          updateConnectionStatus("disconnected");
+          elements.loadingMessage.textContent = `Connection failed: ${error.message}. Retrying...`;
+          setTimeout(connectToSignalR, config.reconnectDelay);
+        }
+      }
+
+      function handleIoTSensorData(message) {
+        try {
+          const data =
+            typeof message === "string" ? JSON.parse(message) : message;
+          const timestamp = new Date().toISOString();
+
+          const temperature = parseFloat(
+            data.CurrentTemperature ?? data.Temperature ?? 0
+          );
+          const humidity = parseFloat(
+            data.CurrentHumidity ?? data.Humidity ?? 0
+          );
+          const flameValue = parseInt(data.CurrentFlame ?? data.Flame ?? 0);
+
+          let status = data.RiskLevel ?? data.status ?? "normal";
+          if (flameValue > config.flameThreshold) {
+            status = "critical";
+            triggerFireAlert(timestamp, flameValue, temperature);
+          }
+
+          if (status === "normal") {
+            if (
+              temperature >= config.criticalTempThreshold ||
+              humidity >= config.criticalHumidityThreshold
+            ) {
+              status = "critical";
+            } else if (
+              temperature >= config.warningTempThreshold ||
+              humidity >= config.warningHumidityThreshold
+            ) {
+              status = "warning";
+            }
+          }
+
+          updateStatistics(temperature, humidity, status);
+
+          addToHistory(timestamp, temperature, humidity, status);
+
+          if (status !== "normal") {
+            createAlert(timestamp, temperature, humidity, status);
+          }
+        } catch (error) {
+          console.error("Error processing IoT message:", error, message);
+        }
+      }
+      function triggerFireAlert(timestamp, flameValue, temperature) {
+        if (state.fireAlert.timeout) {
+          clearTimeout(state.fireAlert.timeout);
+        }
+
+        if (!state.fireAlert.active || flameValue > state.fireAlert.lastValue) {
+          state.fireAlert.active = true;
+          state.fireAlert.lastValue = flameValue;
+
+          const fireAlertDiv = document.createElement("div");
+          fireAlertDiv.id = "fireAlert";
+          fireAlertDiv.style.position = "fixed";
+          fireAlertDiv.style.top = "0";
+          fireAlertDiv.style.left = "0";
+          fireAlertDiv.style.width = "100%";
+          fireAlertDiv.style.padding = "20px";
+          fireAlertDiv.style.backgroundColor = "#ff4444";
+          fireAlertDiv.style.color = "white";
+          fireAlertDiv.style.textAlign = "center";
+          fireAlertDiv.style.fontWeight = "bold";
+          fireAlertDiv.style.fontSize = "1.5rem";
+          fireAlertDiv.style.zIndex = "10000";
+          fireAlertDiv.style.animation = "blink 1s infinite";
+
+          fireAlertDiv.innerHTML = `
+      <div>🔥 FIRE DETECTED! Flame: ${flameValue}, Temp: ${temperature.toFixed(
+            1
+          )}°C 🔥</div>
+      <button id="dismissFireAlert" style="
+        margin-top: 10px;
+        padding: 5px 15px;
+        background: white;
+        color: #ff4444;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+      ">Dismiss Alarm</button>
+    `;
+
+          document.body.appendChild(fireAlertDiv);
+
+          const fireAlarm = document.getElementById("fireAlarmSound");
+          fireAlarm.volume = config.soundSettings.fireAlarmVolume;
+          fireAlarm.loop = config.soundSettings.fireAlarmLoop;
+          fireAlarm.play().catch((e) => console.log("Audio play failed:", e));
+
+          document
+            .getElementById("dismissFireAlert")
+            .addEventListener("click", () => {
+              fireAlarm.pause();
+              fireAlarm.currentTime = 0;
+              fireAlertDiv.remove();
+              state.fireAlert.active = false;
+              if (state.fireAlert.timeout) {
+                clearTimeout(state.fireAlert.timeout);
+              }
+            });
+
+          if (!config.soundSettings.fireAlarmLoop) {
+            state.fireAlert.timeout = setTimeout(() => {
+              fireAlarm.pause();
+              fireAlarm.currentTime = 0;
+              const alert = document.getElementById("fireAlert");
+              if (alert) {
+                alert.remove();
+              }
+              state.fireAlert.active = false;
+            }, config.fireAlertDuration);
+          }
+        }
+      }
+      function updateStatistics(temperature, humidity, status) {
+        state.stats.currentTemp = temperature;
+        state.stats.currentHumidity = humidity;
+        state.stats.status = status;
+
+        state.stats.maxTemp = Math.max(state.stats.maxTemp, temperature);
+        state.stats.minTemp = Math.min(state.stats.minTemp, temperature);
+
+        elements.currentTemp.textContent = `${temperature.toFixed(1)} °C`;
+        elements.currentHumidity.textContent = `${humidity.toFixed(1)} %`;
+        elements.maxTemp.textContent = `${state.stats.maxTemp.toFixed(1)} °C`;
+        elements.minTemp.textContent = `${state.stats.minTemp.toFixed(1)} °C`;
+
+        updateStatusBadge(status);
+      }
+
+      function updateStatusBadge(status) {
+        elements.currentStatus.className = "status-badge mt-sm";
+
+        let statusClass = "status-normal";
+        let statusText = "Normal";
+        let icon = "fa-check-circle";
+
+        switch (status.toLowerCase()) {
+          case "critical":
+            statusClass = "status-critical";
+            statusText = "Critical";
+            icon = "fa-exclamation-circle";
+            break;
+          case "warning":
+            statusClass = "status-warning";
+            statusText = "Warning";
+            icon = "fa-exclamation-triangle";
+            break;
+          case "normal":
+          default:
+            statusClass = "status-normal";
+            statusText = "Normal";
+            icon = "fa-check-circle";
+        }
+
+        elements.currentStatus.classList.add(statusClass);
+        elements.currentStatus.innerHTML = `<i class="fas ${icon}"></i> ${statusText}`;
+      }
+
+      // Add Data to History
+      function addToHistory(timestamp, temperature, humidity, status) {
+        // Add new data to beginning of array
+        state.dataHistory.unshift({
+          timestamp,
+          temperature,
+          humidity,
+          status,
+        });
+
+        // Limit history size
+        if (state.dataHistory.length > config.maxDataPoints * 5) {
+          state.dataHistory.pop();
+        }
+
+        // Update table if on first page
+        if (state.currentPage === 0) {
+          renderHistoryTable();
+        }
+      }
+
+      function renderHistoryTable() {
+        const startIdx = state.currentPage * config.rowsPerPage;
+        const endIdx = startIdx + config.rowsPerPage;
+        const paginatedData = state.dataHistory.slice(startIdx, endIdx);
+
+        // Clear table
+        elements.historyTableBody.innerHTML = "";
+
+        if (paginatedData.length === 0) {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td colspan="4" class="text-center text-muted">
+              No data available
+            </td>
+          `;
+          elements.historyTableBody.appendChild(row);
+        } else {
+          paginatedData.forEach((item) => {
+            const row = document.createElement("tr");
+            row.className = "fade-in";
+
+            const date = new Date(item.timestamp);
+            const formattedTime = date.toLocaleTimeString();
+            const formattedDate = date.toLocaleDateString();
+
+            let statusClass = "status-normal";
+            switch (item.status.toLowerCase()) {
+              case "critical":
+                statusClass = "status-critical";
+                break;
+              case "warning":
+                statusClass = "status-warning";
+                break;
+              default:
+                statusClass = "status-normal";
+            }
+
+            row.innerHTML = `
+              <td>
+                <div>${formattedTime}</div>
+                <div class="text-muted" style="font-size: 0.75rem;">${formattedDate}</div>
+              </td>
+              <td>${item.temperature.toFixed(1)}</td>
+              <td>${item.humidity.toFixed(1)}</td>
+              <td>
+                <span class="status-badge ${statusClass}">
+                  ${item.status}
+                </span>
+              </td>
+            `;
+
+            elements.historyTableBody.appendChild(row);
+          });
+        }
+
+        updatePaginationInfo();
+      }
+
+      function updatePaginationInfo() {
+        const totalItems = state.dataHistory.length;
+        const startItem = state.currentPage * config.rowsPerPage + 1;
+        const endItem = Math.min(
+          (state.currentPage + 1) * config.rowsPerPage,
+          totalItems
+        );
+
+        elements.paginationInfo.textContent =
+          totalItems > 0
+            ? `Showing ${startItem} to ${endItem} of ${totalItems} entries`
+            : "Showing 0 of 0 entries";
+
+        elements.prevPageBtn.disabled = state.currentPage === 0;
+        elements.nextPageBtn.disabled =
+          (state.currentPage + 1) * config.rowsPerPage >= totalItems;
+      }
+
+      // Create Alert
+      function createAlert(
+        timestamp,
+        temperature,
+        humidity,
+        status,
+        flameValue
+      ) {
+        const alertSound = document.getElementById("alertSound");
+        alertSound.volume = config.soundSettings.alertVolume;
+
+        if (elements.alertsContainer.querySelector(".text-muted")) {
+          elements.alertsContainer.innerHTML = "";
+        }
+
+        const date = new Date(timestamp);
+        const formattedTime = date.toLocaleTimeString();
+        const formattedDate = date.toLocaleDateString();
+
+        let alertClass = "alert-normal";
+        let icon = "fa-info-circle";
+        let title = "Normal";
+
+        switch (status.toLowerCase()) {
+          case "critical":
+            alertClass = "alert-critical";
+            icon = "fa-exclamation-circle";
+            title = "Critical Alert";
+            alertSound.src =
+              "https://assets.mixkit.co/sfx/preview/mixkit-serious-alarm-959.mp3";
+            break;
+          case "warning":
+            alertClass = "alert-warning";
+            icon = "fa-exclamation-triangle";
+            title = "Warning Alert";
+            alertSound.src =
+              "https://assets.mixkit.co/sfx/preview/mixkit-alarm-996.mp3";
+            break;
+          case "normal":
+          default:
+            alertClass = "alert-normal";
+            icon = "fa-info-circle";
+            title = "Normal Alert";
+            alertSound.src =
+              "https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3";
+        }
+        alertSound
+          .play()
+          .catch((e) => console.log("Alert sound play failed:", e));
+        const alertDiv = document.createElement("div");
+        alertDiv.className = `alert ${alertClass} fade-in`;
+        alertDiv.innerHTML = `
+          <div class="alert-icon">
+            <i class="fas ${icon}"></i>
+          </div>
+          <div class="alert-content">
+            <div class="alert-title">${title}</div>
+            <div class="alert-message">
+              Temperature: ${temperature.toFixed(
+                1
+              )}°C, Humidity: ${humidity.toFixed(1)}%
+            </div>
+            <div class="alert-timestamp">
+              ${formattedTime} • ${formattedDate}
+            </div>
+          </div>
+        `;
+
+        elements.alertsContainer.insertBefore(
+          alertDiv,
+          elements.alertsContainer.firstChild
+        );
+
+        const alerts = elements.alertsContainer.querySelectorAll(".alert");
+        if (alerts.length > config.alertsLimit) {
+          elements.alertsContainer.removeChild(alerts[alerts.length - 1]);
+        }
+      }
+
+      function updateConnectionStatus(status) {
+        elements.connectionStatus.className = "connection-status";
+
+        let statusText = "Connecting...";
+
+        switch (status) {
+          case "connected":
+            elements.connectionStatus.classList.add("connection-connected");
+            statusText = "Connected";
+            break;
+          case "reconnecting":
+            elements.connectionStatus.classList.add("connection-reconnecting");
+            statusText = "Reconnecting...";
+            break;
+          case "disconnected":
+            elements.connectionStatus.classList.add("connection-disconnected");
+            statusText = "Disconnected";
+            break;
+          case "connecting":
+          default:
+            elements.connectionStatus.classList.add("connection-connecting");
+            statusText = "Connecting...";
+        }
+
+        elements.connectionStatus.querySelector("span").textContent =
+          statusText;
+
+        if (status === "connected") {
+          elements.appContent.style.display = "block";
+        } else {
+          elements.appContent.style.display = "none";
+        }
+      }
+
+      function showLoading(message) {
+        elements.loadingMessage.textContent = message;
+        elements.loadingOverlay.style.display = "flex";
+      }
+
+      function hideLoading() {
+        elements.loadingOverlay.style.display = "none";
+      }
+    </script>
+    <audio id="fireAlarmSound" preload="auto">
+      <source
+        src="./sound/mixkit-facility-alarm-sound-999.wav"
+        type="audio/wav"
+      />
+      Your browser does not support the audio element.
+    </audio>
+
+    <audio id="alertSound" preload="auto">
+      <source src="./sound/mixkit-classic-alarm-995.wav" type="audio/wav" />
+      Your browser does not support the audio element.
+    </audio>
+  </body>
+</html>

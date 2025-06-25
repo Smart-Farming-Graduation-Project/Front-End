@@ -19,9 +19,21 @@ import DataInitializer from "./utils/contexts/DataInitializer";
 import { Toaster } from "react-hot-toast";
 
 import "./globals.css";
-import './utils/api/axiosInterceptor';
+import "./utils/api/axiosInterceptor";
 
-const hiddenPages = ["/signin", "/dashboard", "/dashboard/farmDashboard", "/dashboard/ai", "/dashboard/chat", "/dashboard/community", "/dashboard/live", "/dashboard/admin", "/forgot-password", "/signup"];
+const hiddenPages = [
+  "/signin",
+  "/dashboard",
+  "/dashboard/farmAlerts",
+  "/dashboard/farmDashboard",
+  "/dashboard/ai",
+  "/dashboard/chat",
+  "/dashboard/community",
+  "/dashboard/live",
+  "/dashboard/admin",
+  "/forgot-password",
+  "/signup",
+];
 
 const adminPathPatterns = [/^\/dashboard\/admin(\/.*)?$/];
 const protectedPages = ["/cart", "/wishlist", "/checkout"];
@@ -32,15 +44,20 @@ function AppContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   const isExactMatch = hiddenPages.includes(pathname || "");
-  const isPatternMatch = pathname && hiddenPathPatterns.some((pattern) => pattern.test(pathname));
-  const isAdminRoute = pathname && adminPathPatterns.some((pattern) => pattern.test(pathname));
+  const isPatternMatch =
+    pathname && hiddenPathPatterns.some((pattern) => pattern.test(pathname));
+  const isAdminRoute =
+    pathname && adminPathPatterns.some((pattern) => pattern.test(pathname));
 
   const shouldHide = isExactMatch || isPatternMatch;
 
   let content = children;
 
   content = (
-    <ProtectedRouteProvider protectedPaths={protectedPages} protectedPathPatterns={protectedPathPatterns}>
+    <ProtectedRouteProvider
+      protectedPaths={protectedPages}
+      protectedPathPatterns={protectedPathPatterns}
+    >
       {content}
     </ProtectedRouteProvider>
   );
@@ -59,12 +76,19 @@ function AppContent({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <head>
         <title>Crop Guard | Smart Farming Solution</title>
-        <meta name="description" content="Crop Guard - Protecting your crops, securing your future" />
+        <meta
+          name="description"
+          content="Crop Guard - Protecting your crops, securing your future"
+        />
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body>

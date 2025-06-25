@@ -104,7 +104,7 @@ const AlertCard = () => {
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">
-                Emergency Alerts
+                General Alerts
               </h2>
               <p className="text-xs text-gray-500">
                 Real-time incident notifications
