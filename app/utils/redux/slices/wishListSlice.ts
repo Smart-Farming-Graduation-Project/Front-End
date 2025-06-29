@@ -5,7 +5,7 @@ import axios from "axios";
 import { Product } from "../../types/app";
 import toast from "react-hot-toast";
 
-type WishListItem = {
+type ItemProps = {
   id: number;
   productId: number;
   productName: string;
@@ -13,6 +13,14 @@ type WishListItem = {
   productAvailability: string;
   productImages: string[];
   productDescription: string;
+  averageRating?: number; // Add optional averageRating
+};
+
+type CartItem = ItemProps & {
+  quantity: number;
+};
+
+type WishListItem = ItemProps & {
   fav: boolean;
 };
 
@@ -30,7 +38,6 @@ const initialState: WishListState = {
   wishlistCount: 0,
 };
 
-// Fetch Wishlist - Use the correct endpoint
 export const fetchWishlist = createAsyncThunk<WishListItem[]>(
   "wishlist/fetchWishlist", 
   async (_, { rejectWithValue }) => {
@@ -137,6 +144,7 @@ const wishListSlice = createSlice({
           productAvailability: action.payload.availability,
           productImages: action.payload.images,
           productDescription: action.payload.description,
+          averageRating: action.payload.averageRating || 3.5,
           fav: true,
         });
         state.wishlistCount = state.wishList.length;
