@@ -45,6 +45,8 @@ const nextConfig = {
         pathname: "/**",
       },
     ],
+    unoptimized: false,
+    minimumCacheTTL: 60,
   },
   async headers() {
     return [
