@@ -5,16 +5,17 @@ import API_BASE_URL from "./base";
 export const getMostSells = async () => {
   try {
     const response = await axios.get(`${API_BASE_URL}/Product/ProductsList`);
-    return response.data.data;
+    // Limit to 10 products
+    return response.data.data?.slice(0, 10) || [];
   } catch (error) {
     console.error("Error fetching mostSells:", error);
+    return [];
   }
 };
 
 // Get Product by Id
 export const getProductById = async (id: number) => {
   try {
-
     const response = await axios.get(`${API_BASE_URL}/Product/product/${id}`);
     return response.data.data;
   } catch (error) {

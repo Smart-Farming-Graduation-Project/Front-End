@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { ProductId, ReviewProps } from "@/app/utils/types/app";
-import Image from "next/image";
+import ProductImageGallery from "@/app/components/shop/ProductImageGallery";
 import { Separator } from "@/components/ui/separator";
 import { FaPlus } from "react-icons/fa6";
 import { TiMinus } from "react-icons/ti";
@@ -96,13 +96,15 @@ const CardDetails = ({ product }: { product: ProductId }) => {
   return (
     <section className="card-details p-sec">
       <div className="container">
-        <div className="card-details-container grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="img-product rounded-lg overflow-hidden flex justify-center items-center">
-            {product.images.length > 0 ? <Image src={product.images[0]} alt={product.productName} width={500} height={300} layout="responsive" /> : <div className="text-center text-gray-400">No image available</div>}
+        <div className="card-details-container grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Replace the single image with the gallery */}
+          <div className="img-product">
+            <ProductImageGallery images={product.images} productName={product.productName} />
           </div>
+
           <div className="details">
             <h2 className="font-[700] text-3xl mb-1">{product.productName}</h2>
-            <p className="text-green text-2xl font-[500]">{product.price} EG</p>
+            <p className="text-green text-2xl font-[500]">{product.price.toFixed(2)} EG</p>
             <span className="rate flex items-center gap-[3px] my-2">
               <Rating style={{ maxWidth: 100 }} value={product.averageRating} readOnly />
               <span className="text-md mt-[1px]">{product.averageRating}</span>

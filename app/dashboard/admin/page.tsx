@@ -33,7 +33,7 @@ const Admin = () => {
 
       try {
         // Fetch real stats from APIs
-        const [usersRes, productsRes, categoriesRes] = await Promise.all([
+        const [usersRes, productsRes, categoriesRes, ordersRes] = await Promise.all([
           axios.get(`${API_BASE_URL}/User/GetUsers?pageNumber=1&pageSize=1`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
@@ -41,13 +41,16 @@ const Admin = () => {
             headers: { Authorization: `Bearer ${token}` },
           }),
           axios.get(`${API_BASE_URL}/Category/CategoryList`),
+          axios.get(`${API_BASE_URL}/Order/OrdersList`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
         ]);
 
         setStats({
           users: usersRes.data.meta?.["Total Count"] || 0,
           products: Array.isArray(productsRes.data.data) ? productsRes.data.data.length : 0,
           categories: Array.isArray(categoriesRes.data.data) ? categoriesRes.data.data.length : 0,
-          orders: 128, // Replace with real orders count when API is available
+          orders: Array.isArray(ordersRes.data.data) ? ordersRes.data.data.length : 0,
         });
       } catch (error) {
         console.error("Error fetching stats:", error);

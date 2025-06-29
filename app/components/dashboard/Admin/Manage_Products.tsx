@@ -167,6 +167,7 @@ const Manage_Products = () => {
                 availability: editProduct.availability,
                 categoryName: editProduct.categoryName,
                 images: editProduct.imagesFiles ? editProduct.imagesFiles.map((file) => URL.createObjectURL(file)) : editProduct.images,
+                averageRating: prod.averageRating, // preserve the existing rating
               }
             : prod
         )
@@ -196,43 +197,22 @@ const Manage_Products = () => {
           <div className="space-y-3">
             <div>
               <Label className="text-sm">Product name</Label>
-              <Input
-                placeholder="Product name"
-                value={newProductName}
-                onChange={(e) => setNewProductName(e.target.value)}
-                className="w-full text-sm"
-              />
+              <Input placeholder="Product name" value={newProductName} onChange={(e) => setNewProductName(e.target.value)} className="w-full text-sm" />
             </div>
             <div>
               <Label className="text-sm">Product description</Label>
-              <Input
-                placeholder="Product description"
-                value={newProductDesc}
-                onChange={(e) => setNewProductDesc(e.target.value)}
-                className="w-full text-sm"
-              />
+              <Input placeholder="Product description" value={newProductDesc} onChange={(e) => setNewProductDesc(e.target.value)} className="w-full text-sm" />
             </div>
             <div>
               <Label className="text-sm">Category name</Label>
-              <Input
-                placeholder="Category name"
-                value={newCategoryName}
-                onChange={(e) => setNewCategoryName(e.target.value)}
-                className="w-full text-sm"
-              />
+              <Input placeholder="Category name" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} className="w-full text-sm" />
             </div>
           </div>
 
           <div className="space-y-3">
             <div>
               <Label className="text-sm">Price</Label>
-              <Input
-                placeholder="Price"
-                value={newPrice}
-                onChange={(e) => setNewPrice(e.target.value)}
-                type="number"
-                className="w-full text-sm"
-              />
+              <Input placeholder="Price" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} type="number" className="w-full text-sm" />
             </div>
             <div>
               <Label className="text-sm">Availability</Label>
@@ -248,19 +228,11 @@ const Manage_Products = () => {
             </div>
             <div>
               <Label className="text-sm">Images</Label>
-              <Input
-                type="file"
-                multiple
-                onChange={handleImageChange}
-                className="w-full text-sm"
-              />
+              <Input type="file" multiple onChange={handleImageChange} className="w-full text-sm" />
             </div>
           </div>
         </div>
-        <Button
-          onClick={handleAddProduct}
-          className="bg-green text-white w-full mt-4 text-sm md:text-base"
-        >
+        <Button onClick={handleAddProduct} className="bg-green text-white w-full mt-4 text-sm md:text-base">
           Add Product
         </Button>
       </div>
@@ -293,7 +265,7 @@ const Manage_Products = () => {
                     </div>
                     <div>
                       <span className="text-gray-500">Price:</span>
-                      <p className="font-medium text-green">EG {product.price}</p>
+                      <p className="font-medium text-green">EG {product.price.toFixed(2)}</p>
                     </div>
                   </div>
 
@@ -301,12 +273,7 @@ const Manage_Products = () => {
                     <div className="flex gap-2">
                       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
                         <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 text-xs"
-                            onClick={() => setEditProduct(product)}
-                          >
+                          <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={() => setEditProduct(product)}>
                             Edit
                           </Button>
                         </DialogTrigger>
@@ -429,11 +396,7 @@ const Manage_Products = () => {
 
                       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                         <DialogTrigger asChild>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="flex-1 text-xs"
-                          >
+                          <Button variant="destructive" size="sm" className="flex-1 text-xs">
                             Delete
                           </Button>
                         </DialogTrigger>
@@ -463,18 +426,14 @@ const Manage_Products = () => {
                     <p className="text-sm text-gray-600 truncate">{product.description}</p>
                     <div className="flex gap-4 text-sm text-gray-500 mt-1">
                       <span>Category: {product.categoryName}</span>
-                      <span>Price: EG {product.price}</span>
+                      <span>Price: EG {product.price.toFixed(2)}</span>
                     </div>
                   </div>
 
                   <div className="flex gap-2 ml-4">
                     <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
                       <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setEditProduct(product)}
-                        >
+                        <Button variant="outline" size="sm" onClick={() => setEditProduct(product)}>
                           Edit
                         </Button>
                       </DialogTrigger>

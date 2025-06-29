@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import "./Card.css";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
@@ -11,20 +11,16 @@ import { addToWishlistAPI, removeFromWishlistAPI } from "@/app/utils/redux/slice
 import { addToCartAPI, deleteProductAPI } from "@/app/utils/redux/slices/CartSlice";
 import { Product } from "@/app/utils/types/app";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/utils/contexts/AuthContext"; // Add this import
+import { useAuth } from "@/app/utils/contexts/AuthContext";
 import toast from "react-hot-toast";
 import { Rating } from "@smastrom/react-rating";
 import category_img from "../../assets/images/onions.jpg";
-import axios from "axios";
-import API_BASE_URL from "@/app/utils/api/base";
-import { getTokenClient } from "@/app/utils/api/getTokenClient";
 
 const Card = ({ product, currentPageName }: { product: Product; currentPageName?: string }) => {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const { user } = useAuth(); // Add this line
+  const { user } = useAuth();
   const [isfav, setIsfav] = useState(false);
-  const [avgRating, setAvgRating] = useState<number | null>(null);
 
   const trucnkString = (str: string, num: number) => (str.length > num ? str.slice(0, num) + "..." : str);
 
@@ -38,22 +34,6 @@ const Card = ({ product, currentPageName }: { product: Product; currentPageName?
     return true;
   };
 
-  useEffect(() => {
-    const fetchAvgRating = async () => {
-      try {
-        const token = getTokenClient();
-        if (!token) return;
-
-        const response = await axios.get(`${API_BASE_URL}/Review/GetAverageRating/${product.productId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setAvgRating(response.data.data || 3.5);
-      } catch (error) {
-        console.error("Failed to fetch average rating:", error);
-      }
-    };
-  }, [product.productId]);
-
   return (
     <div
       className="card h-[470px] bg-white border border-[#f5f5f5dc] rounded-xl p-3 relative cursor-pointer flex items-center justify-center flex-col overflow-hidden ease duration-300 hover:shadow-sm"
@@ -64,7 +44,7 @@ const Card = ({ product, currentPageName }: { product: Product; currentPageName?
             className="favorite cursor-pointer "
             onClick={(e) => {
               e.stopPropagation();
-              if (!checkAuth()) return; // Add auth check
+              if (!checkAuth()) return;
               setIsfav(!isfav);
               dispatch(addToWishlistAPI(product));
               dispatch(deleteProductAPI(product.productId));
@@ -77,7 +57,7 @@ const Card = ({ product, currentPageName }: { product: Product; currentPageName?
             className="favorite bg-green cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
-              if (!checkAuth()) return; // Add auth check
+              if (!checkAuth()) return;
               setIsfav(!isfav);
               dispatch(removeFromWishlistAPI(product.productId));
             }}>
@@ -89,7 +69,7 @@ const Card = ({ product, currentPageName }: { product: Product; currentPageName?
           className="close hover:text-green cursor-pointer "
           onClick={(e) => {
             e.stopPropagation();
-            if (!checkAuth()) return; // Add auth check
+            if (!checkAuth()) return;
             dispatch(removeFromWishlistAPI(product.productId));
           }}
         />
@@ -111,10 +91,10 @@ const Card = ({ product, currentPageName }: { product: Product; currentPageName?
         <h4 className="text-lg font-bold">{product.productName}</h4>
         {product.description && <p className="text-sm text-gray-500">{trucnkString(product.description, 50)}</p>}
         <span className="flex items-center gap-[3px] justify-center my-2">
-          <Rating style={{ maxWidth: 100 }} value={avgRating ? avgRating : 3.5} readOnly />
-          <span className="text-md text- mt-[1px]">{avgRating ? avgRating : 3.5}</span>
+          <Rating style={{ maxWidth: 100 }} value={product.averageRating || 3.5} readOnly />
+          <span className="text-md text- mt-[1px]">{product.averageRating || 3.5}</span>
         </span>
-        <h3 className="text-green font-extrabold text-xl my-3">{product.price} EG</h3>
+        <h3 className="text-green font-extrabold text-xl my-3">{product.price.toFixed(2)} EG</h3>
         <button
           className="py-2 px-4 rounded-[20px] uppercase border border-yellow flex items-center gap-2 justify-center mx-auto mt-4 hover:shadow ease font-[600]"
           onClick={(e) => {

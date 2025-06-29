@@ -20,12 +20,9 @@ const Page = () => {
     dispatch(fetchCart());
   }, [dispatch]);
 
-  const total = carts
-    .reduce((acc, product) => {
-      acc += product.productPrice * product.quantity;
-      return acc;
-    }, 0)
-    .toFixed(2);
+  const total = carts.reduce((acc, product) => {
+    return acc + product.productPrice * product.quantity;
+  }, 0).toFixed(2);
 
   return (
     <div className="cart relative">

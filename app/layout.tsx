@@ -31,8 +31,11 @@ const hiddenPages = [
   "/dashboard/community",
   "/dashboard/live",
   "/dashboard/admin",
+  "/dashboard/rovers",
+  "/dashboard/predictions",
   "/forgot-password",
   "/signup",
+  "/profile",
 ];
 
 const adminPathPatterns = [/^\/dashboard\/admin(\/.*)?$/];

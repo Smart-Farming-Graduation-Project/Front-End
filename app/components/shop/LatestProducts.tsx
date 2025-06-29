@@ -36,6 +36,10 @@ const LatestProducts: React.FC<mostSellsProps> = ({ mostSells }) => {
       </div>
     );
   }
+
+  // Ensure we only show maximum 10 products
+  const displayProducts = mostSells.slice(0, 10);
+
   return (
     <section className="LatestProducts p-sec bg-light-green-section">
       <Heading paragraph="Latest Products" heading="Latest Products" />
@@ -63,7 +67,7 @@ const LatestProducts: React.FC<mostSellsProps> = ({ mostSells }) => {
               slidesPerView: 4.5,
             },
           }}>
-          {mostSells.map((product) => (
+          {displayProducts.map((product) => (
             <SwiperSlide key={product.productId}>
               <Card product={product} />
             </SwiperSlide>

@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
-import { GiMagicHat } from "react-icons/gi";
+import React, { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
+import { GiCrystalBall, GiMagicHat } from "react-icons/gi";
 import { RiAdminFill } from "react-icons/ri";
 import { MdOutlineTrackChanges } from "react-icons/md";
 import {
@@ -10,16 +11,43 @@ import {
   TbLayoutSidebarLeftExpand,
   TbVirusSearch,
 } from "react-icons/tb";
-import { FaPeopleGroup } from "react-icons/fa6";
+import { FaPeopleGroup, FaTractor } from "react-icons/fa6";
 import logo from "../../assets/images/Logo.png";
 import Image from "next/image";
 import { useMobileContext } from "@/app/utils/contexts/MobileHandler";
 import { AlertTriangle } from "lucide-react";
+
 const Sidebar = () => {
   const { isMobile } = useMobileContext();
+  const pathname = usePathname(); // Get current pathname
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeLink, setActiveLink] = useState("/dashboard");
+  const [activeLink, setActiveLink] = useState("");
+
+  // Update active link when pathname changes
+  useEffect(() => {
+    setActiveLink(pathname);
+  }, [pathname]);
+
+  // Set initial sidebar state based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsSidebarOpen(true);
+      } else {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    // Set initial state
+    handleResize();
+
+    // Add event listener
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -28,6 +56,14 @@ const Sidebar = () => {
   const handleLinkClick = (path: string) => {
     setActiveLink(path);
     if (isMobile) setIsSidebarOpen(false);
+  };
+
+  // Helper function to check if a link is active
+  const isActiveLink = (path: string) => {
+    if (path === "/dashboard") {
+      return pathname === "/dashboard" || pathname === "/dashboard/farmDashboard";
+    }
+    return pathname === path || pathname.startsWith(path + "/");
   };
 
   return (
@@ -76,8 +112,8 @@ const Sidebar = () => {
           <li className="mb-4">
             <Link
               href="/dashboard"
-              className={`px-4 py-2 cursor-pointer flex items-center gap-2 ${
-                activeLink === "/dashboard/farmDashboard"
+              className={`px-4 py-2 cursor-pointer flex items-center gap-2 transition-colors duration-200 ${
+                isActiveLink("/dashboard")
                   ? "bg-white text-green rounded-lg"
                   : "text-[#9CA3AF] hover:text-white"
               }`}
@@ -88,11 +124,12 @@ const Sidebar = () => {
               {isSidebarOpen && <span className="text-sm">Farm Dashboard</span>}
             </Link>
           </li>
+
           <li className="mb-4">
             <Link
               href="/dashboard/farmAlerts"
-              className={`px-4 py-2 cursor-pointer flex items-center gap-2 ${
-                activeLink === "/dashboard/farmAlerts"
+              className={`px-4 py-2 cursor-pointer flex items-center gap-2 transition-colors duration-200 ${
+                isActiveLink("/dashboard/farmAlerts")
                   ? "bg-white text-green rounded-lg"
                   : "text-[#9CA3AF] hover:text-white"
               }`}
@@ -103,11 +140,12 @@ const Sidebar = () => {
               {isSidebarOpen && <span className="text-sm">Farm Alerts</span>}
             </Link>
           </li>
+
           <li className="mb-4">
             <Link
               href="/dashboard/live"
-              className={`px-4 py-2 cursor-pointer flex items-center gap-2 ${
-                activeLink === "/dashboard/live"
+              className={`px-4 py-2 cursor-pointer flex items-center gap-2 transition-colors duration-200 ${
+                isActiveLink("/dashboard/live")
                   ? "bg-white text-green rounded-lg"
                   : "text-[#9CA3AF] hover:text-white"
               }`}
@@ -118,11 +156,12 @@ const Sidebar = () => {
               {isSidebarOpen && <span className="text-sm">Live Tracking</span>}
             </Link>
           </li>
+
           <li className="mb-4">
             <Link
               href="/dashboard/ai"
-              className={`px-4 py-2 cursor-pointer flex items-center gap-2 ${
-                activeLink === "/dashboard/ai"
+              className={`px-4 py-2 cursor-pointer flex items-center gap-2 transition-colors duration-200 ${
+                isActiveLink("/dashboard/ai")
                   ? "bg-white text-green rounded-lg"
                   : "text-[#9CA3AF] hover:text-white"
               }`}
@@ -136,9 +175,39 @@ const Sidebar = () => {
 
           <li className="mb-4">
             <Link
+              href="/dashboard/predictions"
+              className={`px-4 py-2 cursor-pointer flex items-center gap-2 transition-colors duration-200 ${
+                isActiveLink("/dashboard/predictions")
+                  ? "bg-white text-green rounded-lg"
+                  : "text-[#9CA3AF] hover:text-white"
+              }`}
+              title="Chat"
+              onClick={() => handleLinkClick("/dashboard/predictions")}
+            >
+              <GiCrystalBall size={20} />
+              {isSidebarOpen && <span className="text-sm">Predictions</span>}
+            </Link>
+          </li>
+          <li className="mb-4">
+            <Link
+              href="/dashboard/rovers"
+              className={`px-4 py-2 cursor-pointer flex items-center gap-2 transition-colors duration-200 ${
+                isActiveLink("/dashboard/rovers")
+                  ? "bg-white text-green rounded-lg"
+                  : "text-[#9CA3AF] hover:text-white"
+              }`}
+              title="Chat"
+              onClick={() => handleLinkClick("/dashboard/rovers")}
+            >
+              <FaTractor size={20} />
+              {isSidebarOpen && <span className="text-sm">Rovers</span>}
+            </Link>
+          </li>
+          <li className="mb-4">
+            <Link
               href="/dashboard/chat"
-              className={`px-4 py-2 cursor-pointer flex items-center gap-2 ${
-                activeLink === "/dashboard/chat"
+              className={`px-4 py-2 cursor-pointer flex items-center gap-2 transition-colors duration-200 ${
+                isActiveLink("/dashboard/chat")
                   ? "bg-white text-green rounded-lg"
                   : "text-[#9CA3AF] hover:text-white"
               }`}
@@ -153,8 +222,8 @@ const Sidebar = () => {
           <li className="mb-4">
             <Link
               href="/dashboard/community"
-              className={`px-4 py-2 cursor-pointer flex items-center gap-2 ${
-                activeLink === "/dashboard/community"
+              className={`px-4 py-2 cursor-pointer flex items-center gap-2 transition-colors duration-200 ${
+                isActiveLink("/dashboard/community")
                   ? "bg-white text-green rounded-lg"
                   : "text-[#9CA3AF] hover:text-white"
               }`}
@@ -165,11 +234,12 @@ const Sidebar = () => {
               {isSidebarOpen && <span className="text-sm">Community</span>}
             </Link>
           </li>
+
           <li className="mb-4">
             <Link
               href="/dashboard/admin"
-              className={`px-4 py-2 cursor-pointer flex items-center gap-2 ${
-                activeLink === "/dashboard/admin"
+              className={`px-4 py-2 cursor-pointer flex items-center gap-2 transition-colors duration-200 ${
+                isActiveLink("/dashboard/admin")
                   ? "bg-white text-green rounded-lg"
                   : "text-[#9CA3AF] hover:text-white"
               }`}

@@ -6,6 +6,7 @@ type Product = {
   availability: string;
   categoryName?: string;
   images: string[];
+  averageRating: number;
 };
 type ProductId = {
   productId: number;
@@ -57,5 +58,45 @@ type UserPostProps = {
   createdAt: string;
   updatedAt?: string;
 };
+type OrderItem = {
+  id: number;
+  productId: number;
+  quantity: number;
+  unitPrice: number;
+};
 
-export type { Product, CategoryType, ProductId, WishListItem, CartItem, ItemProps, ReviewProps, UserPostProps };
+type CreateOrderItem = {
+  productId: number;
+  quantity: number;
+  cupon: null;
+};
+
+type Order = {
+  orderId: number;
+  userId: string;
+  shippingAddress: string;
+  orderDate: string;
+  status: string;
+  totalAmount: number;
+  orderItems: OrderItem[];
+};
+
+type CreateOrder = {
+  shippingAddress: string;
+  orderItems: CreateOrderItem[];
+};
+
+type UpdateOrder = {
+  id: number;
+  shippingAddress: string;
+  status: string;
+};
+
+type OrderTotals = {
+  subtotal: number;
+  shipping: number;
+  discount: number;
+  total: number;
+};
+
+export type { Product, CategoryType, ProductId, WishListItem, CartItem, ItemProps, ReviewProps, UserPostProps, Order, OrderItem, CreateOrder, CreateOrderItem, UpdateOrder, OrderTotals };

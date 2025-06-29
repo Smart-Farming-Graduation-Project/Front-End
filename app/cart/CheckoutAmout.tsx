@@ -83,26 +83,26 @@ const CheckoutAmount = ({ total, itemsCount }: { total: number; itemsCount: numb
 
         <div className="flex justify-between text-lg">
           <span>Subtotal:</span>
-          <span className="font-semibold">{total} EG</span>
+          <span className="font-semibold">{total.toFixed(2)} EG</span>
         </div>
 
         {discount > 0 && (
           <div className="flex justify-between text-lg text-green">
             <span>Discount:</span>
-            <span className="font-semibold">-{discount} EG</span>
+            <span className="font-semibold">-{discount.toFixed(2)} EG</span>
           </div>
         )}
 
         <div className="flex justify-between text-lg">
           <span>Shipping:</span>
-          <span className="font-semibold">{shippingCost} EG</span>
+          <span className="font-semibold">{shippingCost.toFixed(2)} EG</span>
         </div>
 
         <Separator className="!my-3" />
 
         <div className="flex justify-between text-xl font-bold text-green-600">
           <span>Total:</span>
-          <span>{finalTotal} EG</span>
+          <span>{finalTotal.toFixed(2)} EG</span>
         </div>
 
         <div className="flex justify-between text-md text-gray-700">
