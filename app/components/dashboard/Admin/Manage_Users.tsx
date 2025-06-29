@@ -22,7 +22,7 @@ type User = {
   email: string;
   phone: string;
   address: string | null;
-  imageUrl: string;
+  imageUrl: string | null;
 };
 
 type UpdateUser = {
@@ -320,7 +320,15 @@ const Manage_Users = () => {
                 <div className="block md:hidden space-y-3">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 relative flex-shrink-0">
-                      <Image src={user.imageUrl || `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`} alt={user.fullName} fill className="rounded-full object-cover" />
+                      <Image
+                        src={user.imageUrl || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=22c55e&color=fff`}
+                        alt={user.fullName}
+                        fill
+                        className="rounded-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=22c55e&color=fff`;
+                        }}
+                      />
                     </div>
                     <div>
                       <h4 className="font-medium text-base">{user.fullName}</h4>
@@ -384,7 +392,15 @@ const Manage_Users = () => {
                 <div className="hidden md:flex items-center justify-between">
                   <div className="flex items-center gap-4 flex-1 min-w-0">
                     <div className="w-12 h-12 relative flex-shrink-0">
-                      <Image src={user.imageUrl || `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`} alt={user.fullName} fill className="rounded-full object-cover" />
+                      <Image
+                        src={user.imageUrl || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=22c55e&color=fff`}
+                        alt={user.fullName}
+                        fill
+                        className="rounded-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=22c55e&color=fff`;
+                        }}
+                      />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-base truncate">{user.fullName}</h4>

@@ -1,14 +1,13 @@
 import Image from "next/image";
 import React from "react";
 import discover from "../../assets/images/discover.jpeg";
-import shop_background from "../../assets/images/shop_background.png";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FaArrowRightLong } from "react-icons/fa6";
 
 const Discover = () => {
   return (
-    <div className="h-screen bg-[#045910] flex items-center justify-center relative overflow-hidden bg-cover bg-center" style={{ backgroundImage: `url(${shop_background.src})` }}>
+    <div className="h-screen bg-[#045910] flex items-center justify-center relative overflow-hidden bg-cover bg-center" style={{ backgroundImage: `url(/assets/images/shop_background.png)` }}>
       {/* Content Section */}
       <div className="container mx-auto px-4 relative z-10 mt-40 md:mt-0 ">
         <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">

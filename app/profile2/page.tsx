@@ -115,7 +115,16 @@ const ProfilePage = () => {
                 <div className="flex justify-center mb-4">
                   {userProfile.imageUrl ? (
                     <div className="relative w-24 h-24 rounded-full overflow-hidden">
-                      <Image src={userProfile.imageUrl} alt={userProfile.firstName} fill className="object-cover" />
+                      <Image
+                        src={userProfile.imageUrl}
+                        alt={userProfile.firstName}
+                        fill
+                        className="object-cover"
+                        onError={(e) => {
+                          // Fallback to default avatar on error
+                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${userProfile.firstName}+${userProfile.lastName}&background=22c55e&color=fff`;
+                        }}
+                      />
                     </div>
                   ) : (
                     <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">

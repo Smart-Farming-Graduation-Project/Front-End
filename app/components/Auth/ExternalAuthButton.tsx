@@ -26,7 +26,7 @@ interface AuthRequest {
   firstName?: string;
   lastName?: string;
   email?: string;
-  profileImage?: string;
+  profileImage?: string | null;
   provider: string;
 }
 
@@ -74,7 +74,7 @@ export default function ExternalAuthButton({ provider, typePage }: ProviderButto
           lastName: response.lastName || "User",
           email: response.email || `${response.userId}@${response.provider}.com`,
           address: "Not provided",
-          profileImage: response.profileImage || "",
+          profileImage: response.profileImage || null,
         }),
         accessToken: response.accessToken,
         userId: response.userId,

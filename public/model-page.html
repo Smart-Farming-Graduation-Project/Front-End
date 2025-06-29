@@ -529,7 +529,7 @@
         const file = event.target?.files?.[0] || event;
         if (file && file.type.startsWith("image/")) {
           const formData = new FormData();
-          formData.append("image", file);
+          formData.append("Image", file);
 
           // Show loading spinner and reset UI
           loadingSpinner.style.display = "block";
@@ -558,11 +558,11 @@
               console.log("Response:", response);
               if (response.succeeded && response.data && response.data.imageId && response.data.imageUrl) {
                 imageId = response.data.imageId; // Store the imageId
-                const imageUrl = response.data.imageUrl.replace(/\\/g, "/");
-                processedImageUrl = response.data.imageUrl.replace(/\\/g, "/");
+                const imageUrl = response.data.imageUrl;
+                processedImageUrl = response.data.imageUrl;
 
                 // Set the processed image source
-                document.getElementById("processed-image").src = `${imageUrl}`;
+                document.getElementById("processed-image").src = imageUrl;
                 resultSection.style.display = "block"; // Show the result section
                 successMessage.style.display = "block"; // Show the success message
                 buttonContainer.style.display = "flex"; // Show the buttons

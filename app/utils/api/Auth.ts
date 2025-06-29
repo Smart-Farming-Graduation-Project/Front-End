@@ -1,9 +1,37 @@
 import axios from "axios";
 import API_BASE_URL from "./base";
 
-export const registerUser = async (userData: { email: string; password: string; confirmPassword: string; firstName: string; lastName: string; userName: string; phone: string; address: string }) => {
+export const registerUser = async (userData: { 
+  email: string; 
+  password: string; 
+  confirmPassword: string; 
+  firstName: string; 
+  lastName: string; 
+  userName: string; 
+  phone: string; 
+  address: string;
+  image?: File;
+}) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/Authentication/Register`, userData);
+    const formData = new FormData();
+    formData.append("FirstName", userData.firstName);
+    formData.append("LastName", userData.lastName);
+    formData.append("UserName", userData.userName);
+    formData.append("Email", userData.email);
+    formData.append("Password", userData.password);
+    formData.append("ConfirmPassword", userData.confirmPassword);
+    formData.append("Phone", userData.phone);
+    formData.append("Address", userData.address);
+    
+    if (userData.image) {
+      formData.append("Image", userData.image);
+    }
+
+    const response = await axios.post(`${API_BASE_URL}/Authentication/Register`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     console.log(response.data);
     return response.data;
   } catch (error) {

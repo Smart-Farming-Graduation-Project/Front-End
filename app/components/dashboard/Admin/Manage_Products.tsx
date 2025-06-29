@@ -166,7 +166,7 @@ const Manage_Products = () => {
                 price: editProduct.price,
                 availability: editProduct.availability,
                 categoryName: editProduct.categoryName,
-                images: editProduct.imagesFiles ? editProduct.imagesFiles.map((file) => URL.createObjectURL(file)) : editProduct.images,
+                images: editProduct.imagesFiles ? editProduct.imagesFiles.map((file) => URL.createObjectURL(file)) : editProduct.images || [],
                 averageRating: prod.averageRating, // preserve the existing rating
               }
             : prod

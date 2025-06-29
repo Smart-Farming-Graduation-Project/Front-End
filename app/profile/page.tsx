@@ -28,11 +28,11 @@ const AccountSettings = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!user?.sub) return;
-      
+
       try {
         const token = getTokenClient();
         if (!token) return;
-        
+
         const profileData = await getUserById(user.sub, token);
         setUserProfile(profileData);
         setFormData({
@@ -55,7 +55,7 @@ const AccountSettings = () => {
     setIsSaving(true);
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       toast.success("Profile updated successfully!");
       setIsEditing(false);
     } catch (error) {
@@ -66,7 +66,7 @@ const AccountSettings = () => {
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -89,12 +89,16 @@ const AccountSettings = () => {
                 <div className="relative inline-block mb-4">
                   {userProfile?.imageUrl ? (
                     <div className="w-32 h-32 rounded-full overflow-hidden mx-auto">
-                      <Image 
-                        src={userProfile.imageUrl} 
-                        alt="Profile" 
-                        width={128} 
+                      <Image
+                        src={userProfile.imageUrl}
+                        alt="Profile"
+                        width={128}
                         height={128}
                         className="object-cover w-full h-full"
+                        onError={(e) => {
+                          // Fallback to default avatar on error
+                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${userProfile.firstName}+${userProfile.lastName}&background=22c55e&color=fff`;
+                        }}
                       />
                     </div>
                   ) : (
@@ -109,9 +113,7 @@ const AccountSettings = () => {
                 <Button variant="outline" className="w-full">
                   Upload New Photo
                 </Button>
-                <p className="text-sm text-gray-500 mt-2">
-                  JPG, PNG or GIF. Max size 2MB
-                </p>
+                <p className="text-sm text-gray-500 mt-2">JPG, PNG or GIF. Max size 2MB</p>
               </CardContent>
             </Card>
 
@@ -146,11 +148,7 @@ const AccountSettings = () => {
             <Card className="shadow-lg">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-xl">Personal Information</CardTitle>
-                <Button
-                  variant={isEditing ? "outline" : "default"}
-                  onClick={() => setIsEditing(!isEditing)}
-                  className="flex items-center gap-2"
-                >
+                <Button variant={isEditing ? "outline" : "default"} onClick={() => setIsEditing(!isEditing)} className="flex items-center gap-2">
                   <Edit3 className="w-4 h-4" />
                   {isEditing ? "Cancel" : "Edit"}
                 </Button>
@@ -159,38 +157,19 @@ const AccountSettings = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <Label htmlFor="firstName">First Name</Label>
-                    <Input
-                      id="firstName"
-                      value={formData.firstName}
-                      onChange={(e) => handleInputChange("firstName", e.target.value)}
-                      disabled={!isEditing}
-                      className="mt-1"
-                    />
+                    <Input id="firstName" value={formData.firstName} onChange={(e) => handleInputChange("firstName", e.target.value)} disabled={!isEditing} className="mt-1" />
                   </div>
 
                   <div>
                     <Label htmlFor="lastName">Last Name</Label>
-                    <Input
-                      id="lastName"
-                      value={formData.lastName}
-                      onChange={(e) => handleInputChange("lastName", e.target.value)}
-                      disabled={!isEditing}
-                      className="mt-1"
-                    />
+                    <Input id="lastName" value={formData.lastName} onChange={(e) => handleInputChange("lastName", e.target.value)} disabled={!isEditing} className="mt-1" />
                   </div>
 
                   <div className="md:col-span-2">
                     <Label htmlFor="email">Email Address</Label>
                     <div className="relative mt-1">
                       <Mail className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => handleInputChange("email", e.target.value)}
-                        disabled={!isEditing}
-                        className="pl-10"
-                      />
+                      <Input id="email" type="email" value={formData.email} onChange={(e) => handleInputChange("email", e.target.value)} disabled={!isEditing} className="pl-10" />
                     </div>
                   </div>
 
@@ -198,14 +177,7 @@ const AccountSettings = () => {
                     <Label htmlFor="phone">Phone Number</Label>
                     <div className="relative mt-1">
                       <Phone className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                      <Input
-                        id="phone"
-                        value={formData.phone}
-                        onChange={(e) => handleInputChange("phone", e.target.value)}
-                        disabled={!isEditing}
-                        className="pl-10"
-                        placeholder="+20 123 456 7890"
-                      />
+                      <Input id="phone" value={formData.phone} onChange={(e) => handleInputChange("phone", e.target.value)} disabled={!isEditing} className="pl-10" placeholder="+20 123 456 7890" />
                     </div>
                   </div>
 
@@ -213,32 +185,17 @@ const AccountSettings = () => {
                     <Label htmlFor="address">Address</Label>
                     <div className="relative mt-1">
                       <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                      <Input
-                        id="address"
-                        value={formData.address}
-                        onChange={(e) => handleInputChange("address", e.target.value)}
-                        disabled={!isEditing}
-                        className="pl-10"
-                        placeholder="Cairo, Egypt"
-                      />
+                      <Input id="address" value={formData.address} onChange={(e) => handleInputChange("address", e.target.value)} disabled={!isEditing} className="pl-10" placeholder="Cairo, Egypt" />
                     </div>
                   </div>
-
                 </div>
 
                 {isEditing && (
                   <div className="flex justify-end gap-3 mt-6 pt-6 border-t">
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsEditing(false)}
-                    >
+                    <Button variant="outline" onClick={() => setIsEditing(false)}>
                       Cancel
                     </Button>
-                    <Button
-                      onClick={handleSave}
-                      disabled={isSaving}
-                      className="flex items-center gap-2"
-                    >
+                    <Button onClick={handleSave} disabled={isSaving} className="flex items-center gap-2">
                       <Save className="w-4 h-4" />
                       {isSaving ? "Saving..." : "Save Changes"}
                     </Button>
