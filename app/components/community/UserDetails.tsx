@@ -16,41 +16,42 @@ interface UserDetailsProps {
 }
 
 const UserDetails = ({ userId, showTimestamp = false, timestamp, imageSize = 32 }: UserDetailsProps) => {
-  const [userData, setUserData] = useState<{ 
-    firstName: string; 
-    lastName: string; 
+  const [userData, setUserData] = useState<{
+    firstName: string;
+    lastName: string;
     imageUrl: string | null;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
       if (!userId) return;
-      
+
       // Return cached data if available
       if (userCache[userId]) {
         setUserData(userCache[userId]);
         setIsLoading(false);
         return;
       }
-      
+
       try {
         const token = getTokenClient();
         if (!token) return;
-        
+
         const response = await axios.get(`${API_BASE_URL}/User/GetById/${userId}`, {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
-        
-        if (response.data && response.data.data) {
+
+        if (response.data && response.data.succeeded && response.data.data) {
           const user = {
-            firstName: response.data.data.firstName || '',
-            lastName: response.data.data.lastName || '',
-            imageUrl: response.data.data.imageUrl || null
+            firstName: response.data.data.firstName || "",
+            lastName: response.data.data.lastName || "",
+            imageUrl: response.data.data.imageUrl || null,
           };
-          
+
           // Cache the user data
           userCache[userId] = user;
           setUserData(user);
@@ -61,28 +62,32 @@ const UserDetails = ({ userId, showTimestamp = false, timestamp, imageSize = 32 
         setIsLoading(false);
       }
     };
-    
+
     fetchUserData();
   }, [userId]);
 
-  const fullName = userData 
-    ? `${userData.firstName} ${userData.lastName}`.trim() || "Unknown User" 
-    : isLoading ? "Loading..." : "Unknown User";
+  const fullName = userData ? `${userData.firstName} ${userData.lastName}`.trim() || "Unknown User" : isLoading ? "Loading..." : "Unknown User";
+
+  // Determine which image to use
+  const getImageSrc = () => {
+    if (imageError || !userData?.imageUrl) {
+      return defaultAvatar;
+    }
+    return userData.imageUrl;
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
 
   return (
     <div className="flex items-center gap-2">
-      <Image 
-        src={userData?.imageUrl || defaultAvatar} 
-        alt={`${fullName}'s avatar`} 
-        width={imageSize} 
-        height={imageSize} 
-        className="rounded-full object-cover" 
-      />
+      <div className={`relative rounded-full overflow-hidden bg-gray-100`} style={{ width: imageSize, height: imageSize }}>
+        <Image src={getImageSrc()} alt={`${fullName}'s avatar`} fill className="object-cover" onError={handleImageError} sizes={`${imageSize}px`} priority={imageSize >= 40} />
+      </div>
       <div>
         <span className="font-medium text-[#1f2937] text-sm">{fullName}</span>
-        {showTimestamp && timestamp && (
-          <span className="block text-xs text-[#6b7280]">{timestamp}</span>
-        )}
+        {showTimestamp && timestamp && <span className="block text-xs text-[#6b7280]">{timestamp}</span>}
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
-"use client"
-import { useSearchParams } from 'next/navigation';
+"use client";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -9,22 +9,101 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import Crumb from "@/app/components/banner/Crumb";
 import img_about from "../assets/images/landing.jpeg";
+import { useSelector } from "react-redux";
+import { RootState } from "../utils/redux/store/store";
+import { useState } from "react";
+import axios from "axios";
+import API_BASE_URL from "../utils/api/base";
+import { getTokenClient } from "../utils/api/getTokenClient";
+import toast from "react-hot-toast";
 
 export default function Checkout() {
   const searchParams = useSearchParams();
-  const discount = parseFloat(searchParams.get('discount') || '0');
-  const coupon = searchParams.get('coupon') || '';
-  
-  const total = 1000;
+  const router = useRouter();
+  const discount = parseFloat(searchParams.get("discount") || "0");
+  const coupon = searchParams.get("coupon") || "";
+
+  const carts = useSelector((state: RootState) => state.carts.carts);
+  const [shippingAddress, setShippingAddress] = useState("");
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+
+  const total = carts.reduce((acc, product) => acc + product.productPrice * product.quantity, 0);
   const shippingCost = 30;
   const finalTotal = total + shippingCost - discount;
-  const itemsCount = 5;
-  
+  const itemsCount = carts.length;
+
+  const handlePlaceOrder = async () => {
+    if (!shippingAddress.trim()) {
+      toast.error("Please enter your shipping address");
+      return;
+    }
+
+    if (carts.length === 0) {
+      toast.error("Your cart is empty");
+      return;
+    }
+
+    setIsPlacingOrder(true);
+
+    try {
+      const token = getTokenClient();
+      if (!token) {
+        toast.error("Please login to place an order");
+        router.push("/signin");
+        return;
+      }
+
+      // Prepare order items from cart
+      const orderItems = carts.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        cupon: coupon || null,
+      }));
+
+      const orderData = {
+        shippingAddress: shippingAddress.trim(),
+        orderItems: orderItems,
+      };
+
+      const response = await axios.post(`${API_BASE_URL}/Order/Create`, orderData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.data.succeeded) {
+        // Navigate to success page with order details
+        router.push(`/order-success?orderId=${response.data.data.orderId}&total=${finalTotal.toFixed(2)}&items=${itemsCount}&address=${encodeURIComponent(shippingAddress)}`);
+      } else {
+        toast.error(response.data.message || "Failed to place order");
+      }
+    } catch (error: any) {
+      console.error("Error placing order:", error);
+      toast.error(error.response?.data?.message || "Failed to place order. Please try again.");
+    } finally {
+      setIsPlacingOrder(false);
+    }
+  };
+
   return (
     <div>
       <Crumb crumb={img_about} />
       <div className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto py-8 px-4 my-10">
         <div className="grid gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl font-semibold text-gray-900">Shipping Information</CardTitle>
+              <CardDescription>Enter your shipping details</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-2">
+                <Label htmlFor="shippingAddress">Shipping Address *</Label>
+                <Input id="shippingAddress" placeholder="Enter your full shipping address" value={shippingAddress} onChange={(e) => setShippingAddress(e.target.value)} required />
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl font-semibold text-gray-900">Payment</CardTitle>
@@ -114,7 +193,7 @@ export default function Checkout() {
             </CardContent>
           </Card>
         </div>
-        
+
         <div className="grid gap-6">
           <Card>
             <CardHeader className="">
@@ -134,49 +213,49 @@ export default function Checkout() {
                       </div>
                       <span className="font-medium">Coupon: {coupon}</span>
                     </div>
-                    <span className="text-green font-medium">-{discount} EG</span>
+                    <span className="text-green font-medium">-{discount.toFixed(2)} EG</span>
                   </div>
                 </div>
               )}
-              
+
               <div className="flex justify-between text-lg">
                 <span>Subtotal:</span>
-                <span className="font-semibold">{total} EG</span>
+                <span className="font-semibold">{total.toFixed(2)} EG</span>
               </div>
-              
+
               {discount > 0 && (
                 <div className="flex justify-between text-lg text-green">
                   <span>Discount:</span>
-                  <span className="font-semibold">-{discount} EG</span>
+                  <span className="font-semibold">-{discount.toFixed(2)} EG</span>
                 </div>
               )}
-              
+
               <div className="flex justify-between text-lg">
                 <span>Shipping:</span>
-                <span className="font-semibold">{shippingCost} EG</span>
+                <span className="font-semibold">{shippingCost.toFixed(2)} EG</span>
               </div>
-              
+
               <Separator className="!my-3" />
-              
+
               <div className="flex justify-between text-xl font-bold text-green-600">
                 <span>Total:</span>
-                <span>{finalTotal} EG</span>
+                <span>{finalTotal.toFixed(2)} EG</span>
               </div>
-              
+
               <div className="flex justify-between text-md text-gray-700">
                 <span>Items:</span>
                 <span>{itemsCount}</span>
               </div>
-              
+
               <div className="flex justify-between text-md text-gray-700">
                 <span>Delivery:</span>
                 <span>Standard (3-5 days)</span>
               </div>
             </CardContent>
           </Card>
-          
-          <Button size="lg" className="w-full">
-            Place Order
+
+          <Button size="lg" className="w-full" onClick={handlePlaceOrder} disabled={isPlacingOrder || !shippingAddress.trim()}>
+            {isPlacingOrder ? "Placing Order..." : "Place Order"}
           </Button>
         </div>
       </div>

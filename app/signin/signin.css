@@ -1,6 +1,6 @@
 .landing-auth {
   position: relative;
-  background-image: url("../assets/images/landing.jpeg");
+  background-image: url("/assets/images/landing.jpeg");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;

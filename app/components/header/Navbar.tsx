@@ -14,12 +14,19 @@ import { Product } from "@/app/utils/types/app";
 import "./Navbar.css";
 import { RootState } from "../../utils/redux/store/store";
 import { useAuth } from "@/app/utils/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import ProfileDropdown from "../dashboard/ProfileDropdown";
 
 const Navbar = ({ setIsOpenRounded }: { setIsOpenRounded: (isOpen: boolean) => void }) => {
   const dispatch = useDispatch();
   const carts = useSelector((state: RootState) => state.carts.carts);
   const wishList = useSelector((state: RootState) => state.wishList.wishList);
+  const { user, isLoading, logout } = useAuth();
+  const router = useRouter();
+
+  // Check if user is admin
+  const isAdmin = user?.Role && Array.isArray(user.Role) && user.Role.includes("Admin");
 
   type Link = {
     name: string;
@@ -33,60 +40,93 @@ const Navbar = ({ setIsOpenRounded }: { setIsOpenRounded: (isOpen: boolean) => v
   ];
   const [isOpen, setIsOpen] = useState(false);
   const { isMobile } = useMobileContext();
-  const { user, isLoading, logout } = useAuth();
+
   return (
     <div className="flex md:items-center md:flex-1">
       {/* Mobile */}
       {isMobile && (
         <div className="flex items-center justify-between w-full">
+          {/* Mobile menu overlay */}
           {isOpen && (
             <div className="flex flex-col absolute top-[100%] bg-black/80 rounded-bl-xl rounded-br-xl left-0 pb-5 gap-3 items-center w-full">
+              {/* Admin Panel Button for Mobile */}
+              {isAdmin && (
+                <div className="w-full px-4 pt-4">
+                  <button
+                    onClick={() => {
+                      router.push("/dashboard/admin");
+                      setIsOpen(false);
+                      setIsOpenRounded(false);
+                    }}
+                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                      />
+                    </svg>
+                    <span>Admin Panel</span>
+                  </button>
+                </div>
+              )}
+
               <nav>
-                <ul className="flex flex-col items-center gap-2 text-lg text-white">
+                <ul className="flex flex-col gap-4 px-4">
                   {links.map((link, index) => (
-                    <li key={index} onClick={() => setIsOpen(false)} className="py-2 cursor-pointer hover:text-white/80 hover:pl-3 transition-all duration-300">
-                      <Link href={link.url}>{link.name}</Link>
+                    <li key={index}>
+                      <Link
+                        className="text-white text-[14px] font-normal transition-all duration-300 hover:text-green-400"
+                        href={link.url}
+                        onClick={() => {
+                          setIsOpen(false);
+                          setIsOpenRounded(false);
+                        }}>
+                        {link.name}
+                      </Link>
                     </li>
                   ))}
                 </ul>
               </nav>
-              <div className="flex items-center justify-center gap-3 flex-col">
-                <Link href="/wishlist" className="flex items-center gap-2  text-white" onClick={() => setIsOpen(false)}>
-                  <FaHeart /> Wishlist
+
+              {/* start nav icon */}
+              <div className="nav-icons flex gap-3">
+                <Link href="/wishlist">
+                  <FaHeart />
+                  <span>{wishList.length}</span>
                 </Link>
-                <Link href="/cart" className="flex items-center gap-2 text-white" onClick={() => setIsOpen(false)}>
-                  <HiOutlineShoppingCart /> Cart
+                <Link href="/cart">
+                  <HiOutlineShoppingCart />
+                  <span>{carts.length}</span>
                 </Link>
-                {!isLoading && (
-                  <button
-                    className="w-fit px-[100%] group text-[14px] whitespace-nowrap font-normal text-white flex gap-2 items-center rounded-full border border-white bg-white/0 hover:bg-white/10 hover:transition-all hover:duration-300"
-                    style={{ height: "35px" }}>
-                    <Link
-                      href="/signin"
-                      onClick={() => {
-                        logout();
-                        setIsOpen(false);
-                      }}>
-                      {user ? "Sign Out" : "Sign In"}
-                    </Link>
-                  </button>
-                )}
               </div>
-              {/* start user & sign in */}
-              {/* end user & sign in */}
+              {/* end nav icon */}
             </div>
           )}
 
-          <div
-            className="text-white text-3xl cursor-pointer"
-            onClick={() => {
-              setIsOpen(!isOpen);
-              setIsOpenRounded(!isOpen);
-            }}>
-            {isOpen ? <IoCloseSharp /> : <IoIosMenu />}
+          {/* Mobile Header Controls */}
+          <div className="flex items-center gap-3">
+            {/* Profile Dropdown - Outside of menu for mobile */}
+            {!isLoading && user && (
+              <div className="md:hidden">
+                <ProfileDropdown />
+              </div>
+            )}
+
+            {/* Hamburger Menu Button */}
+            <div
+              className="text-white text-3xl cursor-pointer"
+              onClick={() => {
+                setIsOpen(!isOpen);
+                setIsOpenRounded(!isOpen);
+              }}>
+              {isOpen ? <IoCloseSharp /> : <IoIosMenu />}
+            </div>
           </div>
         </div>
       )}
+
       {/* Desktop */}
       <div className="flex flex-1 items-center justify-between">
         <nav className="hidden md:flex w-full h-full flex-1 items-center justify-center leading-[17px] font-normal">
@@ -102,12 +142,8 @@ const Navbar = ({ setIsOpenRounded }: { setIsOpenRounded: (isOpen: boolean) => v
             ))}
           </ul>
         </nav>
-        {/* {user && (
-            <span className="text-white">
-              welcome <span className=" font-semibold">{user.given_name}</span>
-            </span>
-          )} */}
-        {/* start user & sign in */}
+
+        {/* Desktop Navigation Icons and User */}
         <div className="nav-icons hidden md:flex items-center justify-end gap-2">
           <Link href="/wishlist">
             <span>{wishList.length ? wishList.length : 0}</span>
@@ -117,16 +153,20 @@ const Navbar = ({ setIsOpenRounded }: { setIsOpenRounded: (isOpen: boolean) => v
             <span>{carts.length ? carts.length : 0}</span>
             <HiOutlineShoppingCart />
           </Link>
+
           {!isLoading && (
-            <BorderButton>
-              <Link href="/signin" onClick={logout}>
-                {user ? "Sign Out" : "Sign In"}
-              </Link>
-              <FaArrowRightLong />
-            </BorderButton>
+            <>
+              {user ? (
+                <ProfileDropdown />
+              ) : (
+                <BorderButton>
+                  <Link href="/signin">Sign In</Link>
+                  <FaArrowRightLong />
+                </BorderButton>
+              )}
+            </>
           )}
         </div>
-        {/* end user & sign in */}
       </div>
     </div>
   );

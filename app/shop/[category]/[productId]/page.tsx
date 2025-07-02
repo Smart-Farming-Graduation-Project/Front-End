@@ -3,13 +3,10 @@ import React from "react";
 import shop_crumb from "@/app/assets/images/shop_crumb.jpg";
 import CardDetails from "@/app/shop/[category]/[productId]/CardDetails";
 import { getProductById } from "../../../utils/api/Products";
-import { getTokenServer } from "@/app/utils/api/getTokenServer";
 import { ProductId } from "@/app/utils/types/app";
 import { Toaster } from "react-hot-toast";
 const Product_details = async ({ params }: { params: { productId: string } }) => {
-  const token = await getTokenServer();
-  if (!token) return <p>Unauthorized access</p>;
-  const product: ProductId = await getProductById(Number(params.productId), token);
+  const product: ProductId = await getProductById(Number(params.productId));
   if (!product) return <p>Product not found</p>;
   return (
     <main>

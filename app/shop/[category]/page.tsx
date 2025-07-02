@@ -27,12 +27,7 @@ const Category = () => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get(
-          `${API_BASE_URL}/Category/Category/${categoryId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          `${API_BASE_URL}/Category/Category/${categoryId}`
         );
         setProducts(response.data.data.products);
       } catch (error) {
@@ -40,10 +35,10 @@ const Category = () => {
       }
     };
 
-    if (categoryId && token) {
+    if (categoryId) {
       fetchProducts();
     }
-  }, [categoryId, token]);
+  }, [categoryId]);
 
   useEffect(() => {
     const filtered = products.filter((product) =>
