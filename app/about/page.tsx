@@ -44,7 +44,7 @@ function About() {
     },
     {
       name: "Mohamed Elsayed",
-      role: "Backend Developer",
+      role: "Backend and Cloud Engineer",
       img: Mohamed_Elsayed,
       linkedin: "https://www.linkedin.com/in/mohamed-elsayed-265328249",
     },
@@ -122,12 +122,19 @@ function About() {
       <div className="container p-sec">
         <Heading heading="Meet Our Team" paragraph="Team Members" />
         <p className="text-center -mt-5">
-          We are a team from Zagazig University, and this is our graduation project. We are passionate about Engineering and have put a lot of effort into creating this project. We hope you find it useful and informative. Thank you for visiting our
-          page!
+          We are a team from Zagazig University, and this is our graduation
+          project. We are passionate about Engineering and have put a lot of
+          effort into creating this project. We hope you find it useful and
+          informative. Thank you for visiting our page!
         </p>
         <div className="about-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
           {teams.map((team, index) => (
-            <Link href={team.linkedin} key={index} target="_blank" className="team-member group">
+            <Link
+              href={team.linkedin}
+              key={index}
+              target="_blank"
+              className="team-member group"
+            >
               <div className="relative w-full aspect-square overflow-hidden rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-105">
                 <Image
                   src={team.img}
@@ -140,8 +147,12 @@ function About() {
                 {/* Overlay Info */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center">
                   <div className="text-center p-4 pb-6 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                    <h3 className="text-xl font-bold text-white mb-1">{team.name}</h3>
-                    <p className="text-yellow-400 text-sm font-medium">{team.role}</p>
+                    <h3 className="text-xl font-bold text-white mb-1">
+                      {team.name}
+                    </h3>
+                    <p className="text-yellow-400 text-sm font-medium">
+                      {team.role}
+                    </p>
                   </div>
                 </div>
               </div>
