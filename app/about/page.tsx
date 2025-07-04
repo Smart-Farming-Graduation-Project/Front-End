@@ -122,19 +122,54 @@ function About() {
       <div className="container p-sec">
         <Heading heading="Meet Our Team" paragraph="Team Members" />
         <p className="text-center -mt-5">
-          We are a team from Zagazig University, and this is our graduation
-          project. We are passionate about Engineering and have put a lot of
-          effort into creating this project. We hope you find it useful and
-          informative. Thank you for visiting our page!
+          We are a team from Zagazig University, and this is our graduation project. We are passionate about Engineering and have put a lot of effort into creating this project. We hope you find it useful and informative. Thank you for visiting our
+          page!
         </p>
+        <div>
+          {/* Supervisor Section */}
+          <div className="my-12 py-8 px-6 rounded-xl bg-gradient-to-r from-green-50 to-yellow-50 border border-green-100 shadow-md">
+            <div className="flex flex-col items-center">
+              <div className="mb-3">
+                <span className="px-4 py-1 bg-green rounded-full text-white text-sm font-medium">Project Supervisor</span>
+              </div>
+              <h3 className="text-3xl font-bold text-gray-800 mb-2">DR. Sara Khalil</h3>
+              <div className="w-20 h-1 bg-yellow rounded-full mb-4"></div>
+              <p className="text-gray-600 text-center max-w-2xl">
+                We would like to express our sincere gratitude to DR. Sara Khalil for her invaluable guidance,
+                <br /> expertise, and continuous support throughout the development of this graduation project.
+              </p>
+
+              <div className="mt-6 flex items-center justify-center">
+                <div className="w-12 h-12 bg-green/10 rounded-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green">
+                    <path d="M20 7h-3a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"></path>
+                    <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2"></path>
+                  </svg>
+                </div>
+                <div className="ml-4 mr-4">
+                  <div className="h-0.5 w-10 bg-gray-300"></div>
+                </div>
+                <div className="w-12 h-12 bg-yellow/10 rounded-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow">
+                    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
+                  </svg>
+                </div>
+                <div className="ml-4 mr-4">
+                  <div className="h-0.5 w-10 bg-gray-300"></div>
+                </div>
+                <div className="w-12 h-12 bg-green/10 rounded-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                    <path d="m9 12 2 2 4-4"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div className="about-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
           {teams.map((team, index) => (
-            <Link
-              href={team.linkedin}
-              key={index}
-              target="_blank"
-              className="team-member group"
-            >
+            <Link href={team.linkedin} key={index} target="_blank" className="team-member group">
               <div className="relative w-full aspect-square overflow-hidden rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-105">
                 <Image
                   src={team.img}
@@ -147,12 +182,8 @@ function About() {
                 {/* Overlay Info */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center">
                   <div className="text-center p-4 pb-6 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                    <h3 className="text-xl font-bold text-white mb-1">
-                      {team.name}
-                    </h3>
-                    <p className="text-yellow-400 text-sm font-medium">
-                      {team.role}
-                    </p>
+                    <h3 className="text-xl font-bold text-white mb-1">{team.name}</h3>
+                    <p className="text-yellow-400 text-sm font-medium">{team.role}</p>
                   </div>
                 </div>
               </div>
