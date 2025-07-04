@@ -1,12 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: [
-      "i.pravatar.cc", 
-      "crop-pilot-api.azurewebsites.net", 
-      "localhost",
-      "graduationprojetct.blob.core.windows.net"
-    ],
+    domains: ["i.pravatar.cc", "crop-pilot-api.azurewebsites.net", "localhost", "graduationproject.blob.core.windows.net"],
     remotePatterns: [
       {
         protocol: "https",
@@ -22,7 +17,7 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "graduationprojetct.blob.core.windows.net",
+        hostname: "graduationproject.blob.core.windows.net",
       },
     ],
   },

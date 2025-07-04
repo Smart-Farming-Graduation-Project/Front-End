@@ -24,6 +24,7 @@ const CardDetails = ({ product }: { product: ProductId }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useAuth();
   const router = useRouter();
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
 
   const [count, setCount] = useState(1);
   const handleIncrement = () => setCount(count + 1);
@@ -93,6 +94,22 @@ const CardDetails = ({ product }: { product: ProductId }) => {
     }
   };
 
+  const handleAddToWishlist = async () => {
+    if (!checkAuth()) return;
+
+    setIsWishlistLoading(true);
+    try {
+      await dispatch(addToWishlistAPI(product)).unwrap();
+      dispatch(deleteProductAPI(product.productId));
+      toast.success("Item added to wishlist!");
+    } catch (error) {
+      console.error("Error adding to wishlist:", error);
+      toast.error("Failed to add to wishlist");
+    } finally {
+      setIsWishlistLoading(false);
+    }
+  };
+
   return (
     <section className="card-details p-sec">
       <div className="container">
@@ -131,22 +148,15 @@ const CardDetails = ({ product }: { product: ProductId }) => {
               <Button
                 className="shadow-none py-6 px-6 sm:px-10 w-full sm:w-auto"
                 onClick={() => {
-                  if (!checkAuth()) return; // Add auth check
+                  if (!checkAuth()) return;
                   dispatch(addToCartAPI({ product, quantity: count }));
                   dispatch(removeFromWishlistAPI(product.productId));
                   toast.success("Item added to cart!");
                 }}>
                 Add to Cart
               </Button>
-              <Button
-                className="shadow-none bg-yellow py-6 px-6 sm:px-10 hover:bg-[#eec451] w-full sm:w-auto"
-                onClick={() => {
-                  if (!checkAuth()) return; // Add auth check
-                  dispatch(addToWishlistAPI(product));
-                  dispatch(deleteProductAPI(product.productId));
-                  toast.success("Item added to wishlist!");
-                }}>
-                Add to Wishlist
+              <Button className="shadow-none bg-yellow py-6 px-6 sm:px-10 hover:bg-[#eec451] w-full sm:w-auto" disabled={isWishlistLoading} onClick={handleAddToWishlist}>
+                {isWishlistLoading ? "Adding..." : "Add to Wishlist"}
               </Button>
             </div>
           </div>

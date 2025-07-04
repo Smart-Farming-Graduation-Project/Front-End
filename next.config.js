@@ -34,6 +34,12 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "graduationproject.blob.core.windows.net",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
         hostname: "graduationprojetct.blob.core.windows.net",
         port: "",
         pathname: "/**",

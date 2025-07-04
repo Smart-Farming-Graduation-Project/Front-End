@@ -29,14 +29,12 @@ const Loading = () => {
           <div className="relative z-10 flex items-center justify-center w-32 h-32 rounded-full bg-white/10 backdrop-blur-sm p-4 overflow-hidden border border-white/20">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-rotate-shine"></div>
             <div className="relative w-16 h-16 animate-float">
-              <Image src={logo} alt="CropGuard Logo" fill className="object-contain" priority />
+              <Image src={logo} alt="CropGuard Logo" fill sizes="64px" className="object-contain" priority />
             </div>
           </div>
         </div>
 
-        <h2 className="text-white text-xl font-medium mb-3 relative">
-          Loading...
-        </h2>
+        <h2 className="text-white text-xl font-medium mb-3 relative">Loading...</h2>
 
         {/* Progress bar */}
         <div className="w-64 h-1.5 bg-white/20 mt-2 rounded-full overflow-hidden">

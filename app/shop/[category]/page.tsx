@@ -22,13 +22,18 @@ const Category = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const categoryId = Array.isArray(category) ? category[0] : category;
-
+  console.log("token" , token)
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get(
-          `${API_BASE_URL}/Category/Category/${categoryId}`
-        );
+          `${API_BASE_URL}/Category/Category/${categoryId}`, {
+      headers: token
+        ? {
+            Authorization: `Bearer ${token}`,
+          }
+        : {},
+        });
         setProducts(response.data.data.products);
       } catch (error) {
         console.error("Error fetching products by category:", error);

@@ -10,7 +10,7 @@ export interface UserProfile {
   email: string;
   phone: string;
   address: string;
-  imageUrl: string;
+  imageUrl: string | null;
 }
 
 export const getUserById = async (id: string, token: string): Promise<UserProfile> => {

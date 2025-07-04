@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import "./Card.css";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
@@ -20,7 +20,15 @@ const Card = ({ product, currentPageName }: { product: Product; currentPageName?
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const { user } = useAuth();
-  const [isfav, setIsfav] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Use local state to track favorite status for immediate UI updates
+  const [isFavorite, setIsFavorite] = useState(product.isFavorite || false);
+
+  // Update local state when product prop changes
+  useEffect(() => {
+    setIsFavorite(product.isFavorite || false);
+  }, [product.isFavorite]);
 
   const trucnkString = (str: string, num: number) => (str.length > num ? str.slice(0, num) + "..." : str);
 
@@ -34,44 +42,66 @@ const Card = ({ product, currentPageName }: { product: Product; currentPageName?
     return true;
   };
 
+  const handleAddToWishlist = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!checkAuth()) return;
+
+    // Optimistic UI update - immediately show as favorited
+    setIsFavorite(true);
+
+    setIsLoading(true);
+    try {
+      await dispatch(addToWishlistAPI(product)).unwrap();
+      dispatch(deleteProductAPI(product.productId));
+      toast.success("Item added to wishlist!");
+    } catch (error) {
+      // Revert optimistic update if API call fails
+      setIsFavorite(false);
+      console.error("Failed to add to wishlist:", error);
+      toast.error("Failed to add to wishlist");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRemoveFromWishlist = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!checkAuth()) return;
+
+    // Optimistic UI update - immediately show as not favorited
+    setIsFavorite(false);
+
+    setIsLoading(true);
+    try {
+      await dispatch(removeFromWishlistAPI(product.productId)).unwrap();
+    } catch (error) {
+      // Revert optimistic update if API call fails
+      setIsFavorite(true);
+      console.error("Failed to remove from wishlist:", error);
+      toast.error("Failed to remove from wishlist");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div
       className="card h-[470px] bg-white border border-[#f5f5f5dc] rounded-xl p-3 relative cursor-pointer flex items-center justify-center flex-col overflow-hidden ease duration-300 hover:shadow-sm"
       onClick={() => router.push(`/shop/category/${product.productId}`)}>
       {currentPageName !== "wishlist" ? (
-        !isfav ? (
-          <div
-            className="favorite cursor-pointer "
-            onClick={(e) => {
-              e.stopPropagation();
-              if (!checkAuth()) return;
-              setIsfav(!isfav);
-              dispatch(addToWishlistAPI(product));
-              dispatch(deleteProductAPI(product.productId));
-              toast.success("Item added to wishList!");
-            }}>
-            <FaRegHeart className="text-green text-[18px] fav_false" />
+        !isFavorite ? (
+          <div className="favorite cursor-pointer" onClick={handleAddToWishlist}>
+            <FaRegHeart className={`text-green text-[18px] fav_false ${isLoading ? "opacity-50" : ""}`} />
           </div>
         ) : (
-          <div
-            className="favorite bg-green cursor-pointer"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (!checkAuth()) return;
-              setIsfav(!isfav);
-              dispatch(removeFromWishlistAPI(product.productId));
-            }}>
-            <FaHeart className="text-[18px] fav_false text-white" />
+          <div className="favorite bg-green cursor-pointer" onClick={handleRemoveFromWishlist}>
+            <FaHeart className={`text-[18px] text-white ${isLoading ? "opacity-50" : ""}`} />
           </div>
         )
       ) : (
         <IoIosClose
-          className="close hover:text-green cursor-pointer "
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!checkAuth()) return;
-            dispatch(removeFromWishlistAPI(product.productId));
-          }}
+          className={`close hover:text-green cursor-pointer ${isLoading ? "opacity-50" : ""}`}
+          onClick={handleRemoveFromWishlist}
         />
       )}
 
@@ -101,7 +131,6 @@ const Card = ({ product, currentPageName }: { product: Product; currentPageName?
             e.stopPropagation();
             if (!checkAuth()) return;
             dispatch(addToCartAPI({ product }));
-            dispatch(removeFromWishlistAPI(product.productId));
             toast.success("Item added to cart!");
           }}>
           <HiOutlineShoppingCart />

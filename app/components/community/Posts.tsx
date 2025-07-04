@@ -6,21 +6,15 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { FaShareAlt, FaComment, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { HiDotsVertical } from "react-icons/hi";
-import avatar from "@/app/assets/images/abdo.jpg";
 import { getTokenClient } from "@/app/utils/api/getTokenClient";
 import API_BASE_URL from "@/app/utils/api/base";
 import { useAuth } from "@/app/utils/contexts/AuthContext";
 import EditPost from "./EditPost";
 import DeletePost from "./DeletePost";
 import Comments from "./Comments";
-import UserDetails from "./UserDetails";
 import { UserPostProps } from "@/app/utils/types/app";
 import moment from "moment";
 import { useRouter } from "next/navigation";
-
-type VoteState = {
-  [postId: number]: "up" | "down" | null;
-};
 
 const Posts = () => {
   const [posts, setPosts] = useState<UserPostProps[]>([]);
@@ -29,7 +23,6 @@ const Posts = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<UserPostProps | null>(null);
-  const [voteStates, setVoteStates] = useState<VoteState>({});
   const [commentsOpenPostId, setCommentsOpenPostId] = useState<number | null>(null);
   const [commentCounts, setCommentCounts] = useState<Record<number, number>>({});
 
@@ -110,13 +103,19 @@ const Posts = () => {
       return;
     }
 
-    const currentVote = voteStates[postId];
+    const currentPost = posts.find((p) => p.id === postId);
+    if (!currentPost) return;
+
+    const currentVote = currentPost.userVoteStatus;
     let voteCountChange: number = voteType;
 
-    if (currentVote === "up" && voteType === -1) {
+    if (currentVote === 1 && voteType === -1) {
       voteCountChange = -2;
-    } else if (currentVote === "down" && voteType === 1) {
+    } else if (currentVote === -1 && voteType === 1) {
       voteCountChange = 2;
+    } else if (currentVote === voteType) {
+      // Remove vote if clicking same vote
+      voteCountChange = -voteType;
     }
 
     try {
@@ -134,11 +133,18 @@ const Posts = () => {
           },
         }
       );
-      setPosts(posts.map((post) => (post.id === postId ? { ...post, voteCount: post.voteCount + voteCountChange } : post)));
-      setVoteStates((prev) => ({
-        ...prev,
-        [postId]: voteType === 1 ? "up" : "down",
-      }));
+
+      setPosts(
+        posts.map((post) =>
+          post.id === postId
+            ? {
+                ...post,
+                voteCount: post.voteCount + voteCountChange,
+                userVoteStatus: currentVote === voteType ? 0 : voteType,
+              }
+            : post
+        )
+      );
     } catch (error) {
       console.error("Error voting:", error);
     }
@@ -149,6 +155,9 @@ const Posts = () => {
       console.log("No token available");
       return;
     }
+
+    const currentPost = posts.find((p) => p.id === postId);
+    if (!currentPost) return;
 
     try {
       await axios.delete(`${API_BASE_URL}/Votes/DeleteVote`, {
@@ -161,17 +170,18 @@ const Posts = () => {
           "Content-Type": "application/json",
         },
       });
+
       setPosts(
         posts.map((post) =>
           post.id === postId
             ? {
                 ...post,
-                voteCount: voteStates[postId] === "up" ? post.voteCount - 1 : voteStates[postId] === "down" ? post.voteCount + 1 : post.voteCount,
+                voteCount: post.voteCount - currentPost.userVoteStatus,
+                userVoteStatus: 0,
               }
             : post
         )
       );
-      setVoteStates((prev) => ({ ...prev, [postId]: null }));
     } catch (error) {
       console.error("Error removing vote:", error);
     }
@@ -194,14 +204,26 @@ const Posts = () => {
         posts.map((post) => (
           <div key={post.id} className="post mb-6 bg-[#f7f7f78c] p-2 rounded-lg shadow-md font-[cairo] w-full max-w-full">
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                <UserDetails 
-                  userId={post.userId} 
-                  showTimestamp={true} 
-                  timestamp={moment(post.createdAt).add(3, 'hours').fromNow()} 
-                  imageSize={40}
-                />
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 relative rounded-full overflow-hidden bg-gray-100">
+                    <Image
+                      src={post.userImageUrl || `https://ui-avatars.com/api/?name=${post.userName}&background=22c55e&color=fff`}
+                      alt={`${post.userName}'s avatar`}
+                      fill
+                      className="object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = `https://ui-avatars.com/api/?name=${post.userName}&background=22c55e&color=fff`;
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <span className="font-medium text-[#1f2937] text-sm">{post.userName}</span>
+                    <span className="block text-xs text-[#6b7280]">{moment(post.createdAt).add(3, "hours").fromNow()}</span>
+                  </div>
                 </div>
+              </div>
+
               {user?.sub === post.userId && (
                 <div className="controls relative">
                   <button onClick={() => toggleMenu(post.id)} className="p-1 hover:bg-[#f3f4f6] rounded">
@@ -232,30 +254,28 @@ const Posts = () => {
                 </div>
               )}
             </div>
+
             <Link href={`/dashboard/community/${post.id}`} className="hover:underline">
               <h2 className="mt-2 text-xl font-semibold text-[#1f2937] font-[cairo]">{post.title}</h2>
             </Link>
             <p className="mt-2 text-[#4b5563]">{post.content}</p>
+
             <div className="flex flex-wrap items-center justify-between gap-2 mt-4">
               <div className="flex flex-wrap items-center gap-2">
                 <Button
                   variant="ghost"
-                  className={`flex items-center gap-1 ${voteStates[post.id] === "up" ? "text-[#22c55e]" : "text-[#6b7280]"} hover:text-[#22c55e]`}
-                  onClick={() => (voteStates[post.id] === "up" ? handleRemoveVote(post.id) : handleVote(post.id, 1))}>
+                  className={`flex items-center gap-2 ${post.userVoteStatus === 1 ? "text-[#22c55e]" : "text-[#6b7280]"} hover:text-[#22c55e]`}
+                  onClick={() => (post.userVoteStatus === 1 ? handleRemoveVote(post.id) : handleVote(post.id, 1))}>
                   <FaArrowUp className="w-4 h-4" />
                   <span>{post.voteCount}</span>
                 </Button>
                 <Button
                   variant="ghost"
-                  className={`flex items-center gap-1 ${voteStates[post.id] === "down" ? "text-[#ef4444]" : "text-[#6b7280]"} hover:text-[#ef4444]`}
-                  onClick={() => (voteStates[post.id] === "down" ? handleRemoveVote(post.id) : handleVote(post.id, -1))}>
+                  className={`flex items-center gap-1 ${post.userVoteStatus === -1 ? "text-[#ef4444]" : "text-[#6b7280]"} hover:text-[#ef4444]`}
+                  onClick={() => (post.userVoteStatus === -1 ? handleRemoveVote(post.id) : handleVote(post.id, -1))}>
                   <FaArrowDown className="w-4 h-4" />
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  className="flex items-center gap-1 text-[#6b7280] hover:text-[#22c55e]" 
-                  onClick={() => router.push(`/dashboard/community/${post.id}`)}
-                >
+                <Button variant="ghost" className="flex items-center gap-1 text-[#6b7280] hover:text-[#22c55e]" onClick={() => router.push(`/dashboard/community/${post.id}`)}>
                   <FaComment className="w-4 h-4" />
                   <span>{commentCounts[post.id] || 0}</span>
                 </Button>
@@ -271,6 +291,7 @@ const Posts = () => {
           </div>
         ))
       )}
+
       {selectedPost && (
         <>
           <EditPost

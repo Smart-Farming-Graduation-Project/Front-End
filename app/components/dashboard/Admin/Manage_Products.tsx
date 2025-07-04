@@ -168,6 +168,8 @@ const Manage_Products = () => {
                 categoryName: editProduct.categoryName,
                 images: editProduct.imagesFiles ? editProduct.imagesFiles.map((file) => URL.createObjectURL(file)) : editProduct.images || [],
                 averageRating: prod.averageRating, // preserve the existing rating
+                isFavorite: prod.isFavorite, // preserve the favorite status
+                productOwner: prod.productOwner // preserve the product owner
               }
             : prod
         )

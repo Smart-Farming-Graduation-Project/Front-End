@@ -26,8 +26,9 @@ const Discover = () => {
             </Link>
           </div>
         </div>
-        <div className="w-full md:w-[50%]">
-          <Image src={discover} alt="why-choose" className="max-w-full md:object-fill h-[350px] sm:h-[500px]" />
+        {/* Right Section */}
+        <div className=" md:w-1/2 flex justify-center">
+          <Image src={discover} alt="Discover Freshness" className="rounded-lg w-full" priority width={500} height={400} style={{ height: "auto" }} />
         </div>
       </div>
     </div>
