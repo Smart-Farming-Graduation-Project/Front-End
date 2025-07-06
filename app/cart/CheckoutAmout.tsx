@@ -8,7 +8,6 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import API_BASE_URL from "../utils/api/base";
 import { getTokenClient } from "../utils/api/getTokenClient";
-
 const CheckoutAmount = ({ total, itemsCount }: { total: number; itemsCount: number }) => {
   const [couponCode, setCouponCode] = useState("");
   const [isApplying, setIsApplying] = useState(false);
@@ -23,7 +22,6 @@ const CheckoutAmount = ({ total, itemsCount }: { total: number; itemsCount: numb
       toast.error("Please enter a coupon code");
       return;
     }
-
     setIsApplying(true);
     try {
       const token = getTokenClient();

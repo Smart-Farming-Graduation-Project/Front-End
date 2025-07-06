@@ -7,7 +7,9 @@ type Product = {
   categoryName?: string;
   images: string[];
   averageRating: number;
-};
+  isFavorite: boolean;
+  productOwner: string;
+}
 type ProductId = {
   productId: number;
   productName: string;
@@ -17,6 +19,8 @@ type ProductId = {
   categoryName?: string;
   images: string[];
   averageRating: number;
+  isFavorite: boolean;
+  productOwner: string;
 };
 
 type ItemProps = {
@@ -52,11 +56,14 @@ type ReviewProps = {
 type UserPostProps = {
   id: number;
   userId: string;
+  userName: string;
+  userImageUrl: string;
   title: string;
   content: string;
   voteCount: number;
   createdAt: string;
   updatedAt?: string;
+  userVoteStatus: number;
 };
 type OrderItem = {
   id: number;

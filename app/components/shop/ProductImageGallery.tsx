@@ -62,6 +62,7 @@ const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({ images, produ
             src={images[selectedImageIndex]}
             alt={`${productName} - Image ${selectedImageIndex + 1}`}
             fill
+            sizes="(max-width: 768px) 100vw, 50vw"
             style={{ objectFit: "contain" }}
             className={`transition-opacity duration-300 ${isLoading ? "opacity-0" : "opacity-100"}`}
             onLoad={handleImageLoad}
@@ -108,7 +109,14 @@ const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({ images, produ
                   selectedImageIndex === index ? "ring-2 ring-green ring-offset-2 shadow-lg" : "ring-1 ring-gray-200 hover:ring-gray-300"
                 }`}
                 aria-label={`View image ${index + 1}`}>
-                <Image src={image} alt={`${productName} thumbnail ${index + 1}`} fill style={{ objectFit: "cover" }} className={`transition-opacity duration-200 ${selectedImageIndex === index ? "opacity-100" : "opacity-70 hover:opacity-100"}`} />
+                <Image
+                  src={image}
+                  alt={`${productName} thumbnail ${index + 1}`}
+                  fill
+                  sizes="80px"
+                  style={{ objectFit: "cover" }}
+                  className={`transition-opacity duration-200 ${selectedImageIndex === index ? "opacity-100" : "opacity-70 hover:opacity-100"}`}
+                />
 
                 {/* Selected indicator */}
                 {selectedImageIndex === index && (

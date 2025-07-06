@@ -52,7 +52,9 @@ const Page = () => {
                       availability: product.productAvailability,
                       images: product.productImages,
                       description: product.productDescription,
-                      averageRating: 3.5, // Add default average rating
+                      averageRating: 3.5,
+                      isFavorite: true,
+                      productOwner: "",
                     }}
                     currentPageName="wishlist"
                   />
