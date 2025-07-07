@@ -160,7 +160,7 @@ const Navbar = ({ setIsOpenRounded }: { setIsOpenRounded: (isOpen: boolean) => v
                 <ProfileDropdown />
               ) : (
                 <BorderButton>
-                  <Link href="/signin">Sign In</Link>
+                  <a href="/signin">Sign In</a>
                   <FaArrowRightLong />
                 </BorderButton>
               )}

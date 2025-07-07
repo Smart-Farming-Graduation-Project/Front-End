@@ -76,6 +76,18 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  trailingSlash: false,
+  reactStrictMode: true,
+  swcMinify: true,
+  async rewrites() {
+    return [
+      {
+        source: "/contact",
+        destination: "/contact",
+      },
+    ];
+  },
 };
 
+module.exports = nextConfig;
 module.exports = nextConfig;
