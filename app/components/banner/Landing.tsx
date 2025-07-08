@@ -20,7 +20,7 @@ const Landing = () => {
           <Button className="font-normal text-xl py-6 px-6">
             <Link href="/signin">Join Now</Link>
           </Button>
-          <Link href="/">
+          <Link href="/signin">
             <BorderButton>
               Join Our Community
               <FaArrowRightLong className="animate-bounce" />

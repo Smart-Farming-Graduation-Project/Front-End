@@ -60,7 +60,7 @@ const AddPost = () => {
         {userData && (
           <div className="w-10 h-10 relative rounded-full overflow-hidden bg-gray-100">
             {userData.imageUrl ? (
-              <Image src={userData.imageUrl} alt={`${userData.firstName} ${userData.lastName}'s avatar`} fill className="object-cover" />
+              <Image src={userData.imageUrl} alt={`${userData.firstName} ${userData.lastName}'s avatar`} fill className="object-cover" sizes="40px" />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
                 <span className="text-white text-sm font-medium">

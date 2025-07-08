@@ -10,7 +10,7 @@ const MemberCard = ({ memberImage, name, jop }: MemberCardProps) => {
   return (
     <div className="member rounded-md relative">
       <div className="image rounded-md h-full overflow-hidden">
-        <Image src={memberImage} alt="member" className="rounded-md h-full object-contain hover:scale-110 ease" style={{ width: "auto" }} />
+        <Image src={memberImage} alt="member" width={400} height={500} className="rounded-md h-full object-contain hover:scale-110 ease" style={{ width: "auto" }} sizes="(max-width: 768px) 100vw, 400px" />
       </div>
       <div className="absolute  bottom-0 left-0 right-0 flex justify-between items-center">
         <div className="member-info  p-4  rounded-b-md z-[15]">

@@ -168,7 +168,7 @@ const PostDetails = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <div className="w-12 h-12 relative rounded-full overflow-hidden bg-gray-100">
-                <Image src={post.userImageUrl} alt={`${post.userName}'s avatar`} fill className="object-cover" />
+                <Image src={post.userImageUrl} alt={`${post.userName}'s avatar`} fill className="object-cover" sizes="48px" />
               </div>
               <div>
                 <span className="font-medium text-[#1f2937] text-sm">{post.userName}</span>

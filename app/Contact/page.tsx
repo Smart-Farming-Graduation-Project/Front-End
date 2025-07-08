@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useForm, ValidationError } from "@formspree/react";
 import img_contact from "../assets/images/landing.jpeg";
 import Crumb from "../components/banner/Crumb";
@@ -11,9 +11,33 @@ import { Button } from "@/components/ui/button";
 import { IoMdCall, IoMdMail } from "react-icons/io";
 import { MdSupport } from "react-icons/md";
 import { FaCheckCircle } from "react-icons/fa";
+import { toast } from "react-hot-toast";
 
 const Contact = () => {
-  const [state, handleSubmit] = useForm("mrbkyoyb");
+  const [formError, setFormError] = useState<string | null>(null);
+  const [state, handleSubmit] = useForm("mrbkyoyb", {
+    data: {
+      source: typeof window !== "undefined" ? window.location.hostname : "unknown",
+    },
+  });
+
+  React.useEffect(() => {
+    if (state.errors && Object.keys(state.errors).length > 0) {
+      console.error("Form errors:", state.errors);
+      setFormError("حدث خطأ أثناء إرسال النموذج. يرجى المحاولة مرة أخرى.");
+
+      if (typeof window !== "undefined" && toast) {
+        toast.error("فشل إرسال الرسالة. يرجى المحاولة مرة أخرى.");
+      }
+    }
+  }, [state.errors]);
+
+  React.useEffect(() => {
+    if (state.succeeded) {
+      console.log("Form submitted successfully");
+      setFormError(null);
+    }
+  }, [state.succeeded]);
 
   if (state.succeeded) {
     return (
@@ -70,13 +94,33 @@ const Contact = () => {
     );
   }
 
+  const onSubmitWrapper = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFormError(null);
+
+    try {
+      console.log("Form submission attempt from:", window.location.hostname);
+      await handleSubmit(e);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      setFormError("حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.");
+
+      if (toast) {
+        toast.error("فشل إرسال الرسالة. يرجى المحاولة مرة أخرى.");
+      }
+    }
+  };
+
   return (
     <main>
       <Crumb crumb={img_contact} />
       <div className="container p-sec">
         <Heading heading="Get in Touch with Us" paragraph="Contact Information" />
         <div className="contact-container">
-          <form onSubmit={handleSubmit} className="p-4 sm:p-6 md:p-8 rounded-lg shadow-md w-[95%] md:w-[600px] mx-auto">
+          <form onSubmit={onSubmitWrapper} className="p-4 sm:p-6 md:p-8 rounded-lg shadow-md w-[95%] md:w-[600px] mx-auto">
+            {/* إضافة رسالة خطأ عامة في حالة وجود مشكلة */}
+            {formError && <div className="mb-4 p-3 bg-red-50 text-red-600 border border-red-200 rounded-md">{formError}</div>}
+
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 mb-4">
               <div>
                 <Label htmlFor="first_name">First Name</Label>

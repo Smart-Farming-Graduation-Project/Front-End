@@ -105,9 +105,9 @@ const Card = ({ product, currentPageName }: { product: Product; currentPageName?
       <div className="img rounded-2xl overflow-hidden">
         <div className="w-full h-[220px] flex items-center justify-center">
           {product.images && product.images.length > 0 ? (
-            <Image src={product.images[0]} alt={product.productName} className="rounded-2xl object-contain" width={200} height={220} />
+            <Image src={product.images[0]} alt={product.productName} className="rounded-2xl object-contain" width={200} height={220} sizes="(max-width: 768px) 100vw, 200px" />
           ) : (
-            <Image src={category_img} alt={product.productName} className="rounded-2xl object-contain" width={200} height={220} />
+            <Image src={category_img} alt={product.productName} className="rounded-2xl object-contain" width={200} height={220} sizes="(max-width: 768px) 100vw, 200px" />
           )}
         </div>
       </div>

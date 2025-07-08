@@ -41,7 +41,8 @@ type WishListItem = ItemProps & {
 type CategoryType = {
   categoryId: number;
   categoryName: string;
-  categoryDescription: Product[];
+  categoryDescription: string;
+  categoryImage: string;
 };
 type ReviewProps = {
   reviewID: string;

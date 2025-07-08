@@ -50,7 +50,14 @@ const Crumb = ({ crumb, productName, categoryName }: Props) => {
   return (
     <div className="crumb relative">
       <div className="crumb-img h-[300px] md:h-[400px] w-full relative">
-        <Image src={crumb} alt="crumb" className="object-cover h-full w-full" />
+        <Image 
+          src={crumb} 
+          alt="crumb" 
+          width={1920} 
+          height={400} 
+          className="object-cover h-full w-full" 
+          sizes="100vw" 
+        />
         <div className="crumb-overlay"></div>
       </div>
       <div className="crumb-text absolute inset-0 flex items-center justify-center z-10">

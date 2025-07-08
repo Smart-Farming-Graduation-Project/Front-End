@@ -20,6 +20,14 @@ import { useAuth } from "@/app/utils/contexts/AuthContext";
 import toast from "react-hot-toast";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Rover = {
   id: string;
@@ -40,10 +48,21 @@ type RoverDetails = {
   lastActivity?: string;
 };
 
+type User = {
+  id: string;
+  userName: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+};
+
 const RoversPage = () => {
   const [rovers, setRovers] = useState<Rover[]>([]);
   const [selectedRover, setSelectedRover] = useState<RoverDetails | null>(null);
   const [newRoverId, setNewRoverId] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [selectedUserName, setSelectedUserName] = useState("");
+  const [users, setUsers] = useState<User[]>([]);
 
   // Dialog states
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
@@ -51,6 +70,7 @@ const RoversPage = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const [loading, setLoading] = useState(true);
+  const [loadingUsers, setLoadingUsers] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const token = getTokenClient();
   const { user } = useAuth();
@@ -81,9 +101,42 @@ const RoversPage = () => {
     }
   };
 
+  // Fetch all users
+  const fetchUsers = async () => {
+    if (!token) return;
+
+    setLoadingUsers(true);
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/User/GetUsers?pageNumber=1&pageSize=100`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data.succeeded) {
+        setUsers(response.data.data || []);
+      } else {
+        toast.error(response.data.message || "Failed to fetch users");
+      }
+    } catch (error: any) {
+      console.error("Error fetching users:", error);
+      toast.error("Failed to fetch users");
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
   useEffect(() => {
     fetchRovers();
   }, [token]);
+
+  useEffect(() => {
+    // Fetch users when create dialog opens
+    if (isCreateDialogOpen) {
+      fetchUsers();
+    }
+  }, [isCreateDialogOpen]);
 
   // View rover details
   const handleViewRover = async (roverId: string) => {
@@ -127,8 +180,8 @@ const RoversPage = () => {
       return;
     }
 
-    if (!user?.given_name) {
-      toast.error("User information not available");
+    if (!selectedUserName) {
+      toast.error("Please select a user");
       return;
     }
 
@@ -140,7 +193,7 @@ const RoversPage = () => {
     setActionLoading(true);
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/Rover/${newRoverId.trim()}/user/${user.given_name}`,
+        `${API_BASE_URL}/Rover/${newRoverId.trim()}/user/${selectedUserName}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -151,6 +204,8 @@ const RoversPage = () => {
         toast.success("Rover created successfully");
         setIsCreateDialogOpen(false);
         setNewRoverId("");
+        setSelectedUserId("");
+        setSelectedUserName("");
         fetchRovers(); // Refresh rovers list
       } else {
         toast.error(response.data.message || "Failed to create rover");
@@ -165,7 +220,7 @@ const RoversPage = () => {
 
   // Delete rover
   const handleDeleteRover = async (roverId: string) => {
-    if (!user?.given_name) {
+    if (!selectedRover?.userName) {
       toast.error("User information not available");
       return;
     }
@@ -178,7 +233,7 @@ const RoversPage = () => {
     setActionLoading(true);
     try {
       const response = await axios.delete(
-        `${API_BASE_URL}/Rover/${roverId}/user/${user.given_name}`,
+        `${API_BASE_URL}/Rover/${roverId}/user/${selectedRover.userName}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -197,6 +252,14 @@ const RoversPage = () => {
       toast.error(error.response?.data?.message || "Failed to delete rover");
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const handleUserSelect = (userId: string) => {
+    const selectedUser = users.find((user) => user.id === userId);
+    if (selectedUser) {
+      setSelectedUserId(userId);
+      setSelectedUserName(selectedUser.userName);
     }
   };
 
@@ -279,11 +342,50 @@ const RoversPage = () => {
                       placeholder="Enter unique rover ID (e.g., RV-001)"
                       value={newRoverId}
                       onChange={(e) => setNewRoverId(e.target.value)}
+                      className="mb-2"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
-                      This will be associated with your account:{" "}
-                      {user?.given_name}
-                    </p>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="userId">Select User *</Label>
+                    {loadingUsers ? (
+                      <div className="flex items-center gap-2 h-10 px-3 rounded-md border border-input bg-transparent text-sm">
+                        <div className="animate-spin w-4 h-4 border-2 border-gray-300 border-t-green rounded-full"></div>
+                        <span className="text-gray-500">Loading users...</span>
+                      </div>
+                    ) : (
+                      <Select
+                        onValueChange={handleUserSelect}
+                        value={selectedUserId}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select a user" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {users.length > 0 ? (
+                              users.map((user) => (
+                                <SelectItem key={user.id} value={user.id}>
+                                  {user.userName}{" "}
+                                  {user.firstName && user.lastName
+                                    ? `(${user.firstName} ${user.lastName})`
+                                    : ""}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem value="no-users" disabled>
+                                No users found
+                              </SelectItem>
+                            )}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    )}
+                    {selectedUserName && (
+                      <p className="text-xs text-green-600 mt-1">
+                        Selected user: {selectedUserName}
+                      </p>
+                    )}
                   </div>
 
                   <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
@@ -301,7 +403,9 @@ const RoversPage = () => {
                 <DialogFooter>
                   <Button
                     onClick={handleCreateRover}
-                    disabled={actionLoading || !newRoverId.trim()}
+                    disabled={
+                      actionLoading || !newRoverId.trim() || !selectedUserName
+                    }
                     className="bg-green text-white"
                   >
                     {actionLoading ? "Booking..." : "Book Rover"}

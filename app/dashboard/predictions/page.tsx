@@ -356,7 +356,7 @@ const PredictionsPage = () => {
 
               {/* Image */}
               <div className="relative max-w-full max-h-full">
-                <Image src={selectedImage.url} alt="Full size preview" width={1200} height={800} className="max-w-full max-h-full object-contain" priority style={{ width: "auto", height: "auto" }} />
+                <Image src={selectedImage.url} alt="Full size preview" width={1200} height={800} className="max-w-full max-h-full object-contain" priority style={{ width: "auto", height: "auto" }} sizes="100vw" />
               </div>
 
               {/* Image Info */}

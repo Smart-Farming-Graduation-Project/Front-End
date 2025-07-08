@@ -56,6 +56,12 @@ const nextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "example.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
     unoptimized: false,
     minimumCacheTTL: 60,
@@ -89,5 +95,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
 module.exports = nextConfig;
