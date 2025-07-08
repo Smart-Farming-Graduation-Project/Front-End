@@ -52,7 +52,6 @@ const Card = ({ product, currentPageName }: { product: Product; currentPageName?
     setIsLoading(true);
     try {
       await dispatch(addToWishlistAPI(product)).unwrap();
-      dispatch(deleteProductAPI(product.productId));
       toast.success("Item added to wishlist!");
     } catch (error) {
       // Revert optimistic update if API call fails
@@ -99,10 +98,7 @@ const Card = ({ product, currentPageName }: { product: Product; currentPageName?
           </div>
         )
       ) : (
-        <IoIosClose
-          className={`close hover:text-green cursor-pointer ${isLoading ? "opacity-50" : ""}`}
-          onClick={handleRemoveFromWishlist}
-        />
+        <IoIosClose className={`close hover:text-green cursor-pointer ${isLoading ? "opacity-50" : ""}`} onClick={handleRemoveFromWishlist} />
       )}
 
       {/* Product Image */}

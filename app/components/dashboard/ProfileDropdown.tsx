@@ -38,7 +38,6 @@ const ProfileDropdown = () => {
 
   const menuItems = [
     { icon: UserCircle, label: "My Profile", action: () => router.push("/profile") },
-    { icon: Settings, label: "Account Settings", action: () => router.push("/settings") },
     ...(isAdmin ? [{ icon: Shield, label: "Admin Panel", action: () => router.push("/dashboard/admin") }] : []),
     { icon: Bell, label: "Notifications", action: () => router.push("/notifications") },
     { icon: CreditCard, label: "Billing", action: () => router.push("/billing") },

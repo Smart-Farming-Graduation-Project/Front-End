@@ -2,6 +2,7 @@ import axios from "axios";
 import API_BASE_URL from "./base";
 import { getTokenServer } from "./getTokenServer";
 import { getTokenClient } from "./getTokenClient";
+import { Product } from "../types/app";
 
 // Use a function that safely gets the token based on context
 const getToken = () => {
@@ -28,8 +29,20 @@ export const getMostSells = async () => {
           }
         : {},
     });
+
+    // Get products from response
+    const products = response.data.data || [];
+
+    // Sort by productId in descending order
+    const sortedProducts = products.sort((a: Product, b: Product) => {
+      // Check if using productId or id as the property name
+      const idA = a.productId;
+      const idB = b.productId;
+      return idB - idA;
+    });
+
     // Limit to 10 products
-    return response.data.data?.slice(0, 10) || [];
+    return sortedProducts.slice(0, 10);
   } catch (error) {
     console.error("Error fetching mostSells:", error);
     return [];
