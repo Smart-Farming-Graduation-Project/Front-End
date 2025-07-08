@@ -256,9 +256,9 @@ const Posts = () => {
             </div>
 
             <Link href={`/dashboard/community/${post.id}`} className="hover:underline">
-              <h2 className="mt-2 text-xl font-semibold text-[#1f2937] font-[cairo]">{post.title}</h2>
+              <h2 className="mt-2 text-xl font-semibold text-[#1f2937] font-[cairo] break-words">{post.title}</h2>
             </Link>
-            <p className="mt-2 text-[#4b5563]">{post.content}</p>
+            <p className="mt-2 text-[#4b5563] break-words">{post.content}</p>
 
             <div className="flex flex-wrap items-center justify-between gap-2 mt-4">
               <div className="flex flex-wrap items-center gap-2">

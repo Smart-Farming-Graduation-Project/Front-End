@@ -13,9 +13,8 @@ import { MdSupport } from "react-icons/md";
 import { FaCheckCircle } from "react-icons/fa";
 
 const Contact = () => {
-  const [state, handleSubmit] = useForm("mrbkyoyb"); 
+  const [state, handleSubmit] = useForm("mrbkyoyb");
 
-  // Success state component
   if (state.succeeded) {
     return (
       <main>
