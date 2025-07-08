@@ -9,12 +9,6 @@ interface ShopByCategoryProps {
 }
 
 const ShopByCategory: React.FC<ShopByCategoryProps> = ({ categories }) => {
-  // const categoriesList = [
-  //   {
-  //     categoryId: 1,
-  //     categoryName: "Fruits",
-  //   },
-  // ];
   if (!categories || categories.length === 0) {
     return (
       <div className="shop-by-category p-sec text-center">
@@ -25,17 +19,27 @@ const ShopByCategory: React.FC<ShopByCategoryProps> = ({ categories }) => {
   return (
     <div className="shop-by-category p-sec" id="categoryId">
       <div className="container">
-        <Heading heading="Shop By Category" paragraph=" Discover the best products, straight from the farm to your home." />
+        <div>
+          <Heading heading="Shop By Category" paragraph=" Discover the best products, straight from the farm to your home." />
+        </div>
+
         <div className="category-container">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {/* array when click on category item send to category page */}
-            {categories.map((category) => (
-              <Link href={`/shop/${category.categoryId}`} key={category.categoryId} className="category-item text-center">
-                <div className="relative cursor-pointer ">
-                  <Image src={category_img} alt={category.categoryName} className="w-full h-32 object-cover mb-2 rounded-2xl hover:shadow-md hover:scale-105 transition-all duration-300 ease-in-out" />
-                  <h3 className="text-lg font-bold">{category.categoryName}</h3>
-                </div>
-              </Link>
+            {categories.map((category, index) => (
+              <div key={category.categoryId} >
+                <Link href={`/shop/${category.categoryId}`} className="category-item text-center">
+                  <div className="relative cursor-pointer">
+                    <Image
+                      src={category.categoryImage ? category.categoryImage : category_img}
+                      alt={category.categoryName}
+                      width={300}
+                      height={128}
+                      className="w-full h-32 object-cover mb-2 rounded-2xl hover:shadow-md hover:scale-105 transition-all duration-300 ease-in-out"
+                    />
+                    <h3 className="text-lg font-bold">{category.categoryName}</h3>
+                  </div>
+                </Link>
+              </div>
             ))}
           </div>
         </div>
