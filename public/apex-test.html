@@ -3,1069 +3,694 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Farm IoT Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.146/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.146/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.146/examples/js/loaders/GLTFLoader.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <title>IoT Data Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
     <style>
+      :root {
+        --primary-color: #4a6fa5;
+        --secondary-color: #6b8cae;
+        --accent-color: #ff7e5f;
+        --background-color: #f5f7fa;
+        --card-color: #ffffff;
+        --text-color: #333333;
+        --warning-color: #ff6b6b;
+      }
+
       body {
-        font-family: Arial, sans-serif;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         margin: 0;
-        background: #f4f4f9;
-        padding: 20px;
-        color: #333;
-        transition: background 0.3s, color 0.3s;
-        overflow: auto;
+        padding: 0;
+        background-color: var(--background-color);
+        color: var(--text-color);
       }
-      #opening-scene {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      header {
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
-        z-index: 10;
-        background: #fff;
-        background-color: #fff;
-        transition: opacity 1s;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e0e0e0;
       }
-      #dashboard {
-        display: none;
-        position: relative;
-        top: auto;
-        left: auto;
-        transform: translate(-50%, -50%);
-        padding: 20px;
-        background: #f4f4f9;
-        color: #333;
-        flex-direction: column;
-        align-items: center;
-        max-width: 1200px;
-        width: 90%;
-        max-height: 90vh;
-        overflow-y: auto;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        border-radius: 10px;
-        transition: background 0.3s, color 0.3s;
-      }
-      .dark-mode #dashboard {
-        background: #1e272e;
-        color: #d2dae2;
-      }
+
       h1 {
-        text-align: center;
-        color: #2c3e50;
-        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin: 0;
       }
-      .dashboard {
-        display: none;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-        width: 100%;
-      }
-      .chart-container {
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
-        transition: background 0.3s, box-shadow 0.3s;
-      }
-      h2 {
-        margin-top: 0;
-        font-size: 1.5em;
-        color: #2c3e50;
-      }
-      .controls {
+      .refresh-controls {
         display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
+        align-items: center;
+        gap: 15px;
       }
-      .controls button {
-        padding: 10px 20px;
-        background: #3498db;
 
+      .refresh-btn {
+        background-color: var(--primary-color);
+        color: white;
         border: none;
-        border-radius: 8px;
+        padding: 8px 15px;
+        border-radius: 4px;
         cursor: pointer;
-        transition: background 0.3s, transform 0.2s;
+        font-weight: 500;
+        transition: background-color 0.3s;
+      }
+
+      .refresh-btn:hover {
+        background-color: var(--secondary-color);
+      }
+
+      .auto-refresh-toggle {
         display: flex;
         align-items: center;
         gap: 8px;
       }
 
-      .controls button:hover {
-        background: #2980b9;
-        transform: translateY(-2px);
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 25px;
       }
 
-      .controls button i {
-        font-size: 1.2rem;
-      }
-      button {
-        padding: 10px 20px;
-        background: #3498db;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background 0.3s;
-      }
-      button:hover {
-        background: #2980b9;
-      }
-      .footer {
-        text-align: center;
-        margin-top: 20px;
-        color: #666;
-      }
-
-      .footer a {
-        color: #3498db;
-        text-decoration: none;
-      }
-
-      .footer a:hover {
-        text-decoration: underline;
-      }
-      /* Notification System */
-      .notification-container {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        max-width: 300px;
-      }
-
-      .notification {
-        padding: 15px 20px;
+      .card {
+        background-color: var(--card-color);
         border-radius: 8px;
-        color: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 20px;
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+      }
+
+      .card-header {
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        transform: translateX(100%);
-        opacity: 0;
-        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        position: relative;
-        overflow: hidden;
+        margin-bottom: 15px;
       }
 
-      .notification.show {
-        transform: translateX(0);
-        opacity: 1;
+      .card-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin: 0;
       }
 
-      .notification.hide {
-        transform: translateX(100%);
-        opacity: 0;
+      .card-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 10px 0;
       }
 
-      .notification.alert {
-        background: #e74c3c;
-        border-left: 5px solid #c0392b;
+      .card-unit {
+        font-size: 1rem;
+        color: #666;
+        margin-left: 5px;
       }
 
-      .notification.warning {
-        background: #f39c12;
-        border-left: 5px solid #d35400;
-      }
-
-      .notification-icon {
-        margin-right: 12px;
-        font-size: 20px;
-      }
-
-      .notification-content {
-        flex: 1;
-      }
-
-      .notification-title {
-        font-weight: bold;
-        margin-bottom: 5px;
-      }
-
-      .notification-message {
-        font-size: 14px;
-      }
-
-      .notification-close {
-        margin-left: 10px;
-        cursor: pointer;
-        opacity: 0.7;
-        transition: opacity 0.2s;
-      }
-
-      .notification-close:hover {
-        opacity: 1;
-      }
-
-      .notification-progress {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        height: 3px;
-        background: rgba(255, 255, 255, 0.5);
-        width: 100%;
-        transform: scaleX(1);
-        transform-origin: left;
-        animation: progress 3s linear forwards;
-      }
-      .dark-mode {
-        background: #1e272e;
-        color: #d2dae2;
-      }
-      .dark-mode .chart-container {
-        background: rgba(30, 39, 46, 0.8);
-        color: #d2dae2;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-      }
-      .dark-mode .chart-container h2 {
-        color: #ecf0f1;
-      }
-      .dark-mode .footer {
-        color: #b0bec5;
-      }
-      .dark-mode button {
-        background: #808e9b;
-        color: #f1f2f6;
-      }
-      .dark-mode button:hover {
-        background: #576574;
-      }
-      @keyframes tractorMove {
-        0% {
-          left: 0;
-          opacity: 0;
-          transform: translateY(-50%) translateX(-50px) scale(0.9);
-        }
-        15% {
-          opacity: 1;
-          transform: translateY(-50%) translateX(0) scale(1);
-        }
-        85% {
-          left: calc(100% - 1.2em);
-          transform: translateY(-50%) translateX(0) scale(1);
-        }
-        90% {
-          left: calc(100% - 1.2em);
-          transform: translateY(-50%) translateX(10px) rotate(-5deg);
-        }
-        95% {
-          left: calc(100% - 1.2em);
-          transform: translateY(-50%) translateX(-5px) rotate(3deg);
-        }
-        100% {
-          left: calc(100% - 1.2em);
-          transform: translateY(-50%) translateX(0) rotate(0deg);
-          filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
-        }
-      }
-
-      .loading-spinner {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #3498db;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-      }
-      /* Animations */
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
-      @keyframes progress {
-        to {
-          transform: scaleX(0);
-        }
-      }
-      .dashboard-container {
-        animation: fadeIn 1s ease-in-out;
-      }
-      .dashboard-text {
-        position: relative;
+      .status-indicator {
         display: inline-block;
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #1b4d3e; /* Deeper green for a more sophisticated tone */
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-        transition: color 0.3s ease, transform 0.3s ease;
-      }
-      .logo-container {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 1rem;
-        animation: fadeIn 1s ease-out;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
       }
 
-      .crop-guard-logo {
-        max-width: 200px;
-        height: auto;
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+      .status-normal {
+        background-color: #4caf50;
       }
-      /* Optional Hover Effect */
-      .dashboard-text:hover {
-        color: #ffcc00;
-        transform: scale(1.05);
+
+      .status-warning {
+        background-color: var(--warning-color);
       }
-      .farm-f,
-      .dashboard-d {
+
+      .chart-container {
         position: relative;
-      }
-
-      #opening-text {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 2.5rem;
-        color: white;
-        text-align: center;
-        z-index: 20;
-        opacity: 0;
-        animation: fadeIn 3s forwards;
-        white-space: nowrap;
-      }
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-      .farm-icon {
-        font-size: 3.5rem;
-        color: #ffcc00;
-        position: absolute;
-        top: -1.5rem;
-        left: 0;
-        transform: translateY(-100%) scale(0.9);
-        opacity: 0;
-        animation: tractorMove 3s ease-out 0.2s forwards;
-        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
-      }
-
-      /* Optional Hover Effect */
-      .farm-icon:hover {
-        transform: translateY(-100%) scale(1.1);
-        color: #ffaa00;
-        filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
-      }
-
-      #three-container {
-        width: 100%;
         height: 300px;
-      }
-      /* Responsive adjustments */
-      @media (max-width: 1300px) {
-        #dashboard {
-          width: 95%;
-          max-width: 100%;
-          transform: none;
-          left: auto;
-          top: auto;
-          margin: 20px auto;
-        }
+        width: 100%;
       }
 
-      @media (max-width: 1100px) {
-        .dashboard {
-          grid-template-columns: repeat(2, minmax(300px, 1fr));
-        }
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
 
-        h1 {
-          font-size: 2rem;
-        }
+      .data-table th,
+      .data-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #e0e0e0;
+      }
 
-        .chart-container {
-          padding: 15px;
-        }
+      .data-table th {
+        background-color: var(--primary-color);
+        color: white;
+        font-weight: 500;
+      }
+
+      .data-table tr:nth-child(even) {
+        background-color: #f8f9fa;
+      }
+
+      .data-table tr:hover {
+        background-color: #f1f3f5;
+      }
+
+      .flame-status {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+
+      .flame-detected {
+        background-color: var(--warning-color);
+        color: white;
+      }
+
+      .flame-normal {
+        background-color: #4caf50;
+        color: white;
       }
 
       @media (max-width: 768px) {
-        .dashboard {
+        .dashboard-grid {
           grid-template-columns: 1fr;
         }
 
-        #dashboard {
-          width: 100%;
-          border-radius: 0;
-          max-height: none;
-          height: auto;
-        }
-
-        body {
-          padding: 0;
-        }
-
-        h1 {
-          font-size: 1.8rem;
-        }
-
-        .controls {
-          flex-direction: column;
-          align-items: center;
-        }
-
-        .controls button {
-          width: 100%;
-          justify-content: center;
-        }
-      }
-
-      @media (max-width: 480px) {
-        h1 {
-          font-size: 1.5rem;
-        }
-
-        h2 {
-          font-size: 1.2em;
-        }
-
-        .chart-container {
-          padding: 10px;
-        }
-
-        .notification-container {
-          max-width: 100%;
-          right: 10px;
-          left: 10px;
-        }
-
-        .notification {
-          padding: 10px 15px;
+        .card {
+          padding: 15px;
         }
       }
     </style>
   </head>
   <body>
-    <!-- Opening Scene -->
-    <div id="opening-scene">
-      <div id="opening-text">
-        <div class="farm-icon" id="tractor-icon">
-          <i class="fas fa-tractor"></i>
+    <div class="container">
+      <header>
+        <h1>IoT Data Dashboard</h1>
+        <div class="refresh-controls">
+          <div class="auto-refresh-toggle">
+            <label for="auto-refresh">Auto Refresh:</label>
+            <input type="checkbox" id="auto-refresh" checked />
+            <span id="refresh-interval-text">(30s)</span>
+          </div>
+          <button class="refresh-btn" id="manual-refresh">Refresh Now</button>
         </div>
-        <span class="dashboard-text"> <span class="farm-f">W</span>elcome To Your Dashboar<span class="dashboard-d">d</span> </span>
-        <div class="logo-container">
-          <img src="Logo.png" alt="Crop Guard Logo" class="crop-guard-logo" />
+      </header>
+
+      <div class="dashboard-grid">
+        <!-- Current Readings Cards -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Temperature</h2>
+            <span
+              class="status-indicator status-normal"
+              id="temp-status"
+            ></span>
+          </div>
+          <div>
+            <span class="card-value" id="current-temp">--</span>
+            <span class="card-unit">°C</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="tempChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Humidity</h2>
+            <span
+              class="status-indicator status-normal"
+              id="humidity-status"
+            ></span>
+          </div>
+          <div>
+            <span class="card-value" id="current-humidity">--</span>
+            <span class="card-unit">%</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="humidityChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Soil Moisture</h2>
+            <span
+              class="status-indicator status-normal"
+              id="soil-status"
+            ></span>
+          </div>
+          <div>
+            <span class="card-value" id="current-soil">--</span>
+            <span class="card-unit">%</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="soilChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Light Intensity</h2>
+            <span
+              class="status-indicator status-normal"
+              id="light-status"
+            ></span>
+          </div>
+          <div>
+            <span class="card-value" id="current-light">--</span>
+            <span class="card-unit">lux</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="lightChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Flame Detection</h2>
+            <span
+              class="status-indicator status-normal"
+              id="flame-status"
+            ></span>
+          </div>
+          <div>
+            <span class="card-value" id="current-flame">--</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="flameChart"></canvas>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- <div style="display: flex; align-items: center; padding: 20px">
-      <img
-        src="Logo2.png"
-        alt="CropGuard Logo"
-        style="height: 60px; margin-right: 15px"
-      />
-    </div> -->
-    <!-- <h1><i class="fas fa-microchip"></i> IoT Dashboard</h1> -->
-    <!-- Controls -->
-    <div class="controls">
-      <button id="startBtn"><i class="fas fa-play"></i> Start Connection</button>
-      <button id="stopBtn"><i class="fas fa-stop"></i> Stop Connection</button>
-      <button id="exportBtn"><i class="fas fa-download"></i> Export Data</button>
-      <button id="darkModeBtn"><i class="fas fa-moon"></i> Toggle Dark Mode</button>
-    </div>
-
-    <!-- Notification -->
-    <div class="notification-container" id="notificationContainer"></div>
-
-    <!-- Loading Spinner -->
-    <div id="loadingSpinner" class="loading-spinner"></div>
-
-    <!-- Dashboard -->
-    <div class="dashboard">
-      <!-- Line Chart -->
-      <div class="chart-container">
-        <h2>Temperature & Humidity Over Time</h2>
-        <div id="lineChart"></div>
+      <!-- Historical Data Table -->
+      <div class="card" style="margin-top: 30px; grid-column: 1 / -1">
+        <div class="card-header">
+          <h2 class="card-title">Historical Data</h2>
+        </div>
+        <div style="overflow-x: auto">
+          <table class="data-table" id="historical-data">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Temperature (°C)</th>
+                <th>Humidity (%)</th>
+                <th>Soil Moisture (%)</th>
+                <th>Light (lux)</th>
+                <th>Flame</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Data will be inserted here by JavaScript -->
+            </tbody>
+          </table>
+        </div>
       </div>
-
-      <!-- Bar Chart -->
-      <div class="chart-container">
-        <h2>Average Data</h2>
-        <div id="barChart"></div>
-      </div>
-
-      <!-- Pie Chart -->
-      <div class="chart-container">
-        <h2>Data Distribution</h2>
-        <div id="pieChart"></div>
-      </div>
-
-      <!-- 3D Chart -->
-      <div class="chart-container">
-        <h2>3D Data Visualization</h2>
-        <div id="3dChart"></div>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer">
-      <p>Developed by <a href="#" target="_blank">Mohamed Zonkol</a> | Powered by ApexCharts & Plotly</p>
     </div>
 
     <script>
-      let scene, camera, renderer;
-      let farmScene, farmCamera, farmRenderer;
-      let darkMode = false;
-      function initOpeningScene() {
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x2e8b57);
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 0, 5);
+      // Global variables
+      let autoRefreshInterval;
+      const refreshInterval = 30000; // 30 seconds
+      let latestReadingsChart, historicalDataChart;
+      let tempChart, humidityChart, soilChart, lightChart, flameChart;
 
-        // Renderer setup
-        renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById("opening-scene").appendChild(renderer.domElement);
+      // DOM elements
+      const autoRefreshCheckbox = document.getElementById("auto-refresh");
+      const manualRefreshBtn = document.getElementById("manual-refresh");
+      const refreshIntervalText = document.getElementById(
+        "refresh-interval-text"
+      );
 
-        // Create particles for stars effect
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 1000;
-        const posArray = new Float32Array(particlesCount * 3);
+      // Initialize the dashboard
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeCharts();
+        fetchData();
+        setupAutoRefresh();
 
-        for (let i = 0; i < particlesCount * 3; i++) {
-          posArray[i] = (Math.random() - 0.5) * 10;
-        }
-
-        particlesGeometry.setAttribute("position", new THREE.BufferAttribute(posArray, 3));
-
-        const particlesMaterial = new THREE.PointsMaterial({
-          size: 0.015,
-          color: 0x87ceeb,
-        });
-
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-        scene.add(particlesMesh);
-
-        // Animation
-        function animate() {
-          requestAnimationFrame(animate);
-
-          particlesMesh.rotation.x += 0.005;
-          particlesMesh.rotation.y += 0.005;
-
-          renderer.render(scene, camera);
-        }
-        // Start the tractor animation after a short delay
-        setTimeout(() => {
-          const textElement = document.querySelector(".dashboard-text");
-          const fElement = document.querySelector(".farm-f");
-          const tractorIcon = document.getElementById("tractor-icon");
-
-          // Position tractor at F
-          const fRect = fElement.getBoundingClientRect();
-          const textRect = textElement.getBoundingClientRect();
-          const offsetLeft = fRect.left - textRect.left;
-
-          tractorIcon.style.left = `${offsetLeft}px`;
-          tractorIcon.style.opacity = "1";
-        }, 100);
-
-        animate();
-        // Hide the dashboard initially
-        // Resize Handling
-        window.addEventListener("resize", () => {
-          camera.aspect = window.innerWidth / window.innerHeight;
-          camera.updateProjectionMatrix();
-          renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-        // Transition to Dashboard After 5 Seconds
-        setTimeout(() => {
-          const openingScene = document.getElementById("opening-scene");
-          const dashboard = document.querySelector(".dashboard");
-
-          openingScene.style.transition = "opacity 1s";
-          dashboard.style.display = "grid";
-
-          openingScene.style.opacity = "0";
-          dashboard.style.transition = "opacity 1s";
-          dashboard.style.opacity = "0";
-          setTimeout(() => {
-            dashboard.style.opacity = "1";
-            openingScene.style.display = "none";
-          }, 100); // Fade-out duration
-        }, 4500);
-      }
-      document.addEventListener("DOMContentLoaded", () => initOpeningScene());
-
-      // Initialize Opening Scene
-      // Resize handling
-      window.addEventListener("resize", () => {
-        farmCamera.aspect = document.getElementById("three-container").clientWidth / document.getElementById("three-container").clientHeight;
-        farmCamera.updateProjectionMatrix();
-        farmRenderer.setSize(document.getElementById("three-container").clientWidth, document.getElementById("three-container").clientHeight);
+        // Event listeners
+        autoRefreshCheckbox.addEventListener("change", setupAutoRefresh);
+        manualRefreshBtn.addEventListener("click", fetchData);
       });
 
-      // Initialize data arrays
-      let temperatureData = [];
-      let humidityData = [];
-      let soilMoistureData = [];
-      let flameData = [];
-      let lightData = [];
-
-      // Initialize averages and counts arrays
-      let averages = [0, 0, 0, 0, 0];
-      let counts = [0, 0, 0, 0, 0];
-
-      // Line Chart Setup
-      const lineChartOptions = {
-        chart: {
+      function initializeCharts() {
+        // Temperature Chart
+        const tempCtx = document.getElementById("tempChart").getContext("2d");
+        tempChart = new Chart(tempCtx, {
           type: "line",
-          height: 350,
-          animations: {
-            enabled: true,
+          data: {
+            datasets: [
+              {
+                label: "Temperature (°C)",
+                borderColor: "#4a6fa5",
+                backgroundColor: "rgba(74, 111, 165, 0.1)",
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: "#4a6fa5",
+                fill: true,
+                tension: 0.4,
+              },
+            ],
           },
-        },
-        series: [
-          {
-            name: "Temperature (°C)",
-            data: temperatureData,
+          options: getChartOptions("Temperature (°C)"),
+        });
+
+        // Humidity Chart
+        const humidityCtx = document
+          .getElementById("humidityChart")
+          .getContext("2d");
+        humidityChart = new Chart(humidityCtx, {
+          type: "line",
+          data: {
+            datasets: [
+              {
+                label: "Humidity (%)",
+                borderColor: "#6b8cae",
+                backgroundColor: "rgba(107, 140, 174, 0.1)",
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: "#6b8cae",
+                fill: true,
+                tension: 0.4,
+              },
+            ],
           },
-          {
-            name: "Humidity (%)",
-            data: humidityData,
+          options: getChartOptions("Humidity (%)"),
+        });
+
+        // Soil Moisture Chart
+        const soilCtx = document.getElementById("soilChart").getContext("2d");
+        soilChart = new Chart(soilCtx, {
+          type: "line",
+          data: {
+            datasets: [
+              {
+                label: "Soil Moisture (%)",
+                borderColor: "#8e6c88",
+                backgroundColor: "rgba(142, 108, 136, 0.1)",
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: "#8e6c88",
+                fill: true,
+                tension: 0.4,
+              },
+            ],
           },
-          {
-            name: "Soil Moisture",
-            data: soilMoistureData,
+          options: getChartOptions("Soil Moisture (%)"),
+        });
+
+        // Light Intensity Chart
+        const lightCtx = document.getElementById("lightChart").getContext("2d");
+        lightChart = new Chart(lightCtx, {
+          type: "line",
+          data: {
+            datasets: [
+              {
+                label: "Light Intensity (lux)",
+                borderColor: "#ffb347",
+                backgroundColor: "rgba(255, 179, 71, 0.1)",
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: "#ffb347",
+                fill: true,
+                tension: 0.4,
+              },
+            ],
           },
-          {
-            name: "Flame ",
-            data: flameData,
+          options: getChartOptions("Light Intensity (lux)"),
+        });
+
+        // Flame Detection Chart
+        const flameCtx = document.getElementById("flameChart").getContext("2d");
+        flameChart = new Chart(flameCtx, {
+          type: "line",
+          data: {
+            datasets: [
+              {
+                label: "Flame Detection",
+                borderColor: "#ff6b6b",
+                backgroundColor: "rgba(255, 107, 107, 0.1)",
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: "#ff6b6b",
+                fill: true,
+                tension: 0.4,
+              },
+            ],
           },
-          {
-            name: "Light (lux)",
-            data: lightData,
-          },
-        ],
-        stroke: {
-          curve: "smooth",
-          width: 2,
-        },
-        colors: ["#e74c3c", "#3498db", "#2ecc71", "#9b59b6", "#f1c40f"],
-        xaxis: {
-          type: "category",
-          labels: {
-            style: {
-              colors: "#666",
-            },
-          },
-        },
-        yaxis: {
-          labels: {
-            style: {
-              colors: "#666",
-            },
-            formatter: function (value) {
-              return value.toFixed(1); // Format y-axis labels to one decimal place
-            },
-          },
-        },
-        marker: {
-          show: true,
-        },
-        grid: {
-          borderColor: "#eee",
-        },
-        tooltip: {
-          enabled: true,
-          shared: true,
-          intersect: false,
-        },
-        legend: {
-          position: "bottom",
-          labels: {
-            colors: "#b0bec5", // Neutral gray-blue, visible in both modes
-          },
-        },
-      };
-
-      const lineChart = new ApexCharts(document.querySelector("#lineChart"), lineChartOptions);
-      lineChart.render();
-
-      // Bar Chart Setup
-      const barChartOptions = {
-        chart: {
-          type: "bar",
-          height: 350,
-        },
-        series: [{ name: "Average Values", data: [0, 0, 0, 0, 0] }],
-        colors: ["#e74c3c", "#3498db", "#2ecc71", "#9b59b6", "#f1c40f"],
-        xaxis: {
-          categories: ["Temperature", "Humidity", "Soil Moisture", "Flame", "Light"],
-          labels: {
-            style: {
-              colors: "#666",
-            },
-          },
-        },
-        yaxis: {
-          labels: {
-            style: {
-              colors: "#666",
-            },
-            formatter: function (value) {
-              return value.toFixed(1); // Format y-axis labels to one decimal place
-            },
-            reversed: true,
-          },
-        },
-        grid: {
-          borderColor: "#eee",
-        },
-        tooltip: {
-          enabled: true,
-          shared: true,
-          intersect: false,
-        },
-        legend: {
-          position: "bottom",
-          labels: {
-            colors: "#b0bec5", // Neutral gray-blue, visible in both modes
-          },
-        },
-        plotOptions: {
-          bar: {
-            borderRadius: 2, // Rounded corners for bars
-            columnWidth: "70%",
-            distributed: true,
-          },
-        },
-      };
-      const barChart = new ApexCharts(document.querySelector("#barChart"), barChartOptions);
-      barChart.render();
-
-      // Pie Chart Setup
-      const pieChartOptions = {
-        chart: {
-          type: "pie",
-          height: 350,
-        },
-        series: [],
-        labels: ["Temperature", "Humidity", "Soil Moisture", "Flame", "Light"],
-        colors: ["#e74c3c", "#3498db", "#2ecc71", "#9b59b6", "#f1c40f"],
-        tooltip: {
-          enabled: true,
-        },
-        legend: {
-          position: "bottom",
-          labels: {
-            colors: "#b0bec5", // Neutral gray-blue, visible in both modes
-          },
-        },
-      };
-
-      const pieChart = new ApexCharts(document.querySelector("#pieChart"), pieChartOptions);
-      pieChart.render();
-
-      // 3D Chart Setup
-      const layout3D = {
-        margin: { l: 0, r: 0, b: 0, t: 0 },
-        scene: {
-          xaxis: { title: "Time" },
-          yaxis: { title: "Value" },
-          zaxis: { title: "Data Type" },
-        },
-      };
-
-      // Function to update average data
-      function updateAverages() {
-        const round = (value) => Math.round(value * 100) / 100;
-
-        const avgTemperature = temperatureData.reduce((sum, point) => sum + point.y, 0) / temperatureData.length || 0;
-        const avgHumidity = humidityData.reduce((sum, point) => sum + point.y, 0) / humidityData.length || 0;
-        const avgSoilMoisture = soilMoistureData.reduce((sum, point) => sum + point.y, 0) / soilMoistureData.length || 0;
-        const avgFlame = flameData.reduce((sum, point) => sum + point.y, 0) / flameData.length || 0;
-        const avgLight = lightData.reduce((sum, point) => sum + point.y, 0) / lightData.length || 0;
-
-        // Update the bar chart with the correct data and rounded values
-        barChart.updateSeries([
-          {
-            name: "Average Values",
-            data: [round(avgTemperature), round(avgHumidity), round(avgSoilMoisture), round(avgFlame), round(avgLight)],
-          },
-        ]);
-      }
-
-      // Function to add data to the charts
-      function addData(label, temperature, humidity, soilMoisture, flame, light) {
-        // Add data to the line chart
-        temperatureData.push({ x: label, y: temperature });
-        humidityData.push({ x: label, y: humidity });
-        soilMoistureData.push({ x: label, y: soilMoisture });
-        flameData.push({ x: label, y: flame });
-        lightData.push({ x: label, y: light });
-        lineChart.updateSeries([
-          { name: "Temperature (°C)", data: temperatureData },
-          { name: "Humidity (%)", data: humidityData },
-          { name: "Soil Moisture (%)", data: soilMoistureData },
-          { name: "Flame (°C)", data: flameData },
-          { name: "Light (lux)", data: lightData },
-        ]);
-
-        // Update averages
-        updateAverages();
-        checkThresholds(temperature, humidity, soilMoisture, flame, light);
-        // Update the pie chart with the latest data
-        pieChart.updateSeries([temperature, humidity, soilMoisture, flame, light]);
-
-        // Update the 3D chart
-        const data3D = [
-          {
-            type: "surface",
-            z: [temperatureData.map((point) => point.y), humidityData.map((point) => point.y), soilMoistureData.map((point) => point.y), flameData.map((point) => point.y), lightData.map((point) => point.y)],
-            colorscale: "Viridis",
-          },
-        ];
-        Plotly.newPlot("3dChart", data3D, layout3D);
-
-        // Check for thresholds and show notifications
-        // Notification System
-        function showNotification(type, title, message, duration = 3000) {
-          const container = document.getElementById("notificationContainer");
-          const notification = document.createElement("div");
-
-          // Set notification type and content
-          notification.className = `notification ${type}`;
-          notification.innerHTML = `
-              <div class="notification-icon">
-                  ${type === "alert" ? '<i class="fas fa-exclamation-circle"></i>' : '<i class="fas fa-exclamation-triangle"></i>'}
-              </div>
-              <div class="notification-content">
-                  <div class="notification-title">${title}</div>
-                  <div class="notification-message">${message}</div>
-              </div>
-              <div class="notification-close">
-                  <i class="fas fa-times"></i>
-              </div>
-              <div class="notification-progress"></div>
-          `;
-
-          // Add to container
-          container.appendChild(notification);
-
-          // Trigger show animation
-          setTimeout(() => {
-            notification.classList.add("show");
-          }, 10);
-
-          // Close button functionality
-          const closeBtn = notification.querySelector(".notification-close");
-          closeBtn.addEventListener("click", () => {
-            closeNotification(notification);
-          });
-
-          // Auto-close after duration
-          if (duration > 0) {
-            setTimeout(() => {
-              closeNotification(notification);
-            }, duration);
-          }
-
-          return notification;
-        }
-
-        function closeNotification(notification) {
-          notification.classList.remove("show");
-          notification.classList.add("hide");
-
-          // Remove from DOM after animation completes
-          setTimeout(() => {
-            notification.remove();
-          }, 300);
-        }
-
-        // Threshold check with improved notifications
-        function checkThresholds(temperature, humidity, soilMoisture, flame, light) {
-          // Clear previous notifications
-          document.getElementById("notificationContainer").innerHTML = "";
-
-          // Check each threshold
-          if (temperature > 30) {
-            showNotification("alert", "High Temperature", `Temperature is ${temperature}°C (Above 30°C threshold)`);
-          } else if (temperature > 25) {
-            showNotification("warning", "Elevated Temperature", `Temperature is ${temperature}°C (Approaching threshold)`);
-          }
-
-          if (humidity > 60) {
-            showNotification("alert", "High Humidity", `Humidity is ${humidity}% (Above 60% threshold)`);
-          } else if (humidity > 50) {
-            showNotification("warning", "Elevated Humidity", `Humidity is ${humidity}% (Approaching threshold)`);
-          }
-
-          if (soilMoisture < 30) {
-            showNotification("alert", "Low Soil Moisture", `Soil Moisture level is ${soilMoisture}% (Below 30% threshold)`);
-          } else if (soilMoisture > 50) {
-            showNotification("warning", "Elevated Soil Moisture", `Soil Moisture level is ${soilMoisture}% (Approaching threshold)`);
-          }
-
-          if (flame > 0) {
-            showNotification("alert", "High Flame", `Flame level is ${flame}°C (Above 0°C threshold)`);
-          }
-
-          if (light > 1200) {
-            showNotification("alert", "High Light", `Light is ${light}lux (Above 1200lux threshold)`);
-          } else if (light > 1000) {
-            showNotification("warning", "Elevated Light", `Light is ${light}lux (Approaching threshold)`);
-          }
-        }
-      }
-
-      // Simulate live data updates
-      let time = 0;
-      let interval;
-      function startUpdates() {
-        interval = setInterval(() => {
-          const label = `12:${time.toString().padStart(2, "0")}`;
-          const temperature = 20 + Math.random() * 15; // 20-35°C
-          const humidity = 40 + Math.random() * 40; // 40-80%
-          const soilMoisture = 30 + Math.random() * 40; // 30-70%
-          const flame = Math.random() > 0.5 ? 0 : Math.random() * 100; // 0-100°C, flame is either present or not
-          const light = 100 + Math.random() * 900; // 100-1000 lux
-          addData(label, temperature, humidity, soilMoisture, flame, light);
-          time += 5;
-        }, 5000);
-      }
-
-      function stopUpdates() {
-        clearInterval(interval);
-      }
-
-      // Export data as JSON with improved error handling
-      function exportData() {
-        try {
-          const data = {
-            timestamp: new Date().toISOString(),
-            temperature: temperatureData,
-            humidity: humidityData,
-            soilMoisture: soilMoistureData,
-            flame: flameData,
-            light: lightData,
-            metadata: {
-              exportedBy: "IoT Dashboard",
-              version: "1.0.0",
-              totalDataPoints: temperatureData.length,
-            },
-          };
-
-          const jsonString = JSON.stringify(data, null, 2);
-          const blob = new Blob([jsonString], {
-            type: "application/json;charset=utf-8",
-          });
-
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-          a.href = url;
-          a.download = `iot-data-${timestamp}.json`;
-          a.style.display = "none";
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-
-          console.log("Data exported successfully");
-        } catch (error) {
-          console.error("Export failed:", error);
-          alert("Export failed. Please try again.");
-        }
-      }
-
-      // Toggle dark mode
-      function toggleDarkMode() {
-        darkMode = !darkMode;
-
-        document.body.classList.toggle("dark-mode");
-        const isDarkMode = document.body.classList.contains("dark-mode");
-
-        // Update charts
-
-        // Update chart themes
-        if (darkMode) {
-          lineChart.updateOptions({
-            chart: { foreColor: "#b2bec3" },
-            grid: { borderColor: "#2d3436" },
-            xaxis: { labels: { style: { colors: "#b2bec3" } } },
-            yaxis: { labels: { style: { colors: "#b2bec3" } } },
-            legend: { labels: { colors: "#b2bec3" } },
-          });
-
-          barChart.updateOptions({
-            chart: { foreColor: "#b2bec3" },
-            xaxis: { labels: { style: { colors: "#b2bec3" } } },
-            yaxis: { labels: { style: { colors: "#b2bec3" } } },
-            legend: { labels: { colors: "#b2bec3" } },
-          });
-
-          pieChart.updateOptions({
-            chart: { foreColor: "#b2bec3" },
-            legend: { labels: { colors: "#b2bec3" } },
-          });
-        } else {
-          lineChart.updateOptions({
-            chart: { foreColor: "#333" },
-            grid: { borderColor: "#eee" },
-            xaxis: { labels: { style: { colors: "#666" } } },
-            yaxis: { labels: { style: { colors: "#666" } } },
-            legend: { labels: { colors: "#b0bec5" } },
-          });
-
-          barChart.updateOptions({
-            chart: { foreColor: "#333" },
-            xaxis: { labels: { style: { colors: "#666" } } },
-            yaxis: { labels: { style: { colors: "#666" } } },
-            legend: { labels: { colors: "#b0bec5" } },
-          });
-
-          pieChart.updateOptions({
-            chart: { foreColor: "#333" },
-            legend: { labels: { colors: "#b0bec5" } },
-          });
-        }
-      }
-      // Update chart options for dark mode
-      function updateChartsForDarkMode(isDarkMode) {
-        const newBorderColor = isDarkMode ? "#34495e" : "#eee";
-
-        charts.forEach((chart) => {
-          chart.updateOptions({
-            grid: {
-              borderColor: newBorderColor,
-            },
-          });
+          options: getChartOptions("Flame Detection (0 = No, 1 = Yes)"),
         });
       }
 
-      // Event listeners
-      document.getElementById("startBtn").addEventListener("click", startUpdates);
-      document.getElementById("stopBtn").addEventListener("click", stopUpdates);
-      document.getElementById("exportBtn").addEventListener("click", exportData);
-      document.getElementById("darkModeBtn").addEventListener("click", toggleDarkMode);
+      function getChartOptions(title) {
+        return {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false,
+            },
+            tooltip: {
+              mode: "index",
+              intersect: false,
+            },
+          },
+          scales: {
+            x: {
+              type: "time",
+              time: {
+                tooltipFormat: "MMM D, h:mm:ss a",
+                displayFormats: {
+                  minute: "h:mm a",
+                },
+              },
+              title: {
+                display: true,
+                text: "Time",
+              },
+            },
+            y: {
+              title: {
+                display: true,
+                text: title,
+              },
+            },
+          },
+          interaction: {
+            mode: "nearest",
+            axis: "x",
+            intersect: false,
+          },
+        };
+      }
+
+      function setupAutoRefresh() {
+        if (autoRefreshCheckbox.checked) {
+          refreshIntervalText.textContent = `(${refreshInterval / 1000}s)`;
+          autoRefreshInterval = setInterval(fetchData, refreshInterval);
+        } else {
+          refreshIntervalText.textContent = "(Off)";
+          clearInterval(autoRefreshInterval);
+        }
+      }
+
+      async function fetchData() {
+        try {
+          // Show loading state
+          manualRefreshBtn.disabled = true;
+          manualRefreshBtn.textContent = "Refreshing...";
+
+          // Fetch latest readings
+          const latestResponse = await fetch(
+            "https://crop-pilot-api.azurewebsites.net/api/IoT/latest-reading"
+          );
+          const latestData = await latestResponse.json();
+
+          // Fetch historical data
+          const historicalResponse = await fetch(
+            "https://crop-pilot-api.azurewebsites.net/api/IoT/Get-All-Data"
+          );
+          const historicalData = await historicalResponse.json();
+
+          // Process and display data
+          updateCurrentReadings(latestData.data);
+          updateHistoricalData(historicalData.data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          alert("Failed to fetch data. Please check the console for details.");
+        } finally {
+          // Reset button state
+          manualRefreshBtn.disabled = false;
+          manualRefreshBtn.textContent = "Refresh Now";
+        }
+      }
+
+      function updateCurrentReadings(data) {
+        if (!data || data.length === 0) return;
+
+        // Get the most recent reading
+        const latest = data[0];
+
+        // Update current values
+        document.getElementById("current-temp").textContent =
+          latest.temperature.toFixed(1);
+        document.getElementById("current-humidity").textContent =
+          latest.humidity.toFixed(1);
+        document.getElementById("current-soil").textContent =
+          latest.soilMoisture.toFixed(0);
+        document.getElementById("current-light").textContent =
+          latest.lightIntensity.toFixed(0);
+
+        // Update flame detection
+        const flameElement = document.getElementById("current-flame");
+        if (latest.flame === 0) {
+          flameElement.textContent = "No Flame Detected";
+          flameElement.className = "flame-status flame-normal";
+          document.getElementById("flame-status").className =
+            "status-indicator status-normal";
+        } else {
+          flameElement.textContent = "FLAME DETECTED!";
+          flameElement.className = "flame-status flame-detected";
+          document.getElementById("flame-status").className =
+            "status-indicator status-warning";
+        }
+
+        // Update status indicators based on thresholds
+        updateStatusIndicator("temp-status", latest.temperature, 10, 35);
+        updateStatusIndicator("humidity-status", latest.humidity, 30, 80);
+        updateStatusIndicator("soil-status", latest.soilMoisture, 20, 80);
+        updateStatusIndicator("light-status", latest.lightIntensity, 10, 90);
+
+        // Update charts with latest readings data
+        updateChart(tempChart, data, "temperature", "Temperature (°C)");
+        updateChart(humidityChart, data, "humidity", "Humidity (%)");
+        updateChart(soilChart, data, "soilMoisture", "Soil Moisture (%)");
+        updateChart(
+          lightChart,
+          data,
+          "lightIntensity",
+          "Light Intensity (lux)"
+        );
+        updateChart(flameChart, data, "flame", "Flame Detection");
+      }
+
+      function updateStatusIndicator(
+        elementId,
+        value,
+        minThreshold,
+        maxThreshold
+      ) {
+        const element = document.getElementById(elementId);
+        if (value < minThreshold || value > maxThreshold) {
+          element.className = "status-indicator status-warning";
+        } else {
+          element.className = "status-indicator status-normal";
+        }
+      }
+
+      function updateChart(chart, data, dataKey, label) {
+        // Prepare chart data
+        const labels = [];
+        const values = [];
+
+        // Process data in reverse to show newest first
+        const reversedData = [...data].reverse();
+
+        reversedData.forEach((reading, index) => {
+          // Create timestamp labels (using index as proxy since we don't have actual timestamps)
+          const now = new Date();
+          const timestamp = new Date(
+            now - (reversedData.length - index - 1) * 60000
+          ); // 1 minute intervals
+          labels.push(timestamp);
+
+          values.push(reading[dataKey]);
+        });
+
+        // Update chart
+        chart.data.labels = labels;
+        chart.data.datasets[0].data = values;
+        chart.data.datasets[0].label = label;
+        chart.update();
+      }
+
+      function updateHistoricalData(data) {
+        if (!data || data.length === 0) return;
+
+        const tableBody = document.querySelector("#historical-data tbody");
+        tableBody.innerHTML = "";
+
+        // Process data in reverse to show newest first
+        const reversedData = [...data].reverse();
+
+        reversedData.forEach((reading) => {
+          const row = document.createElement("tr");
+
+          // Create timestamp cell (using current time since we don't have actual timestamps)
+          const timestampCell = document.createElement("td");
+          timestampCell.textContent = new Date().toLocaleString();
+
+          // Temperature cell
+          const tempCell = document.createElement("td");
+          tempCell.textContent = reading.temperature
+            ? reading.temperature.toFixed(1)
+            : "--";
+
+          // Humidity cell
+          const humidityCell = document.createElement("td");
+          humidityCell.textContent = reading.humidity
+            ? reading.humidity.toFixed(1)
+            : "--";
+
+          // Soil moisture cell
+          const soilCell = document.createElement("td");
+          soilCell.textContent = reading.soilMoisture
+            ? reading.soilMoisture.toFixed(0)
+            : "--";
+
+          // Light intensity cell
+          const lightCell = document.createElement("td");
+          lightCell.textContent = reading.lightIntensity
+            ? reading.lightIntensity.toFixed(0)
+            : "--";
+
+          // Flame detection cell
+          const flameCell = document.createElement("td");
+          const flameSpan = document.createElement("span");
+          if (reading.flame === 0) {
+            flameSpan.textContent = "No";
+            flameSpan.className = "flame-status flame-normal";
+          } else {
+            flameSpan.textContent = "Yes";
+            flameSpan.className = "flame-status flame-detected";
+          }
+          flameCell.appendChild(flameSpan);
+
+          // Append all cells to the row
+          row.appendChild(timestampCell);
+          row.appendChild(tempCell);
+          row.appendChild(humidityCell);
+          row.appendChild(soilCell);
+          row.appendChild(lightCell);
+          row.appendChild(flameCell);
+
+          // Append row to table
+          tableBody.appendChild(row);
+        });
+      }
     </script>
   </body>
 </html>
