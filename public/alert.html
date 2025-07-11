@@ -6,13 +6,22 @@
     <meta name="description" content="Real-time IoT Dashboard with SignalR" />
     <title>IoT Monitoring Dashboard</title>
 
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>"
+    />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -79,7 +88,8 @@
       }
 
       body {
-        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         background-color: #f5f7fa;
         color: var(--dark);
         line-height: 1.6;
@@ -600,7 +610,10 @@
       <div class="container">
         <header class="header">
           <div class="header-title">
-            <i class="fas fa-chart-line" style="font-size: 1.5rem; color: var(--primary)"></i>
+            <i
+              class="fas fa-chart-line"
+              style="font-size: 1.5rem; color: var(--primary)"
+            ></i>
             <h1>IoT Monitoring Dashboard</h1>
           </div>
           <div class="header-actions">
@@ -608,7 +621,9 @@
               <div class="connection-dot"></div>
               <span>Connecting...</span>
             </div>
-            <button id="refreshBtn" class="btn btn-outline"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <button id="refreshBtn" class="btn btn-outline">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
           </div>
         </header>
 
@@ -619,8 +634,12 @@
               <div class="card-header">
                 <h2 class="card-title">Environmental Data</h2>
                 <div class="d-flex gap-sm">
-                  <button id="pauseChartBtn" class="btn btn-outline btn-sm"><i class="fas fa-pause"></i> Pause</button>
-                  <button id="exportChartBtn" class="btn btn-outline btn-sm"><i class="fas fa-download"></i> Export</button>
+                  <button id="pauseChartBtn" class="btn btn-outline btn-sm">
+                    <i class="fas fa-pause"></i> Pause
+                  </button>
+                  <button id="exportChartBtn" class="btn btn-outline btn-sm">
+                    <i class="fas fa-download"></i> Export
+                  </button>
                 </div>
               </div>
               <div class="chart-container">
@@ -633,7 +652,9 @@
               <div class="card-header">
                 <h2 class="card-title">Historical Data</h2>
                 <div class="d-flex gap-sm">
-                  <button id="exportDataBtn" class="btn btn-outline btn-sm"><i class="fas fa-download"></i> CSV</button>
+                  <button id="exportDataBtn" class="btn btn-outline btn-sm">
+                    <i class="fas fa-download"></i> CSV
+                  </button>
                 </div>
               </div>
               <div class="table-container">
@@ -650,10 +671,16 @@
                 </table>
               </div>
               <div class="pagination">
-                <div class="pagination-info" id="paginationInfo">Showing 0 of 0 entries</div>
+                <div class="pagination-info" id="paginationInfo">
+                  Showing 0 of 0 entries
+                </div>
                 <div class="pagination-controls">
-                  <button id="prevPageBtn" class="btn btn-outline" disabled><i class="fas fa-chevron-left"></i> Previous</button>
-                  <button id="nextPageBtn" class="btn btn-outline" disabled>Next <i class="fas fa-chevron-right"></i></button>
+                  <button id="prevPageBtn" class="btn btn-outline" disabled>
+                    <i class="fas fa-chevron-left"></i> Previous
+                  </button>
+                  <button id="nextPageBtn" class="btn btn-outline" disabled>
+                    Next <i class="fas fa-chevron-right"></i>
+                  </button>
                 </div>
               </div>
             </div>
@@ -664,10 +691,14 @@
             <div class="card">
               <div class="card-header">
                 <h2 class="card-title">Alerts</h2>
-                <button id="clearAlertsBtn" class="btn btn-outline btn-sm"><i class="fas fa-trash-alt"></i> Clear</button>
+                <button id="clearAlertsBtn" class="btn btn-outline btn-sm">
+                  <i class="fas fa-trash-alt"></i> Clear
+                </button>
               </div>
               <div class="alerts-container" id="alertsContainer">
-                <div class="text-center text-muted mt-md">No alerts received yet</div>
+                <div class="text-center text-muted mt-md">
+                  No alerts received yet
+                </div>
               </div>
             </div>
 
@@ -701,7 +732,12 @@
 
                 <div class="mt-lg">
                   <div class="text-muted">Current Status</div>
-                  <div id="currentStatus" class="status-badge status-normal mt-sm"><i class="fas fa-check-circle"></i> Normal</div>
+                  <div
+                    id="currentStatus"
+                    class="status-badge status-normal mt-sm"
+                  >
+                    <i class="fas fa-check-circle"></i> Normal
+                  </div>
                 </div>
               </div>
             </div>
@@ -709,7 +745,10 @@
         </main>
 
         <footer class="text-center text-muted mt-xl">
-          <p>IoT Monitoring Dashboard &copy; <span id="currentYear"></span> | Version 1.0.0</p>
+          <p>
+            IoT Monitoring Dashboard &copy; <span id="currentYear"></span> |
+            Version 1.0.0
+          </p>
         </footer>
       </div>
     </div>
@@ -725,7 +764,7 @@
           alertVolume: 0.5, // 50% volume for regular alerts
         },
         rowsPerPage: 10,
-        apiEndpoint: "https://alert-mointer-ctfudeh2dfa3f4de.uaenorth-01.azurewebsites.net/api/negotiate?code=C2njEF5Z1jF7wTCz6vuRNl0CCEQqARYos57eZiuB-ZaiAzFuCvBXwA==",
+        apiEndpoint: "http://localhost:7186/api/negotiate",
         reconnectDelay: 5000,
         criticalTempThreshold: 25,
         warningTempThreshold: 20,
@@ -783,7 +822,8 @@
       // Initialize the application
       document.addEventListener("DOMContentLoaded", () => {
         // Set current year in footer
-        document.getElementById("currentYear").textContent = new Date().getFullYear();
+        document.getElementById("currentYear").textContent =
+          new Date().getFullYear();
 
         // Initialize Chart
         initializeChart();
@@ -847,7 +887,9 @@
                     chart.data.datasets.forEach((dataset) => {
                       dataset.data.push({
                         x: Date.now(),
-                        y: dataset.label.includes("Temperature") ? state.stats.currentTemp || null : state.stats.currentHumidity || null,
+                        y: dataset.label.includes("Temperature")
+                          ? state.stats.currentTemp || null
+                          : state.stats.currentHumidity || null,
                       });
 
                       // Remove older data to keep the chart clean
@@ -960,7 +1002,9 @@
         });
 
         elements.nextPageBtn.addEventListener("click", () => {
-          const totalPages = Math.ceil(state.dataHistory.length / config.rowsPerPage);
+          const totalPages = Math.ceil(
+            state.dataHistory.length / config.rowsPerPage
+          );
           if (state.currentPage < totalPages - 1) {
             state.currentPage++;
             renderHistoryTable();
@@ -985,7 +1029,9 @@
 
         elements.pauseChartBtn.addEventListener("click", () => {
           state.isChartPaused = !state.isChartPaused;
-          elements.pauseChartBtn.innerHTML = state.isChartPaused ? '<i class="fas fa-play"></i> Resume' : '<i class="fas fa-pause"></i> Pause';
+          elements.pauseChartBtn.innerHTML = state.isChartPaused
+            ? '<i class="fas fa-play"></i> Resume'
+            : '<i class="fas fa-pause"></i> Pause';
         });
 
         elements.exportDataBtn.addEventListener("click", () => {
@@ -995,13 +1041,27 @@
           }
 
           try {
-            const headers = ["Timestamp", "Temperature (°C)", "Humidity (%)", "Status"];
-            const rows = state.dataHistory.map((item) => [item.timestamp, item.temperature.toFixed(2), item.humidity.toFixed(2), item.status]);
+            const headers = [
+              "Timestamp",
+              "Temperature (°C)",
+              "Humidity (%)",
+              "Status",
+            ];
+            const rows = state.dataHistory.map((item) => [
+              item.timestamp,
+              item.temperature.toFixed(2),
+              item.humidity.toFixed(2),
+              item.status,
+            ]);
 
             let csvContent = headers.join(",") + "\n";
             rows.forEach((row) => {
               // Escape any commas in the data
-              const escapedRow = row.map((field) => (typeof field === "string" && field.includes(",") ? `"${field}"` : field));
+              const escapedRow = row.map((field) =>
+                typeof field === "string" && field.includes(",")
+                  ? `"${field}"`
+                  : field
+              );
               csvContent += escapedRow.join(",") + "\n";
             });
 
@@ -1060,7 +1120,9 @@
           });
 
           if (!response.ok) {
-            throw new Error(`Negotiation failed: ${response.status} ${response.statusText}`);
+            throw new Error(
+              `Negotiation failed: ${response.status} ${response.statusText}`
+            );
           }
 
           const { url, accessToken } = await response.json();
@@ -1092,13 +1154,19 @@
           });
 
           state.connection.onreconnected((connectionId) => {
-            console.log("Connection reestablished. New connection ID:", connectionId);
+            console.log(
+              "Connection reestablished. New connection ID:",
+              connectionId
+            );
             updateConnectionStatus("connected");
             hideLoading();
           });
 
           await state.connection.start();
-          console.log("SignalR connection established. Connection ID:", state.connection.connectionId);
+          console.log(
+            "SignalR connection established. Connection ID:",
+            state.connection.connectionId
+          );
           updateConnectionStatus("connected");
           hideLoading();
         } catch (error) {
@@ -1111,11 +1179,16 @@
 
       function handleIoTSensorData(message) {
         try {
-          const data = typeof message === "string" ? JSON.parse(message) : message;
+          const data =
+            typeof message === "string" ? JSON.parse(message) : message;
           const timestamp = new Date().toISOString();
 
-          const temperature = parseFloat(data.CurrentTemperature ?? data.Temperature ?? 0);
-          const humidity = parseFloat(data.CurrentHumidity ?? data.Humidity ?? 0);
+          const temperature = parseFloat(
+            data.CurrentTemperature ?? data.Temperature ?? 0
+          );
+          const humidity = parseFloat(
+            data.CurrentHumidity ?? data.Humidity ?? 0
+          );
           const flameValue = parseInt(data.CurrentFlame ?? data.Flame ?? 0);
 
           let status = data.RiskLevel ?? data.status ?? "normal";
@@ -1125,9 +1198,15 @@
           }
 
           if (status === "normal") {
-            if (temperature >= config.criticalTempThreshold || humidity >= config.criticalHumidityThreshold) {
+            if (
+              temperature >= config.criticalTempThreshold ||
+              humidity >= config.criticalHumidityThreshold
+            ) {
               status = "critical";
-            } else if (temperature >= config.warningTempThreshold || humidity >= config.warningHumidityThreshold) {
+            } else if (
+              temperature >= config.warningTempThreshold ||
+              humidity >= config.warningHumidityThreshold
+            ) {
               status = "warning";
             }
           }
@@ -1168,7 +1247,9 @@
           fireAlertDiv.style.animation = "blink 1s infinite";
 
           fireAlertDiv.innerHTML = `
-      <div>🔥 FIRE DETECTED! Flame: ${flameValue}, Temp: ${temperature.toFixed(1)}°C 🔥</div>
+      <div>🔥 FIRE DETECTED! Flame: ${flameValue}, Temp: ${temperature.toFixed(
+            1
+          )}°C 🔥</div>
       <button id="dismissFireAlert" style="
         margin-top: 10px;
         padding: 5px 15px;
@@ -1188,15 +1269,17 @@
           fireAlarm.loop = config.soundSettings.fireAlarmLoop;
           fireAlarm.play().catch((e) => console.log("Audio play failed:", e));
 
-          document.getElementById("dismissFireAlert").addEventListener("click", () => {
-            fireAlarm.pause();
-            fireAlarm.currentTime = 0;
-            fireAlertDiv.remove();
-            state.fireAlert.active = false;
-            if (state.fireAlert.timeout) {
-              clearTimeout(state.fireAlert.timeout);
-            }
-          });
+          document
+            .getElementById("dismissFireAlert")
+            .addEventListener("click", () => {
+              fireAlarm.pause();
+              fireAlarm.currentTime = 0;
+              fireAlertDiv.remove();
+              state.fireAlert.active = false;
+              if (state.fireAlert.timeout) {
+                clearTimeout(state.fireAlert.timeout);
+              }
+            });
 
           if (!config.soundSettings.fireAlarmLoop) {
             state.fireAlert.timeout = setTimeout(() => {
@@ -1338,16 +1421,29 @@
       function updatePaginationInfo() {
         const totalItems = state.dataHistory.length;
         const startItem = state.currentPage * config.rowsPerPage + 1;
-        const endItem = Math.min((state.currentPage + 1) * config.rowsPerPage, totalItems);
+        const endItem = Math.min(
+          (state.currentPage + 1) * config.rowsPerPage,
+          totalItems
+        );
 
-        elements.paginationInfo.textContent = totalItems > 0 ? `Showing ${startItem} to ${endItem} of ${totalItems} entries` : "Showing 0 of 0 entries";
+        elements.paginationInfo.textContent =
+          totalItems > 0
+            ? `Showing ${startItem} to ${endItem} of ${totalItems} entries`
+            : "Showing 0 of 0 entries";
 
         elements.prevPageBtn.disabled = state.currentPage === 0;
-        elements.nextPageBtn.disabled = (state.currentPage + 1) * config.rowsPerPage >= totalItems;
+        elements.nextPageBtn.disabled =
+          (state.currentPage + 1) * config.rowsPerPage >= totalItems;
       }
 
       // Create Alert
-      function createAlert(timestamp, temperature, humidity, status, flameValue) {
+      function createAlert(
+        timestamp,
+        temperature,
+        humidity,
+        status,
+        flameValue
+      ) {
         const alertSound = document.getElementById("alertSound");
         alertSound.volume = config.soundSettings.alertVolume;
 
@@ -1368,22 +1464,27 @@
             alertClass = "alert-critical";
             icon = "fa-exclamation-circle";
             title = "Critical Alert";
-            alertSound.src = "https://assets.mixkit.co/sfx/preview/mixkit-serious-alarm-959.mp3";
+            alertSound.src =
+              "https://assets.mixkit.co/sfx/preview/mixkit-serious-alarm-959.mp3";
             break;
           case "warning":
             alertClass = "alert-warning";
             icon = "fa-exclamation-triangle";
             title = "Warning Alert";
-            alertSound.src = "https://assets.mixkit.co/sfx/preview/mixkit-alarm-996.mp3";
+            alertSound.src =
+              "https://assets.mixkit.co/sfx/preview/mixkit-alarm-996.mp3";
             break;
           case "normal":
           default:
             alertClass = "alert-normal";
             icon = "fa-info-circle";
             title = "Normal Alert";
-            alertSound.src = "https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3";
+            alertSound.src =
+              "https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3";
         }
-        alertSound.play().catch((e) => console.log("Alert sound play failed:", e));
+        alertSound
+          .play()
+          .catch((e) => console.log("Alert sound play failed:", e));
         const alertDiv = document.createElement("div");
         alertDiv.className = `alert ${alertClass} fade-in`;
         alertDiv.innerHTML = `
@@ -1393,7 +1494,9 @@
           <div class="alert-content">
             <div class="alert-title">${title}</div>
             <div class="alert-message">
-              Temperature: ${temperature.toFixed(1)}°C, Humidity: ${humidity.toFixed(1)}%
+              Temperature: ${temperature.toFixed(
+                1
+              )}°C, Humidity: ${humidity.toFixed(1)}%
             </div>
             <div class="alert-timestamp">
               ${formattedTime} • ${formattedDate}
@@ -1401,7 +1504,10 @@
           </div>
         `;
 
-        elements.alertsContainer.insertBefore(alertDiv, elements.alertsContainer.firstChild);
+        elements.alertsContainer.insertBefore(
+          alertDiv,
+          elements.alertsContainer.firstChild
+        );
 
         const alerts = elements.alertsContainer.querySelectorAll(".alert");
         if (alerts.length > config.alertsLimit) {
@@ -1433,7 +1539,8 @@
             statusText = "Connecting...";
         }
 
-        elements.connectionStatus.querySelector("span").textContent = statusText;
+        elements.connectionStatus.querySelector("span").textContent =
+          statusText;
 
         if (status === "connected") {
           elements.appContent.style.display = "block";
@@ -1452,7 +1559,10 @@
       }
     </script>
     <audio id="fireAlarmSound" preload="auto">
-      <source src="./sound/mixkit-facility-alarm-sound-999.wav" type="audio/wav" />
+      <source
+        src="./sound/mixkit-facility-alarm-sound-999.wav"
+        type="audio/wav"
+      />
       Your browser does not support the audio element.
     </audio>
 
